@@ -119,13 +119,13 @@ span {
   color: #1a1f36;
 }
 label {
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 .reset-pass a,
 label {
-  font-size: 14px;
+  /* font-size: 14px; */
   font-weight: 600;
-  display: block;
+  /* display: block; */
 }
 .reset-pass > a {
   text-align: right;
@@ -138,6 +138,7 @@ label {
 }
 
 .field input {
+  margin: 6px;
   font-size: 16px;
   line-height: 28px;
   padding: 8px 16px;
@@ -153,7 +154,11 @@ label {
     rgba(0, 0, 0, 0) 0px 0px 0px 0px;
 }
 
-input[type="submit"] {
+.formbg button {
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
   background-color: rgb(84, 105, 212);
   box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
     rgba(0, 0, 0, 0.12) 0px 1px 1px 0px, rgb(84, 105, 212) 0px 0px 0px 1px,
@@ -162,18 +167,6 @@ input[type="submit"] {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-}
-.field-checkbox input {
-  width: 20px;
-  height: 15px;
-  margin-right: 5px;
-  box-shadow: unset;
-  min-height: unset;
-}
-.field-checkbox label {
-  display: flex;
-  align-items: center;
-  margin: 0;
 }
 a.ssolink {
   display: block;
