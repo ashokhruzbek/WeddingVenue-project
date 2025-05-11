@@ -1,27 +1,29 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios'
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Login() {
-    const [password, setPassword] =useState('');
-    const [username, setUsername] = useState('')
-    const [error, setError] =useState();
-    const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        try {
-          const res = await axios.post(``, {
-            username,
-            password,
-          });
-          localStorage.setItem("token", res.data.token);
-          navigate("/mainPage");
-        } catch (err) {
-          setError(err.response?.data || "Xato yuz berdi!");
-        }
-      };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const res = await axios.post(`http://localhost:3030/login`, {
+        username,
+        password,
+      });
+      localStorage.setItem("token", res.data.token);
+      setTimeout(() => navigate("/main-page"), 1000);
+      toast.success("Muvaffaqiyatli kirdingiz");
+    } catch (err) {
+      toast.error(err.response?.data || "Xatolik yuz berdi!");
+    }
+  };
 
   return (
     <div className="login-root">
@@ -139,28 +141,28 @@ function Login() {
                 <form id="stripe-login " onSubmit={handleSubmit}>
                   <div className="field padding-bottom--24">
                     {/* <label htmlFor="text">Username</label> */}
-                    <input 
-                        placeholder="Username"
-                        type="text"
-                        value={username}
-                        onChange={(e)=>setUsername(e.target.value)}
-                        required
-                        />
+                    <input
+                      placeholder="Username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="field padding-bottom--24">
                     <div className="grid--50-50">
                       {/* <label htmlFor="password">Password</label> */}
                     </div>
-                    <input 
-                        type="password" 
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e)=> setPassword(e.target.value)}
-                        />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
                   </div>
                   {/* {error && <p style={{ color: "red", margin: "0 auto" }}>{error}</p>} */}
                   <div className="field padding-bottom--24">
-                    <button type="submit" > Continue</button>
+                    <button type="submit"> Continue</button>
                   </div>
                 </form>
               </div>

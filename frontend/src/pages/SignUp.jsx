@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 function Login() {
   const [firstname, setFirstname] = useState('');
@@ -9,21 +11,30 @@ function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("firstname", firstname);
-    formData.append("lastname", lastname);
-    formData.append("username", username);
-    formData.append("password", password);
+  e.preventDefault();
 
-    try {
-      await axios.post(``, formData);
-        alert("Ro'yxatdan o'tdingiz! Endi tizimga kiring.");
-      navigate("/");
-    } catch (err) {
-      alert(err.response?.data || "Xato yuz berdi!");
-    }
-  };
+  // Form validation (ixtiyoriy)
+  if (!firstname || !lastname || !username || !password) {
+    toast.error("Iltimos, barcha maydonlarni to‘ldiring.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("firstname", firstname);
+  formData.append("lastname", lastname);
+  formData.append("username", username);
+  formData.append("password", password);
+
+  try {
+    await axios.post("http://localhost:3030/signup", formData);
+    toast.success("Ro'yxatdan o'tdingiz! Endi tizimga kiring.");
+    setTimeout(() => navigate("/"), 1000); 
+  } catch (err) {
+    console.error(err);
+    toast.error(err.response?.data?.message || "Xatolik yuz berdi!");
+  }
+};
+
 
 
   return (
@@ -175,7 +186,7 @@ function Login() {
                     />
                   </div>
                   <div className="field padding-bottom--22">
-                    <button type="submit" >Sign Up</button>
+                    <button type="submit" onClick={handleSubmit} >Sign Up</button>
                   </div>
                 </form>
               </div>
