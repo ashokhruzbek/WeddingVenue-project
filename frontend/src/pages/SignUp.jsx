@@ -26,7 +26,7 @@ function Login() {
   formData.append("password", password);
 
   try {
-    await axios.post("http://localhost:3030/signup", formData);
+    await axios.post("http://localhost:4000/signup", formData);
     toast.success("Ro'yxatdan o'tdingiz! Endi tizimga kiring.");
     setTimeout(() => navigate("/"), 1000); 
   } catch (err) {
