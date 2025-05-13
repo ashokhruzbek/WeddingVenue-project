@@ -18,7 +18,7 @@ function Login() {
         password,
       });
       localStorage.setItem("token", res.data.token);
-      setTimeout(() => navigate("/main-page"), 1000);
+      setTimeout(() => navigate("/home"), 1000);
       toast.success("Muvaffaqiyatli kirdingiz");
     } catch (err) {
       toast.error(err.response?.data || "Xatolik yuz berdi!");

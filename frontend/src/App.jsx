@@ -3,9 +3,8 @@ import "./App.css";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
-import Toast from "./pages/Toast";
 import { Toaster } from "react-hot-toast";
-import MainPage from "./pages/MainPage";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -14,8 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />}></Route>
         <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/main-page" element={<MainPage/>}></Route>
-        <Route path="/toast" element={<Toast/>}/>
+        <Route path="/home" element={<Home />}></Route>
+
       </Routes>
     </BrowserRouter>
   );
