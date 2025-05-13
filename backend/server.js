@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 
 app.use("/", authRoutes);
 
-// app.use(authentication);
+app.use(authentication);
 
 
 const PORT = process.env.PORT || 4000;
