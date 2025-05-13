@@ -6,19 +6,20 @@ const app = express();
 // const { authentication } = require("./middlewares/authentication");
 const authRoutes = require("./routes/auth/authRoutes");
 const adminRouter = require("./routes/admin/adminRoutes");
+const { authentication } = require("./middlewares/authentication");
 
 app.use(cors());
 app.use(express.json());
 
-// app.use((req, res, next) => {
-//     console.log(req.url);
-//     next();
-//   })
+app.use((req, res, next) => {
+    console.log(req.url);
+    next();
+  })
 
 
 app.use("/", authRoutes);
 
-// app.use(authentication);
+app.use(authentication);
 
 
 app.use("/admin", adminRouter);

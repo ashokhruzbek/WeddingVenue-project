@@ -7,6 +7,7 @@ const { updateVenue } = require('../../controllers/admin/updateVenue');
 const { checkRole } = require('../../middlewares/checkRole');
 const { createOwner } = require('../../controllers/admin/createOwner');
 const { deleteVenue } = require('../../controllers/admin/deleteVenue');
+const { viewAllVenues } = require('../../controllers/admin/view-all-Venues');
 
 // adminRouter.use(checkRole(['admin']))
 
@@ -15,5 +16,6 @@ adminRouter.post('/create-venue', authentication,  createVenue )
 adminRouter.put('/update-venue/:id',  updateVenue)
 adminRouter.post('/create-owner', createOwner)
 adminRouter.delete('/delete-venue/:id', deleteVenue)
+adminRouter.get('/view-all-venues', authentication, viewAllVenues)
 
 module.exports = adminRouter;
