@@ -7,6 +7,7 @@ const app = express();
 const authRoutes = require("./routes/auth/authRoutes");
 const adminRouter = require("./routes/admin/adminRoutes");
 const { authentication } = require("./middlewares/authentication");
+const userRouter = require("./routes/user/userRoutes");
 
 app.use(cors());
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use(authentication);
 
 
 app.use("/admin", adminRouter);
+app.use('/user', userRouter);
 
 
 const PORT = process.env.PORT || 4000;
