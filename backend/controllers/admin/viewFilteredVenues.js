@@ -14,7 +14,6 @@ exports.viewFilteredVenues = async (req, res) => {
     if (userRole === 'user') {
       conditions.push(`status = 'tasdiqlangan'`);
     }
-
     // Saralash
     if (status) {
       params.push(status);

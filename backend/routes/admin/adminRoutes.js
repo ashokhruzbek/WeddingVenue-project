@@ -1,25 +1,31 @@
-const express = require('express');
+const express = require("express");
 const adminRouter = express.Router();
-const { authentication } = require('../../middlewares/authentication');
-const { assignOwner } = require('../../controllers/admin/assignOwner');
-const { createVenue } = require('../../controllers/admin/createVenue');
-const { updateVenue } = require('../../controllers/admin/updateVenue');
-const { checkRole } = require('../../middlewares/checkRole');
-const { createOwner } = require('../../controllers/admin/createOwner');
-const { deleteVenue } = require('../../controllers/admin/deleteVenue');
-const { viewAllVenues } = require('../../controllers/admin/view-all-Venues');
-const { viewFilteredVenues } = require('../../controllers/admin/viewFilteredVenues');
-const { getSingleVenue } = require('../../controllers/admin/singleVenue');
+const { assignOwner } = require("../../controllers/admin/assignOwner");
+const { createVenue } = require("../../controllers/admin/createVenue");
+const { updateVenue } = require("../../controllers/admin/updateVenue");
+const { checkRole } = require("../../middlewares/checkRole");
+const { createOwner } = require("../../controllers/admin/createOwner");
+const { deleteVenue } = require("../../controllers/admin/deleteVenue");
+const { viewAllVenues } = require("../../controllers/admin/view-all-Venues");
+const { viewFilteredVenues } = require("../../controllers/admin/viewFilteredVenues");
+const { getSingleVenue } = require("../../controllers/admin/singleVenue");
+const { approveVenue } = require("../../controllers/admin/approveVenue");
+const { authentication } = require("../../middlewares/authentication");
+const { viewAllOwners } = require("../../controllers/admin/viewAllOwners");
+const { viewAllBookings } = require("../../controllers/admin/viewAllBooking");
 
-// adminRouter.use(checkRole(['admin']))
+adminRouter.use(authentication, checkRole(["admin"]));
 
-adminRouter.post('/assign-owner', assignOwner);
-adminRouter.post('/create-venue', authentication,  createVenue )
-adminRouter.put('/update-venue/:id',  updateVenue)
-adminRouter.post('/create-owner', createOwner)
-adminRouter.delete('/delete-venue/:id', deleteVenue)
-adminRouter.get('/view-all-venues', authentication, viewAllVenues)
-adminRouter.get('/venues', authentication, viewFilteredVenues)
-adminRouter.get('/get-single-venue/:id',authentication, getSingleVenue)
+adminRouter.post("/assign-owner", assignOwner);
+adminRouter.post("/create-venue", createVenue);
+adminRouter.put("/update-venue/:id", updateVenue);
+adminRouter.post("/create-owner", createOwner);
+adminRouter.delete("/delete-venue/:id", deleteVenue);
+adminRouter.get("/view-all-venues", viewAllVenues);
+adminRouter.get("/venues", viewFilteredVenues);
+adminRouter.get("/get-single-venue/:id", getSingleVenue);
+adminRouter.put("/approve-venue/:id", approveVenue);
+adminRouter.get('/owners', viewAllOwners);
+adminRouter.get('/view-all-bookings', viewAllBookings)
 
 module.exports = adminRouter;
