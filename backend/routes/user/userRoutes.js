@@ -1,12 +1,14 @@
 const express = require('express');
 const userRouter = express.Router();
-const { addBooking } = require('../../controllers/user/addBooking');
 const { authentication } = require('../../middlewares/authentication');
 const { checkRole } = require('../../middlewares/checkRole');
+const { addBooking } = require('../../controllers/user/addBooking');
+const { cancelBooking } = require('../../controllers/user/cancelBooking');
 
-userRouter.use(checkRole(['user']))
+userRouter.use( authentication, checkRole(['user']))
 
-userRouter.post('/add-booking',authentication, addBooking)
+userRouter.delete('/cancel-booking/:id', cancelBooking )
+userRouter.post('/add-booking', addBooking )
 
 
 module.exports = userRouter;

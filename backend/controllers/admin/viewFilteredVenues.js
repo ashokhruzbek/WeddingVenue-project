@@ -2,57 +2,56 @@ const pool = require('../../config/db');
 
 exports.viewFilteredVenues = async (req, res) => {
   try {
-    const { sort, district, status, search } = req.query;
-    const userRole = req.user.role;
+    // Querydan filter va sort parametrlari
+    const { sort_by, order, district_id, status, search } = req.query;
 
     let baseQuery = `SELECT * FROM venues`;
     let conditions = [];
-    let params = [];
+    let values = [];
     let orderClause = '';
 
-    // Faqat tasdiqlanganlar user uchun
-    if (userRole === 'user') {
-      conditions.push(`status = 'tasdiqlangan'`);
-    }
-    // Saralash
-    if (status) {
-      params.push(status);
-      conditions.push(`status = $${params.length}`);
+    // Filterlar
+    if (district_id) {
+      values.push(district_id);
+      conditions.push(`district_id = $${values.length}`);
     }
 
-    if (district) {
-      params.push(district);
-      conditions.push(`district_id = $${params.length}`);
+    if (status) {
+      values.push(status.toLowerCase());
+      conditions.push(`LOWER(status) = $${values.length}`);
     }
 
     if (search) {
-      params.push(`%${search}%`);
-      conditions.push(`LOWER(name) ILIKE LOWER($${params.length})`);
+      values.push(`%${search.toLowerCase()}%`);
+      conditions.push(`LOWER(name) LIKE $${values.length}`);
     }
 
-    // WHERE qo‘shamiz, agar conditions mavjud bo‘lsa
+    // WHERE qismi yasash
     if (conditions.length > 0) {
-      baseQuery += ' WHERE ' + conditions.join(' AND ');
+      baseQuery += ` WHERE ` + conditions.join(' AND ');
     }
 
-    // Saralash/tartiblash
-    if (sort === 'price_asc') {
-      orderClause = ' ORDER BY price_seat ASC';
-    } else if (sort === 'price_desc') {
-      orderClause = ' ORDER BY price_seat DESC';
-    } else if (sort === 'capacity_asc') {
-      orderClause = ' ORDER BY capacity ASC';
-    } else if (sort === 'capacity_desc') {
-      orderClause = ' ORDER BY capacity DESC';
+    // Sort qismi yasash
+    const allowedSortFields = ['price_seat', 'capacity'];
+    const sortField = allowedSortFields.includes(sort_by) ? sort_by : null;
+    const sortOrder = order === 'desc' ? 'DESC' : 'ASC';
+
+    if (sortField) {
+      orderClause = ` ORDER BY ${sortField} ${sortOrder}`;
     }
 
+    // Yakuniy so‘rov
     const finalQuery = baseQuery + orderClause;
-    const result = await pool.query(finalQuery, params);
+    const venues = await pool.query(finalQuery, values);
 
-    res.status(200).json({ venues: result.rows });
+    res.status(200).json({
+      message: "To'yxonalar ro'yxati",
+      count: venues.rows.length,
+      venues: venues.rows
+    });
 
   } catch (error) {
-    console.error('Filtrlangan venue larni olishda xatolik:', error);
-    res.status(500).json({ message: 'Server xatosi' });
+    console.error("To'yxonalarni olishda xatolik:", error);
+    res.status(500).json({ message: "Server xatosi" });
   }
 };
