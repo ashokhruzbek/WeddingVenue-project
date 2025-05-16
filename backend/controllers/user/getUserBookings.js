@@ -1,9 +1,9 @@
 const pool = require('../../config/db');
 
-exports.viewOwnerBookings = async (req, res) => {
+exports.getUserBookings = async (req, res) => {
   try {
-    const ownerId = req.user.id;
-    const { sortBy = 'reservation_date', order = 'asc', venue, district, status } = req.query;
+    const userId = req.user.id; // Token orqali foydalanuvchi ID
+    const { sortBy = 'reservation_date', order = 'asc', status, venue, district } = req.query;
 
     let baseQuery = `
       SELECT 
@@ -20,10 +20,15 @@ exports.viewOwnerBookings = async (req, res) => {
       JOIN venues v ON b.venue_id = v.id
       JOIN district d ON v.district_id = d.id
       JOIN users u ON b.user_id = u.id
-      WHERE v.owner_id = $1
+      WHERE b.user_id = $1
     `;
 
-    const params = [ownerId];
+    const params = [userId];
+
+    if (status) {
+      params.push(status.toLowerCase());
+      baseQuery += ` AND LOWER(b.status) = $${params.length}`;
+    }
 
     if (venue) {
       params.push(`%${venue.toLowerCase()}%`);
@@ -33,11 +38,6 @@ exports.viewOwnerBookings = async (req, res) => {
     if (district) {
       params.push(`%${district.toLowerCase()}%`);
       baseQuery += ` AND LOWER(d.name) LIKE $${params.length}`;
-    }
-
-    if (status) {
-      params.push(status.toLowerCase());
-      baseQuery += ` AND LOWER(b.status) = $${params.length}`;
     }
 
     const allowedSort = {
@@ -55,11 +55,11 @@ exports.viewOwnerBookings = async (req, res) => {
     const result = await pool.query(baseQuery, params);
 
     res.status(200).json({
-      message: "Sizga tegishli bronlar",
+      message: "Sizning bronlaringiz",
       bookings: result.rows
     });
   } catch (error) {
-    console.error("Ega bronlarini olishda xatolik:", error);
+    console.error("Foydalanuvchi bronlarini olishda xatolik:", error);
     res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };
