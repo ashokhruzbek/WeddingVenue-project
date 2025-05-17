@@ -26,17 +26,17 @@ exports.viewOwnerBookings = async (req, res) => {
     const params = [ownerId];
 
     if (venue) {
-      params.push(`%${venue.toLowerCase()}%`);
+      params.push(`%${venue }%`);
       baseQuery += ` AND LOWER(v.name) LIKE $${params.length}`;
     }
 
     if (district) {
-      params.push(`%${district.toLowerCase()}%`);
+      params.push(`%${district }%`);
       baseQuery += ` AND LOWER(d.name) LIKE $${params.length}`;
     }
 
     if (status) {
-      params.push(status.toLowerCase());
+      params.push(status );
       baseQuery += ` AND LOWER(b.status) = $${params.length}`;
     }
 
@@ -48,7 +48,7 @@ exports.viewOwnerBookings = async (req, res) => {
     };
 
     const sortColumn = allowedSort[sortBy] || 'b.reservation_date';
-    const sortOrder = order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+    const sortOrder = order  === 'desc' ? 'DESC' : 'ASC';
 
     baseQuery += ` ORDER BY ${sortColumn} ${sortOrder}`;
 

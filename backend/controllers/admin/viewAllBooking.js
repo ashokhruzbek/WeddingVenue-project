@@ -47,7 +47,7 @@ exports.viewAllBookings = async (req, res) => {
     };
 
     const sortColumn = allowedSort[sortBy] || 'b.reservation_date';
-    const sortOrder = order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+    const sortOrder = order  === 'desc' ? 'DESC' : 'ASC';
 
     baseQuery += ` ORDER BY ${sortColumn} ${sortOrder}`;
 

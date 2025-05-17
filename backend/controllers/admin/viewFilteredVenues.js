@@ -17,12 +17,12 @@ exports.viewFilteredVenues = async (req, res) => {
     }
 
     if (status) {
-      values.push(status.toLowerCase());
+      values.push(status );
       conditions.push(`LOWER(status) = $${values.length}`);
     }
 
     if (search) {
-      values.push(`%${search.toLowerCase()}%`);
+      values.push(`%${search }%`);
       conditions.push(`LOWER(name) LIKE $${values.length}`);
     }
 
