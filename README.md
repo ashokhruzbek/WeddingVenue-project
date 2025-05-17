@@ -1,4 +1,4 @@
-### Wedding Venue project - O'quv kursni semester topshirig'i (assignment)
+#### Wedding Venue project - O'quv kursni semester topshirig'i (assignment)
 
 ```bash
 frontend/
