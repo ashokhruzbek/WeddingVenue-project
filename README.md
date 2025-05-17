@@ -1,5 +1,7 @@
 ### Wedding Venue project - O'quv kursni semester topshirig'i (assignment)
-  frontend/
+
+```bash
+frontend/
 ├── public/
 │   ├── index.html
 │   └── assets/
@@ -102,7 +104,3 @@
 ├── package.json
 ├── vite.config.js
 └── README.md
-
-
-
-
