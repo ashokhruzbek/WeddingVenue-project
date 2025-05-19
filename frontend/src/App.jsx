@@ -1,37 +1,45 @@
-/* eslint-disable no-unused-vars */
-import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import routes from "./routes";
-import NotFound from "./pages/notFound";
-import Login from "./pages/login";
+import { Route, Routes } from "react-router-dom";
 import PublicRoute from "./components/PublicRoute";
+import MainLayout from "./layouts/MainLayout";
+import routes from "./routes";
+import Home from "./pages/home/Home";
+import Venues from "./pages/user/Venues";
+import VenueInfos from "./pages/user/VenueInfos";
+import UserBookings from "./pages/user/UserBookings";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
+import NotFound from "./pages/notFound/NotFound";
 import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
     <Routes>
-      {/* Public Route */}
       <Route element={<PublicRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/user-venues" element={<Venues />} />
+          <Route path="/user-venues/:id" element={<VenueInfos />} />
+          <Route path="/user-bookings" element={<UserBookings />} />
+        </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Route>
-
       {/* Private Routes */}
       <Route element={<PrivateRoute />}>
-        <Route path="/" element={<Navigate to={routes[0].path} replace />} />
         {routes.map(({ path, layout: Layout, children }) => (
           <Route key={path} path={path} element={<Layout />}>
-            {children.map(({ path: childPath, element }, idx) => (
-              <Route
-                key={idx}
-                index={childPath === ""}
-                path={childPath}
-                element={element}
-              />
-            ))}
+            {Array.isArray(children) &&
+              children.map(({ path: childPath, element }, idx) => (
+                <Route
+                  key={idx}
+                  index={childPath === "" || childPath === undefined}
+                  path={childPath}
+                  element={element}
+                />
+              ))}
           </Route>
         ))}
       </Route>
-
       {/* Not found */}
       <Route path="*" element={<NotFound />} />
     </Routes>

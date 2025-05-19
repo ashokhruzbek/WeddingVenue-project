@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 function NotFound() {
   return (
@@ -6,7 +6,7 @@ function NotFound() {
       <h1>404 Not Found</h1>
       <p>Wedding Venue page is not undifined</p>
     </div>
-  )
+  );
 }
 
-export default NotFound
+export default NotFound;
