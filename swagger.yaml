@@ -1,0 +1,886 @@
+openapi: 3.0.3
+info:
+  title: To‘yxona.uz API
+  description: To‘yxona boshqaruv tizimi uchun API hujjatlari
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+paths:
+  /login:
+    post:
+      summary: Foydalanuvchi tizimga kirishi
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: shokh
+                password:
+                  type: string
+                  example: 1111
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Muvaffaqiyatli kirish
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstname:
+                        type: string
+                      lastname:
+                        type: string
+                      username:
+                        type: string
+                      role:
+                        type: string
+                        enum: [admin, owner, user]
+        '401':
+          description: Noto‘g‘ri login yoki parol
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid credentials
+  /signup:
+    post:
+      summary: Yangi foydalanuvchi ro‘yxatdan o‘tishi
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  example: Zafar
+                lastname:
+                  type: string
+                  example: Ibrohimov
+                username:
+                  type: string
+                  example: qovun
+                password:
+                  type: string
+                  example: 1111
+                role:
+                  type: string
+                  enum: [admin, owner, user]
+                  example: owner
+              required:
+                - firstname
+                - lastname
+                - username
+                - password
+                - role
+      responses:
+        '201':
+          description: Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  username:
+                    type: string
+                  role:
+                    type: string
+        '400':
+          description: Noto‘g‘ri so‘rov
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Username already exists
+  /admin/create-venue:
+    post:
+      summary: Yangi to‘yxona qo‘shish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Tanho
+                district_id:
+                  type: string
+                  example: "1"
+                address:
+                  type: string
+                  example: Sergeli 3
+                capacity:
+                  type: integer
+                  example: 500
+                price_seat:
+                  type: number
+                  example: 50
+                phone_number:
+                  type: string
+                  example: "+998903930898"
+                status:
+                  type: string
+                  enum: [tasdiqlanmagan, tasdiqlangan]
+                  example: tasdiqlanmagan
+                owner_id:
+                  type: integer
+                  example: 5
+              required:
+                - name
+                - district_id
+                - address
+                - capacity
+                - price_seat
+                - phone_number
+                - status
+                - owner_id
+      responses:
+        '201':
+          description: To‘yxona muvaffaqiyatli qo‘shildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  district_id:
+                    type: string
+                  address:
+                    type: string
+                  capacity:
+                    type: integer
+                  price_seat:
+                    type: number
+                  phone_number:
+                    type: string
+                  status:
+                    type: string
+                  owner_id:
+                    type: integer
+        '403':
+          description: Faqat adminlar uchun
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+  /admin/create-owner:
+    post:
+      summary: Yangi to‘yxona egasi qo‘shish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  example: Tohirjon
+                lastname:
+                  type: string
+                  example: Yusupov
+                username:
+                  type: string
+                  example: tarvuz
+                password:
+                  type: string
+                  example: 1111
+              required:
+                - firstname
+                - lastname
+                - username
+                - password
+      responses:
+        '201':
+          description: Egasi muvaffaqiyatli qo‘shildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  username:
+                    type: string
+                  role:
+                    type: string
+                    example: owner
+        '400':
+          description: Noto‘g‘ri so‘rov
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Username already exists
+  /admin/assign-owner:
+    post:
+      summary: To‘yxonaga egasi biriktirish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                venue_id:
+                  type: string
+                  example: "18"
+                owner_id:
+                  type: string
+                  example: "11"
+              required:
+                - venue_id
+                - owner_id
+      responses:
+        '200':
+          description: Egasi muvaffaqiyatli biriktirildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Owner assigned successfully
+        '400':
+          description: Noto‘g‘ri so‘rov
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid venue or owner ID
+  /admin/update-venue/{id}:
+    put:
+      summary: To‘yxona ma'lumotlarini yangilash
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: To‘yxona ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Tohna
+                district_id:
+                  type: integer
+                  example: 1
+                address:
+                  type: string
+                  example: Sergeli 3
+                capacity:
+                  type: integer
+                  example: 500
+                price_seat:
+                  type: string
+                  example: "50.00"
+                phone_number:
+                  type: string
+                  example: "+998903930898"
+                status:
+                  type: string
+                  enum: [tasdiqlanmagan, tasdiqlangan]
+                  example: tasdiqlanmagan
+                owner_id:
+                  type: integer
+                  example: 5
+              required:
+                - name
+                - district_id
+                - address
+                - capacity
+                - price_seat
+                - phone_number
+                - status
+                - owner_id
+      responses:
+        '200':
+          description: To‘yxona muvaffaqiyatli yangilandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  district_id:
+                    type: integer
+                  address:
+                    type: string
+                  capacity:
+                    type: integer
+                  price_seat:
+                    type: string
+                  phone_number:
+                    type: string
+                  status:
+                    type: string
+                  owner_id:
+                    type: integer
+        '404':
+          description: To‘yxona topilmadi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Venue not found
+  /admin/approve-venue/{id}:
+    put:
+      summary: To‘yxonani tasdiqlash
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: To‘yxona ID
+      responses:
+        '200':
+          description: To‘yxona muvaffaqiyatli tasdiqlandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Venue approved successfully
+        '404':
+          description: To‘yxona topilmadi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Venue not found
+  /admin/view-all-venues:
+    get:
+      summary: Barcha to‘yxonalarni ko‘rish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: To‘yxonalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    district_id:
+                      type: integer
+                    address:
+                      type: string
+                    capacity:
+                      type: integer
+                    price_seat:
+                      type: number
+                    phone_number:
+                      type: string
+                    status:
+                      type: string
+                    owner_id:
+                      type: integer
+  /admin/venues:
+    get:
+      summary: To‘yxonalarni filtr va qidiruv bilan ko‘rish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+            enum: [price_seat, capacity]
+          description: Tartiblash maydoni
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Tartiblash tartibi
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [tasdiqlangan, tasdiqlanmagan]
+          description: To‘yxona holati
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: To‘yxona nomi bo‘yicha qidiruv
+      responses:
+        '200':
+          description: Filtrlangan to‘yxonalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    district_id:
+                      type: integer
+                    address:
+                      type: string
+                    capacity:
+                      type: integer
+                    price_seat:
+                      type: number
+                    phone_number:
+                      type: string
+                    status:
+                      type: string
+                    owner_id:
+                      type: integer
+  /admin/view-all-bookings:
+    get:
+      summary: Barcha buyurtmalarni ko‘rish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [reservation_date, venue, district]
+          description: Tartiblash maydoni
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Tartiblash tartibi
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: ["bo`lib o`tgan", kutilmoqda, bekor]
+          description: Buyurtma holati
+        - in: query
+          name: district
+          schema:
+            type: string
+          description: Tuman nomi bo‘yicha filtr
+      responses:
+        '200':
+          description: Buyurtmalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    venue_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    reservation_date:
+                      type: string
+                      format: date
+                    status:
+                      type: string
+                    district:
+                      type: string
+  /admin/cancel-booking/{id}:
+    delete:
+      summary: Buyurtmani bekor qilish
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Buyurtma ID
+      responses:
+        '200':
+          description: Buyurtma muvaffaqiyatli bekor qilindi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Booking cancelled successfully
+        '404':
+          description: Buyurtma topilmadi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Booking not found
+  /owner/reg-owner:
+    post:
+      summary: Yangi to‘yxona ro‘yxatdan o‘tkazish
+      tags:
+        - Owner
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Oltin Saroy
+                district_id:
+                  type: integer
+                  example: 2
+                address:
+                  type: string
+                  example: Toshkent, Yunusobod
+                capacity:
+                  type: integer
+                  example: 300
+                price_seat:
+                  type: integer
+                  example: 25000
+                phone_number:
+                  type: string
+                  example: "+998901112233"
+              required:
+                - name
+                - district_id
+                - address
+                - capacity
+                - price_seat
+                - phone_number
+      responses:
+        '201':
+          description: To‘yxona muvaffaqiyatli ro‘yxatdan o‘tdi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  district_id:
+                    type: integer
+                  address:
+                    type: string
+                  capacity:
+                    type: integer
+                  price_seat:
+                    type: integer
+                  phone_number:
+                    type: string
+                  status:
+                    type: string
+                    example: tasdiqlanmagan
+        '403':
+          description: Faqat ownerlar uchun
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+  /owner/update-owner/{id}:
+    put:
+      summary: To‘yxona ma'lumotlarini yangilash
+      tags:
+        - Owner
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: To‘yxona ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Oltin Kumush
+                district_id:
+                  type: integer
+                  example: 2
+                address:
+                  type: string
+                  example: Toshkent, Yunusobod
+                capacity:
+                  type: integer
+                  example: 300
+                price_seat:
+                  type: integer
+                  example: 25000
+                phone_number:
+                  type: string
+                  example: "+998901112233"
+              required:
+                - name
+                - district_id
+                - address
+                - capacity
+                - price_seat
+                - phone_number
+      responses:
+        '200':
+          description: To‘yxona muvaffaqiyatli yangilandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  district_id:
+                    type: integer
+                  address:
+                    type: string
+                  capacity:
+                    type: integer
+                  price_seat:
+                    type: integer
+                  phone_number:
+                    type: string
+        '404':
+          description: To‘yxona topilmadi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Venue not found
+  /owner/view-venue-booking/{id}:
+    get:
+      summary: Muayyan to‘yxona buyurtmalarini ko‘rish
+      tags:
+        - Owner
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: To‘yxona ID
+      responses:
+        '200':
+          description: Buyurtmalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    venue_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    reservation_date:
+                      type: string
+                      format: date
+                    status:
+                      type: string
+        '404':
+          description: To‘yxona topilmadi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Venue not found
+  /user/get-venues-user:
+    get:
+      summary: Foydalanuvchi uchun to‘yxonalarni ko‘rish
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: To‘yxonalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    district_id:
+                      type: integer
+                    address:
+                      type: string
+                    capacity:
+                      type: integer
+                    price_seat:
+                      type: number
+                    phone_number:
+                      type: string
+                    status:
+                      type: string
+  /user/get-booking-user:
+    get:
+      summary: Foydalanuvchi buyurtmalarini ko‘rish
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Buyurtmalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    venue_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    reservation_date:
+                      type: string
+                      format: date
+                    status:
+                      type: string
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

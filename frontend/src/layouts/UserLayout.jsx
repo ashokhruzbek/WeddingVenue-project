@@ -1,8 +1,11 @@
 import React from 'react'
+import Sidebar from '../components/sidebar/Sidebar'
 
 function UserLayout() {
   return (
-    <div>UserLayout</div>
+    <div> 
+      <Sidebar/>
+    </div>
   )
 }
 

@@ -1,7 +1,10 @@
 import React from "react";
+import Sidebar from "../components/sidebar/Sidebar";
 
 function OwnerLayout() {
-  return <div>OwnerLayout</div>;
+  return <div> 
+    <Sidebar/>
+  </div>;
 }
 
 export default OwnerLayout;
