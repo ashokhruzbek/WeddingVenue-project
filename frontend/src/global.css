@@ -1,5 +1,0 @@
-@import "tailwindcss";
-
-.text-gradient {
-    @apply bg-clip-text text-transparent;
-}

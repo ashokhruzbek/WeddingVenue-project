@@ -17,7 +17,7 @@ function App() {
       <Route element={<PublicRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/user-venues" element={<Venues />} />
+          <Route path="/user" element={<Venues />} />
           <Route path="/user-venues/:id" element={<VenueInfos />} />
           <Route path="/user-bookings" element={<UserBookings />} />
         </Route>

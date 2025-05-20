@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function OwnerLayout() {
-  return (
-    <div>OwnerLayout</div>
-  )
+  return <div>OwnerLayout</div>;
 }
 
-export default OwnerLayout
+export default OwnerLayout;

@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 function PrivateRoute() {
   const { isAuthenticated, role } = useAuth();
   const location = useLocation();
- if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isOwnerRoute = location.pathname.startsWith("/owner");
