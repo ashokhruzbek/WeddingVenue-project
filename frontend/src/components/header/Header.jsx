@@ -1,20 +1,47 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function Header() {
   const navigate = useNavigate();
 
   return (
-    <header className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-300">
-      <div className="text-4xl font-script text-[#2e82ff] font-bold cursor-default select-none cursor-pointer">
-        WeddingVenue
-      </div>
-      <button
-        onClick={() => navigate('/login')}
-        className="px-5 py-2 bg-[#2e82ff] text-white rounded-md hover:bg-[#4c9eff] transition cursor-pointer"
+    <header className="flex justify-between items-center px-6 py-4 bg-white shadow-md">
+      {/* Logo */}
+      <Link
+        to="/"
+        className="text-3xl font-bold text-[#2e82ff] cursor-pointer select-none"
       >
-        Kirish
-      </button>
+        WeddingVenue
+      </Link>
+
+      {/* Navigatsiya */}
+      <nav className="flex items-center gap-6">
+        <Link
+          to="/"
+          className="text-gray-700 hover:text-[#2e82ff] transition font-medium"
+        >
+          🏛 Home
+        </Link>
+        <Link
+          to="/venue"
+          className="text-gray-700 hover:text-[#2e82ff] transition font-medium"
+        >
+          📋 To‘yxonalar
+        </Link>
+        <Link
+          to="/user-bookings"
+          className="text-gray-700 hover:text-[#2e82ff] transition font-medium"
+        >
+        </Link>
+
+        {/* Kirish tugmasi */}
+        <button
+          onClick={() => navigate("/login")}
+          className="px-4 py-2 bg-[#2e82ff] text-white rounded-md hover:bg-[#4c9eff] transition"
+        >
+          Kirish
+        </button>
+      </nav>
     </header>
   );
 }
