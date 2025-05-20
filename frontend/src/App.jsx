@@ -4,7 +4,7 @@ import MainLayout from "./layouts/MainLayout";
 import routes from "./routes";
 import Landing from "./pages/landing";
 import Venues from "./pages/user/Venues";
-import VenueInfos from "./pages/user/VenueInfos";
+import VenueInfos from "./pages/user/FavoritesVenues";
 import UserBookings from "./pages/user/UserBookings";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";

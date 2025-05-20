@@ -162,12 +162,12 @@ const Sidebar = () => {
 
     const adminItems = [
       {
-        title: "Admin paneli",
+        title: "Admin paneli",      
         icon: <Shield size={20} />,
         submenu: true,
         submenuName: "admin",
         items: [
-          { title: "Foydalanuvchilar", path: "/admin/users", icon: <Users size={18} /> },
+          { title: "Foydalanuvchilar", path: "/admin/user", icon: <Users size={18} /> },
           { title: "To‘yxonalar", path: "/admin/venues", icon: <Building size={18} /> },
           { title: "Yangi to‘yxona", path: "/admin/create-venue", icon: <PlusCircle size={18} /> },
           { title: "Egasi qo‘shish", path: "/admin/create-owner", icon: <User size={18} /> },
@@ -322,25 +322,7 @@ const Sidebar = () => {
           </div>
 
           {/* User info */}
-          {userRole && (
-            <div className="p-4 border-b">
-              <motion.div className="flex items-center justify-center w-full" variants={iconVariants}>
-                <Tooltip label="Foydalanuvchi">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold">
-                    {userName ? userName.charAt(0) : "U"}
-                  </div>
-                </Tooltip>
-                {isOpen && (
-                  <motion.div className="ml-3" variants={textVariants}>
-                    <p className="font-medium text-gray-800">{userName || "Foydalanuvchi"}</p>
-                    <p className="text-xs text-gray-500 capitalize">
-                      {userRole === "admin" ? "Administrator" : userRole === "owner" ? "To‘yxona egasi" : "Foydalanuvchi"}
-                    </p>
-                  </motion.div>
-                )}
-              </motion.div>
-            </div>
-          )}
+          
 
           {/* Navigation */}
           <div className="flex-1 overflow-y-auto py-4">
@@ -481,6 +463,25 @@ const Sidebar = () => {
               ))}
             </ul>
           </div>
+          {userRole && (
+            <div className="p-4 border-b">
+              <motion.div className="flex items-center justify-center w-full" variants={iconVariants}>
+                <Tooltip label="Foydalanuvchi">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold">
+                    {userName ? userName.charAt(0) : "U"}
+                  </div>
+                </Tooltip>
+                {isOpen && (
+                  <motion.div className="ml-3" variants={textVariants}>
+                    <p className="font-medium text-gray-800">{userName || "Foydalanuvchi"}</p>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {userRole === "admin" ? "Administrator" : userRole === "owner" ? "To‘yxona egasi" : "Foydalanuvchi"}
+                    </p>
+                  </motion.div>
+                )}
+              </motion.div>
+            </div>
+          )}
 
           {/* Logout button */}
           <div className="p-4 border-t">
@@ -506,6 +507,7 @@ const Sidebar = () => {
                     <LogOut size={20} />
                   </span>
                 )}
+                
                 {isOpen && (
                   <motion.span className="ml-3 font-medium" variants={textVariants}>
                     Chiqish
