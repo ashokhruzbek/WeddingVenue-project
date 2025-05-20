@@ -6,10 +6,12 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
  
 import { Home, Heart, Calendar, Search } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+
 
 export default function NotFound() {
   const [mounted, setMounted] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     setMounted(true)
@@ -175,11 +177,12 @@ export default function NotFound() {
 
         {/* Back to home button */}
         <motion.div variants={itemVariants}>
-          <Link href="/">
+          <Link to="/">
             <motion.button
               className="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full font-medium flex items-center justify-center mx-auto shadow-md hover:shadow-lg transition-shadow duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
+              // onClick={()=>{navigate('/')}}
             >
               <Home className="mr-2" size={20} />
               Bosh sahifaga qaytish

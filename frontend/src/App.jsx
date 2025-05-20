@@ -11,10 +11,13 @@ import Signup from "./pages/auth/Signup";
 import NotFound from "./pages/notFound/NotFound";
 import PrivateRoute from "./components/PrivateRoute";
 import Home from "./pages/home/Home";
+import { ToastContainer } from "react-toastify";
+import { Toaster } from "sonner";
 
 
 function App() {
   return (
+    <>
     <Routes>
       {/* Umumiy (Public) yo‘llar */}
       <Route element={<PublicRoute />}>
@@ -48,6 +51,25 @@ function App() {
       {/* Noto‘g‘ri yo‘llar uchun */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <Toaster
+        position="top-right"
+        duration={3000}
+        richColors
+        closeButton
+      />
+      </>
   );
 }
 

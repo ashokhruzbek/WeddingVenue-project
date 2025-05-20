@@ -1,48 +1,69 @@
- 
-
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { motion, AnimatePresence } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import { Search, MapPin, Users, DollarSign, Phone, Filter } from "lucide-react"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Search, MapPin, Users, DollarSign, Phone, Filter } from "lucide-react";
+import { toast } from "react-toastify";
 
 function Home() {
-  const [venues, setVenues] = useState([])
-  const [filteredVenues, setFilteredVenues] = useState([])
-  const [search, setSearch] = useState("")
-  const [districtFilter, setDistrictFilter] = useState("all")
-  const [isLoading, setIsLoading] = useState(true)
+  const [venues, setVenues] = useState([]);
+  const [filteredVenues, setFilteredVenues] = useState([]);
+  const [search, setSearch] = useState("");
+  const [districtFilter, setDistrictFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const token = localStorage.getItem("token");
+ const navigate = useNavigate();
 
-  const navigate = useNavigate()
+const handleClickCheck = () => {
+    if (!token) {
+      toast.error("Iltimos, avval tizimga kiring!", {
+        duration: 3000,
+        position: "top-right",
+        richColors: true,
+        action: {
+          label: "Kirish",
+          onClick: () => navigate("/login"),
+        },
+      });
+      navigate("/login");
+    }
+  };
+ 
 
   useEffect(() => {
     const fetchVenues = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:4000/user/get-venues-user")
-        setVenues(res.data.venues)
-        setFilteredVenues(res.data.venues)
+        const res = await axios.get(
+          "http://localhost:4000/user/get-venues-user"
+        );
+        setVenues(res.data.venues);
+        setFilteredVenues(res.data.venues);
       } catch (err) {
-        console.log(err)
+        console.log(err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    fetchVenues()
-  }, [])
+    };
+    fetchVenues();
+  }, []);
 
   useEffect(() => {
     const result = venues.filter((item) => {
-      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase())
-      const matchesDistrict = districtFilter === "all" || item.district_id === Number.parseInt(districtFilter)
-      return matchesSearch && matchesDistrict
-    })
-    setFilteredVenues(result)
-  }, [search, districtFilter, venues])
+      const matchesSearch = item.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesDistrict =
+        districtFilter === "all" ||
+        item.district_id === Number.parseInt(districtFilter);
+      return matchesSearch && matchesDistrict;
+    });
+    setFilteredVenues(result);
+  }, [search, districtFilter, venues]);
 
   const handleClick = (id) => {
-    navigate(`/booking/${id}`)
-  }
+    navigate(`/booking/${id}`);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -52,7 +73,7 @@ function Home() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const cardVariants = {
     hidden: { y: 50, opacity: 0 },
@@ -67,11 +88,12 @@ function Home() {
     },
     hover: {
       y: -10,
-      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      boxShadow:
+        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
       transition: { type: "spring", stiffness: 400, damping: 10 },
     },
     tap: { scale: 0.98 },
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6">
@@ -108,7 +130,10 @@ function Home() {
         >
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder="Qidiruv (nomi bo'yicha)..."
@@ -119,15 +144,45 @@ function Home() {
             </div>
 
             <div className="relative w-full md:w-1/3">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Filter
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <select
                 className="pl-10 pr-4 py-3 rounded-xl border border-gray-200 w-full appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 outline-none"
                 value={districtFilter}
                 onChange={(e) => setDistrictFilter(e.target.value)}
               >
                 <option value="all">Barcha tumanlar</option>
-                <option value="1">Sergeli</option>
-                <option value="5">Chilonzor</option>
+                <option value="bektemir">Bektemir</option>
+                <option value="mirzo_ulugbek">Mirzo Ulugʻbek</option>
+                <option value="mirobod">Mirobod</option>
+                <option value="olmazor">Olmazor</option>
+                <option value="sergeli">Sergeli</option>
+                <option value="shayxontohur">Shayxontohur</option>
+                <option value="uchtepa">Uchtepa</option>
+                <option value="chilonzor">Chilonzor</option>
+                <option value="yunusobod">Yunusobod</option>
+                <option value="yakkasaroy">Yakkasaroy</option>
+                <option value="yangihayot">Yangihayot</option>
+                <option value="bekobod">Bekobod</option>
+                <option value="boʻka">Boʻka</option>
+                <option value="qibray">Qibray</option>
+                <option value="zangiota">Zangiota</option>
+                <option value="yangiyoʻl">Yangiyoʻl</option>
+                <option value="nurafshon">Nurafshon (shahar)</option>
+                <option value="parkent">Parkent</option>
+                <option value="ohangaron">Ohangaron</option>
+                <option value="piskent">Piskent</option>
+                <option value="olmaliq">Olmaliq (shahar)</option>
+                <option value="angren">Angren (shahar)</option>
+                <option value="chinoz">Chinoz</option>
+                <option value="oroltog">O‘rta Chirchiq</option>
+                <option value="quyichirchiq">Quyi Chirchiq</option>
+                <option value="yuqorichirchiq">Yuqori Chirchiq</option>
+                <option value="toshkent_vil_shahar">
+                  
+                </option>
               </select>
             </div>
           </div>
@@ -140,7 +195,9 @@ function Home() {
           transition={{ delay: 0.4, duration: 0.5 }}
           className="max-w-7xl mx-auto mb-6"
         >
-          <p className="text-gray-600 font-medium">{filteredVenues.length} ta natija topildi</p>
+          <p className="text-gray-600 font-medium">
+            {filteredVenues.length} ta natija topildi
+          </p>
         </motion.div>
 
         {/* Venue Cards */}
@@ -171,7 +228,7 @@ function Home() {
                     variants={cardVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    onClick={() => handleClick(toy.id)}
+                    
                     className="bg-white rounded-2xl overflow-hidden cursor-pointer"
                     layoutId={`venue-${toy.id}`}
                   >
@@ -191,30 +248,46 @@ function Home() {
 
                     <div className="p-6 space-y-3">
                       <div className="flex items-start gap-3">
-                        <MapPin className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                        <MapPin
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={18}
+                        />
                         <p className="text-gray-700">{toy.address}</p>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Users className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                        <Users
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={18}
+                        />
                         <p className="text-gray-700">
-                          <span className="font-semibold">{toy.capacity}</span> kishi
+                          <span className="font-semibold">{toy.capacity}</span>{" "}
+                          kishi
                         </p>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <DollarSign className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                        <DollarSign
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={18}
+                        />
                         <p className="text-gray-700">
-                          <span className="font-semibold">{toy.price_seat}</span> ming so'm
+                          <span className="font-semibold">
+                            {toy.price_seat}
+                          </span>{" "}
+                          ming so'm
                         </p>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Phone className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                        <Phone
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={18}
+                        />
                         <p className="text-gray-700">{toy.phone_number}</p>
                       </div>
 
-                      <motion.button
+                      <motion.button onClick={handleClickCheck}
                         className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors duration-200"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
@@ -230,7 +303,7 @@ function Home() {
         )}
       </motion.div>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

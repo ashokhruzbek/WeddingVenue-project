@@ -208,7 +208,7 @@ function Landing() {
               className="flex flex-col sm:flex-row justify-center gap-4"
             >
               <Link
-                to=""
+                to="/venue"
                 className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-8 py-3 rounded-full transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 To'yxonalarni ko'rish
