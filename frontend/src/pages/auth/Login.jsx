@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -87,15 +87,16 @@ const Login = () => {
             disabled={isLoading}
             required
           />
-          <span className="block mt-2 ml-2 text-xs text-blue-400">
-            <a href="/forgot-password">Forgot Password?</a>
-          </span>
           <button
             type="submit"
             className="w-full font-bold bg-gradient-to-r from-blue-500 to-blue-400 text-white py-4 mt-5 rounded-xl shadow-md hover:scale-105 hover:shadow-lg active:scale-95"
           >
-            {isLoading ? "Loading..." : "Sign In"}
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
+          <span className="flex justify-center gap-5 mt-2 ml-2 text-xs decoration-clone text-blue-400 ">
+            Don't have an account? 
+           <Link to="/signup">Sign Up</Link>
+          </span>
         </form>
       </div>
     </div>
