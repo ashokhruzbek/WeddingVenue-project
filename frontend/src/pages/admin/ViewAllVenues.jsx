@@ -1,9 +1,11 @@
+"use client"
+
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { Search, Filter, SortAsc, SortDesc, RefreshCw, Building, Phone, Users, DollarSign, ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, SortAsc, SortDesc, RefreshCw, Building, Phone, Users, DollarSign, ImageIcon, ChevronLeft, ChevronRight, Edit, Trash2, X } from 'lucide-react';
 
 // Animation variants
 const containerVariants = {
@@ -29,8 +31,15 @@ const itemVariants = {
   },
 };
 
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
+};
+
 const VenuesList = () => {
   const [venues, setVenues] = useState([]);
+  const [districts, setDistricts] = useState([]); // Added for district dropdown
   const [filterStatus, setFilterStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
@@ -39,7 +48,34 @@ const VenuesList = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone_number: "",
+    capacity: "",
+    price_seat: "",
+    district_id: "",
+  });
+  const [formError, setFormError] = useState(null);
   const navigate = useNavigate();
+
+  // Fetch districts for dropdown
+  const fetchDistricts = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
+
+      const response = await axios.get("http://localhost:4000/admin/districts", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setDistricts(response.data.districts || []);
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+      toast.error("Tumanlarni olishda xatolik yuz berdi");
+    }
+  }, []);
 
   const fetchVenues = useCallback(async () => {
     setLoading(true);
@@ -88,7 +124,96 @@ const VenuesList = () => {
 
   useEffect(() => {
     fetchVenues();
-  }, [fetchVenues]);
+    fetchDistricts(); // Fetch districts on component mount
+  }, [fetchVenues, fetchDistricts]);
+
+  const handleDelete = async (venueId) => {
+    if (!window.confirm("Bu to'yxonani o'chirishni tasdiqlaysizmi?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
+
+      await axios.delete(`http://localhost:4000/admin/delete-venue/${venueId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("To'yxona muvaffaqiyatli o'chirildi", { duration: 3000 });
+      fetchVenues();
+    } catch (error) {
+      console.error("Error deleting venue:", error);
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "To'yxonani o'chirishda xatolik yuz berdi";
+      toast.error(errorMessage, { duration: 3000 });
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    }
+  };
+
+  const openUpdateModal = (venue) => {
+    setSelectedVenue(venue);
+    setFormData({
+      name: venue.name || "",
+      phone_number: venue.phone_number || "",
+      capacity: venue.capacity || "",
+      price_seat: venue.price_seat || "",
+      district_id: venue.district_id || "",
+    });
+    setFormError(null);
+    setIsModalOpen(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!selectedVenue) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
+
+      const updatedData = {
+        name: formData.name,
+        phone_number: formData.phone_number,
+        capacity: Number(formData.capacity),
+        price_seat: Number(formData.price_seat),
+        district_id: Number(formData.district_id), // Ensure district_id is a number
+      };
+
+      const response = await axios.put(
+        `http://localhost:4000/admin/update-venue/${selectedVenue.id}`,
+        updatedData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success(response.data.message || "To'yxona muvaffaqiyatli yangilandi", { duration: 3000 });
+      setIsModalOpen(false);
+      setSelectedVenue(null);
+      fetchVenues();
+    } catch (error) {
+      console.error("Error updating venue:", error);
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "To'yxonani yangilashda xatolik yuz berdi";
+      setFormError(errorMessage);
+      toast.error(errorMessage, { duration: 3000 });
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -310,6 +435,23 @@ const VenuesList = () => {
                           ))}
                         </div>
                       )}
+
+                      <div className="mt-4 flex gap-2">
+                        <button
+                          onClick={() => openUpdateModal(venue)}
+                          className="flex-1 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 transition-colors duration-300"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Tahrirlash
+                        </button>
+                        <button
+                          onClick={() => handleDelete(venue.id)}
+                          className="flex-1 py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center gap-2 transition-colors duration-300"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          O'chirish
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -350,6 +492,138 @@ const VenuesList = () => {
           )}
         </AnimatePresence>
       )}
+
+      {/* Update Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-800">To'yxonani tahrirlash</h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              {formError && (
+                <div className="bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded-lg mb-4">
+                  {formError}
+                </div>
+              )}
+
+              <form onSubmit={handleUpdate} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    To'yxona nomi
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefon raqami
+                  </label>
+                  <input
+                    type="text"
+                    name="phone_number"
+                    value={formData.phone_number}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    O'rindiqlar soni
+                  </label>
+                  <input
+                    type="number"
+                    name="capacity"
+                    value={formData.capacity}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    min="1"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Narxi (so'mda)
+                  </label>
+                  <input
+                    type="number"
+                    name="price_seat"
+                    value={formData.price_seat}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tuman
+                  </label>
+                  <select
+                    name="district_id"
+                    value={formData.district_id}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                     
+                  >
+                    <option value="">Tuman tanlang</option>
+                    {districts.map((district) => (
+                      <option key={district.id} value={district.id}>
+                        {district.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="flex-1 py-2 px-4 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-colors duration-300"
+                  >
+                    Saqlash
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 py-2 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors duration-300"
+                  >
+                    Bekor qilish
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
