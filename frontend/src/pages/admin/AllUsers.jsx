@@ -9,10 +9,12 @@ import {
   TableRow,
   CircularProgress,
   Alert,
+  TableContainer,
+  Paper,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 const AllOwners = () => {
   const [owners, setOwners] = useState([]);
@@ -33,7 +35,6 @@ const AllOwners = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // API javobidan owners massivini olish
       const data = Array.isArray(response.data.owners) ? response.data.owners : [];
       setOwners(data);
     } catch (error) {
@@ -51,17 +52,22 @@ const AllOwners = () => {
     }
   };
 
-  // Fetch owners on component mount
   useEffect(() => {
     fetchOwners();
   }, [navigate]);
 
   return (
-    <Box p={{ xs: 2, sm: 3 }} maxWidth="1200px" mx="auto">
+    <Box p={{ xs: 2, sm: 4 }} maxWidth="1200px" mx="auto">
       <Typography
         variant="h5"
         gutterBottom
-        sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+        sx={{
+          fontWeight: "bold",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          mb: 3,
+        }}
       >
         👥 Barcha egalarni ko‘rish
       </Typography>
@@ -73,32 +79,41 @@ const AllOwners = () => {
       )}
 
       {loading && owners.length === 0 ? (
-        <Box display="flex" justifyContent="center">
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
           <CircularProgress />
         </Box>
       ) : (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>To‘liq ism</TableCell>
-              <TableCell>Telefon / Username</TableCell>
-              <TableCell>Email</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {owners.map((owner) => (
-              <TableRow key={owner.id}>
-                <TableCell>{owner.id}</TableCell>
-                <TableCell>
-                  {(owner.firstname || "") + " " + (owner.lastname || "") || "Noma'lum"}
-                </TableCell>
-                <TableCell>{owner.username || "Noma'lum"}</TableCell>
-                <TableCell>{"-"}{/* Email API javobida yo‘q */}</TableCell>
+        <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
+          <Table>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>To‘liq ism</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Telefon / Username</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {owners.map((owner) => (
+                <TableRow
+                  key={owner.id}
+                  hover
+                  sx={{
+                    transition: "background-color 0.3s",
+                    "&:hover": { backgroundColor: "#f0f0f0" },
+                  }}
+                >
+                  <TableCell>{owner.id}</TableCell>
+                  <TableCell>
+                    {(owner.firstname || "") + " " + (owner.lastname || "") || "Noma'lum"}
+                  </TableCell>
+                  <TableCell>{owner.username || "Noma'lum"}</TableCell>
+                  <TableCell>-</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Box>
   );

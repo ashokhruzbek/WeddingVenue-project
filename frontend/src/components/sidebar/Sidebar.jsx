@@ -24,7 +24,7 @@ import {
   XCircle,
 } from "lucide-react"
 import { jwtDecode } from "jwt-decode"
-import { toast } from "sonner"
+import { toast } from "react-toastify"
 import { useFloating, autoUpdate, offset, shift, useHover, useInteractions, FloatingPortal } from "@floating-ui/react"
 
 const Sidebar = () => {

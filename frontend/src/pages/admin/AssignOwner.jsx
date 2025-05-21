@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Alert,
   Stack,
+  Autocomplete,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -16,48 +17,41 @@ const AssignOwner = () => {
   const [formData, setFormData] = useState({
     venue_name: "",
     owner_name: "",
-    venue_id: "",
-    owner_id: "",
   });
+  const [venues, setVenues] = useState([]);
+  const [owners, setOwners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Nomdan ID olish funktsiyasi
-  const fetchIdFromName = async (type, name) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
-      const endpoint =
-        type === "venue" ? "/admin/venues/search" : "/admin/owners/search";
+        const [venuesRes, ownersRes] = await Promise.all([
+          axios.get("http://localhost:4000/admin/venues", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("http://localhost:4000/admin/owners", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-      const response = await axios.get(
-        `http://localhost:4000${endpoint}?query=${encodeURIComponent(name)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        setVenues(venuesRes.data.venues || []);
+        setOwners(ownersRes.data.owners || []);
+      } catch (err) {
+        console.error("Ma'lumotlarni olishda xatolik:", err);
+        setError("Ma'lumotlarni olishda xatolik yuz berdi");
+      }
+    };
 
-      const idKey = type === "venue" ? "venue_id" : "owner_id";
-      return response.data[idKey] || null;
-    } catch (error) {
-      console.error(`Error fetching ${type} ID:`, error);
-      return null;
-    }
-  };
+    fetchData();
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validateId = (id) => {
-    const numId = Number(id);
-    return !isNaN(numId) && numId > 0;
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -65,76 +59,45 @@ const AssignOwner = () => {
     setError(null);
     setLoading(true);
 
-    // venue_name va owner_name bo'sh emasligini tekshirish
-    if (!formData.venue_name.trim()) {
-      setError("To‘yxona nomi kiritilishi shart");
-      setLoading(false);
-      return;
-    }
-    if (!formData.owner_name.trim()) {
-      setError("Egasi nomi kiritilishi shart");
+    if (!formData.venue_name || !formData.owner_name) {
+      setError("Iltimos, to‘liq ma'lumotlarni tanlang");
       setLoading(false);
       return;
     }
 
-    // venue_id va owner_id ni olish
-    const venueId = await fetchIdFromName("venue", formData.venue_name);
-    const ownerId = await fetchIdFromName("owner", formData.owner_name);
+    const selectedVenue = venues.find((v) => v.name === formData.venue_name);
+    const selectedOwner = owners.find((o) => o.username === formData.owner_name);
 
-    if (!validateId(venueId)) {
-      setError("To‘yxona ID si topilmadi yoki noto‘g‘ri");
-      setLoading(false);
-      return;
-    }
-    if (!validateId(ownerId)) {
-      setError("Egasi ID si topilmadi yoki noto‘g‘ri");
+    if (!selectedVenue || !selectedOwner) {
+      setError("Tanlangan qiymatlar topilmadi");
       setLoading(false);
       return;
     }
 
-    // API uchun ma'lumotlar
     const payload = {
-      venue_id: Number(venueId),
-      owner_id: Number(ownerId),
+      venue_id: selectedVenue.id,
+      owner_id: selectedOwner.id,
     };
-    console.log("API ga yuborilayotgan ma'lumotlar:", payload);
 
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
+      if (!token) throw new Error("Token mavjud emas");
 
-      const response = await axios.post(
+      const res = await axios.post(
         "http://localhost:4000/admin/assign-owner",
         payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success(
-        response.data.message || "To‘yxona egasi muvaffaqiyatli biriktirildi",
-        {
-          duration: 3000,
-        }
-      );
-
-      setFormData({
-        venue_name: "",
-        owner_name: "",
-        venue_id: "",
-        owner_id: "",
-      });
-
+      toast.success(res.data.message || "Egasi muvaffaqiyatli biriktirildi");
+      setFormData({ venue_name: "", owner_name: "" });
       navigate("/admin/venues");
-    } catch (error) {
-      console.error("Error assigning owner:", error);
-      const errorMessage =
-        error.response?.data?.message || "Egani biriktirishda xatolik yuz berdi";
-      setError(errorMessage);
-      toast.error(errorMessage, {
-        duration: 3000,
-      });
-      if (error.response?.status === 401) {
+    } catch (err) {
+      console.error("Xatolik:", err);
+      const msg = err.response?.data?.message || "Egani biriktirishda xatolik yuz berdi";
+      setError(msg);
+      toast.error(msg);
+      if (err.response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");
       }
@@ -144,53 +107,108 @@ const AssignOwner = () => {
   };
 
   return (
-    <Box p={{ xs: 2, sm: 3 }} maxWidth="600px" mx="auto">
+    <Box
+      p={{ xs: 2, sm: 3 }}
+      maxWidth="600px"
+      mx="auto"
+      sx={{
+        backgroundColor: "#fff",
+        borderRadius: "12px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+        color: "#333",
+      }}
+    >
       <Typography
         variant="h5"
         gutterBottom
-        sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+        sx={{
+          fontWeight: "bold",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          color: "#ff4d94",
+        }}
       >
         🔗 To‘yxonaga egasi biriktirish
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert
+          severity="error"
+          sx={{
+            mb: 2,
+            backgroundColor: "#fee2e2",
+            color: "#dc2626",
+            border: "1px solid #ff4d94",
+            borderRadius: "8px",
+          }}
+        >
           {error}
         </Alert>
       )}
 
       <form onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          <TextField
-            label="To‘yxona nomi"
-            name="venue_name"
+        <Stack spacing={3}>
+          <Autocomplete
+            options={venues.map((v) => v.name)}
             value={formData.venue_name}
-            onChange={handleChange}
-            variant="outlined"
-            fullWidth
-            disabled={loading}
-            helperText={"To‘yxona nomini kiriting"}
-            error={!!error && !formData.venue_name.trim()}
+            onChange={(e, newValue) => handleChange("venue_name", newValue || "")}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="To‘yxona nomi"
+                fullWidth
+                disabled={loading}
+                helperText="To‘yxona nomini tanlang"
+                sx={{
+                  "& .MuiInputLabel-root": { color: "#ff4d94" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#ff4d94" },
+                    "&:hover fieldset": { borderColor: "#ff4d94" },
+                    "&.Mui-focused fieldset": { borderColor: "#ff4d94" },
+                  },
+                }}
+              />
+            )}
           />
 
-          <TextField
-            label="Egasi nomi"
-            name="owner_name"
+          <Autocomplete
+            options={owners.map((o) => o.username)}
             value={formData.owner_name}
-            onChange={handleChange}
-            variant="outlined"
-            fullWidth
-            disabled={loading}
-            helperText={"Egasi nomini kiriting"}
-            error={!!error && !formData.owner_name.trim()}
+            onChange={(e, newValue) => handleChange("owner_name", newValue || "")}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Egasi nomi"
+                fullWidth
+                disabled={loading}
+                helperText="Egasi nomini tanlang"
+                sx={{
+                  "& .MuiInputLabel-root": { color: "#ff4d94" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#ff4d94" },
+                    "&:hover fieldset": { borderColor: "#ff4d94" },
+                    "&.Mui-focused fieldset": { borderColor: "#ff4d94" },
+                  },
+                }}
+              />
+            )}
           />
 
           <Button
             type="submit"
             variant="contained"
-            color="primary"
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : null}
+            sx={{
+              backgroundColor: "#ff4d94",
+              "&:hover": { backgroundColor: "#ff1a75" },
+              color: "#fff",
+              fontWeight: "bold",
+              padding: "10px",
+              borderRadius: "8px",
+              textTransform: "none",
+            }}
           >
             {loading ? "Biriktirmoqda..." : "Biriktirish"}
           </Button>

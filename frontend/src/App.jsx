@@ -12,46 +12,47 @@ import NotFound from "./pages/notFound/NotFound";
 import PrivateRoute from "./components/PrivateRoute";
 import Home from "./pages/home/Home";
 import { ToastContainer } from "react-toastify";
-import { Toaster } from "sonner";
-
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <>
-    <Routes>
-      {/* Umumiy (Public) yo‘llar */}
-      <Route element={<PublicRoute />}>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Landing />} /> {/* Home linki bu yerga yo‘naltiriladi */}
-          <Route path="/venue" element={<Home />} /> {/* To‘yxonalar linki bu yerga */}
-          <Route path="/user-venues/:id" element={<VenueInfos />} />
-          <Route path="/user-bookings" element={<UserBookings />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Route>
-
-      {/* Maxsus (Private) yo‘llar */}
-      <Route element={<PrivateRoute />}>
-        {routes.map(({ path, layout: Layout, children }) => (
-          <Route key={path} path={path} element={<Layout />}>
-            {Array.isArray(children) &&
-              children.map(({ path: childPath, element }, idx) => (
-                <Route
-                  key={idx}
-                  index={childPath === "" || childPath === undefined}
-                  path={childPath}
-                  element={element}
-                />
-              ))}
+      <Routes>
+        {/* Umumiy (Public) yo‘llar */}
+        <Route element={<PublicRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/venue" element={<Home />} />
+            <Route path="/user-venues/:id" element={<VenueInfos />} />
+            <Route path="/user-bookings" element={<UserBookings />} />
           </Route>
-        ))}
-      </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Route>
 
-      {/* Noto‘g‘ri yo‘llar uchun */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-    <ToastContainer
+        {/* Maxsus (Private) yo‘llar */}
+        <Route element={<PrivateRoute />}>
+          {routes.map(({ path, layout: Layout, children }) => (
+            <Route key={path} path={path} element={<Layout />}>
+              {Array.isArray(children) &&
+                children.map(({ path: childPath, element }, idx) => (
+                  <Route
+                    key={idx}
+                    index={childPath === "" || childPath === undefined}
+                    path={childPath}
+                    element={element}
+                  />
+                ))}
+            </Route>
+          ))}
+        </Route>
+
+        {/* Noto‘g‘ri yo‘llar uchun */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {/* Toast container */}
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -63,13 +64,7 @@ function App() {
         pauseOnHover
         theme="colored"
       />
-      <Toaster
-        position="top-right"
-        duration={3000}
-        richColors
-        closeButton
-      />
-      </>
+    </>
   );
 }
 

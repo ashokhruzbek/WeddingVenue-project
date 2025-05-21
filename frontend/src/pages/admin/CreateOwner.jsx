@@ -16,7 +16,7 @@ const CreateOwner = () => {
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
-    phone_number: "",
+    username: "", // changed from phone_number to username
     email: "",
   });
   const [loading, setLoading] = useState(false);
@@ -28,9 +28,8 @@ const CreateOwner = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validatePhoneNumber = (phone) => {
-    const phoneRegex = /^\+998\d{9}$/;
-    return phoneRegex.test(phone);
+  const validateUsername = (username) => {
+    return username.trim().length > 0; // Basic check for username
   };
 
   const validateEmail = (email) => {
@@ -44,7 +43,7 @@ const CreateOwner = () => {
     setError(null);
     setLoading(true);
 
-    // Validatsiya
+    // Validation
     if (!formData.firstname.trim()) {
       setError("Ismni kiriting");
       setLoading(false);
@@ -55,8 +54,8 @@ const CreateOwner = () => {
       setLoading(false);
       return;
     }
-    if (!validatePhoneNumber(formData.phone_number)) {
-      setError("Telefon raqami +998 bilan boshlanib, 12 raqamdan iborat bo‘lishi kerak");
+    if (!validateUsername(formData.username)) {
+      setError("Username kiritilishi kerak");
       setLoading(false);
       return;
     }
@@ -66,12 +65,12 @@ const CreateOwner = () => {
       return;
     }
 
-    // Yuboriladigan ma'lumot
+    // Payload
     const payload = {
       firstname: formData.firstname,
       lastname: formData.lastname,
-      username: formData.phone_number, // telefon raqamni username qilamiz
-      password: "owner123", // vaqtincha parol yoki generate qilingan parol
+      username: formData.username, // using username now
+      password: "owner123", // Replace with a secure method or random generation
       email: formData.email || undefined,
     };
 
@@ -94,11 +93,11 @@ const CreateOwner = () => {
       setFormData({
         firstname: "",
         lastname: "",
-        phone_number: "",
+        username: "", // reset username as well
         email: "",
       });
 
-      navigate("/admin/owners");
+      navigate("/admin/user");
     } catch (error) {
       console.error("Owner yaratishda xatolik:", error);
       const errorMessage = error.response?.data?.message || "Xatolik yuz berdi";
@@ -114,19 +113,48 @@ const CreateOwner = () => {
   };
 
   return (
-    <Box p={3} maxWidth="600px" mx="auto">
-      <Typography variant="h5" gutterBottom fontWeight="bold">
+    <Box
+      p={{ xs: 2, sm: 3 }}
+      maxWidth="600px"
+      mx="auto"
+      sx={{
+        backgroundColor: "#ffffff",
+        borderRadius: "12px",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        color: "#333333",
+      }}
+    >
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          color: "#ff4d94",
+        }}
+      >
         👤 Yangi egasi yaratish
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert
+          severity="error"
+          sx={{
+            mb: 2,
+            backgroundColor: "#fee2e2",
+            color: "#dc2626",
+            border: "1px solid #ff4d94",
+            borderRadius: "8px",
+          }}
+        >
           {error}
         </Alert>
       )}
 
       <form onSubmit={handleSubmit}>
-        <Stack spacing={2}>
+        <Stack spacing={3}>
           <TextField
             label="Ism"
             name="firstname"
@@ -135,6 +163,14 @@ const CreateOwner = () => {
             variant="outlined"
             fullWidth
             disabled={loading}
+            sx={{
+              "& .MuiInputLabel-root": { color: "#ff4d94" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#ff4d94" },
+                "&:hover fieldset": { borderColor: "#ff4d94" },
+                "&.Mui-focused fieldset": { borderColor: "#ff4d94" },
+              },
+            }}
           />
 
           <TextField
@@ -145,17 +181,32 @@ const CreateOwner = () => {
             variant="outlined"
             fullWidth
             disabled={loading}
+            sx={{
+              "& .MuiInputLabel-root": { color: "#ff4d94" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#ff4d94" },
+                "&:hover fieldset": { borderColor: "#ff4d94" },
+                "&.Mui-focused fieldset": { borderColor: "#ff4d94" },
+              },
+            }}
           />
 
           <TextField
-            label="Telefon raqami"
-            name="phone_number"
-            value={formData.phone_number}
+            label="Username"
+            name="username" // updated to username
+            value={formData.username}
             onChange={handleChange}
             variant="outlined"
             fullWidth
-            placeholder="+998901234567"
             disabled={loading}
+            sx={{
+              "& .MuiInputLabel-root": { color: "#ff4d94" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#ff4d94" },
+                "&:hover fieldset": { borderColor: "#ff4d94" },
+                "&.Mui-focused fieldset": { borderColor: "#ff4d94" },
+              },
+            }}
           />
 
           <TextField
@@ -167,12 +218,28 @@ const CreateOwner = () => {
             fullWidth
             placeholder="example@domain.com"
             disabled={loading}
+            sx={{
+              "& .MuiInputLabel-root": { color: "#ff4d94" },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#ff4d94" },
+                "&:hover fieldset": { borderColor: "#ff4d94" },
+                "&.Mui-focused fieldset": { borderColor: "#ff4d94" },
+              },
+            }}
           />
 
           <Button
             type="submit"
             variant="contained"
-            color="primary"
+            sx={{
+              backgroundColor: "#ff4d94",
+              "&:hover": { backgroundColor: "#ff1a75" },
+              color: "#ffffff",
+              fontWeight: "bold",
+              padding: "10px",
+              borderRadius: "8px",
+              textTransform: "none",
+            }}
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : null}
           >
