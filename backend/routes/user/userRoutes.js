@@ -13,7 +13,7 @@ const { getAvailableDates } = require('../../controllers/user/getAvailableDates'
 userRouter.delete('/cancel-booking/:id', cancelBooking )
 userRouter.post('/add-booking', addBooking )
 userRouter.get('/get-venues-user', getAllVenuesForUser)
-userRouter.get('/get-booking-user', getUserBookings)
+userRouter.get('/get-user-booking', getUserBookings)
 userRouter.get('/get-available-dates', getAvailableDates)
 
 

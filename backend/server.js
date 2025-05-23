@@ -9,6 +9,7 @@ const adminRouter = require("./routes/admin/adminRoutes");
 // const { authentication } = require("./middlewares/authentication");
 const userRouter = require("./routes/user/userRoutes");
 const ownerRouter = require("./routes/owner/ownerRoutes");
+const venueRouter = require("./routes/venuesRouter/venuesRouter");
 
 app.use(cors());
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use("/", authRoutes);
 app.use("/admin", adminRouter);
 app.use('/user', userRouter);
 app.use('/owner', ownerRouter )
+app.use('/', venueRouter)
 
 
 const PORT = process.env.PORT || 4000;
