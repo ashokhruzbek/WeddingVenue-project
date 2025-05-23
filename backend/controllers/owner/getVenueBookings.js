@@ -7,7 +7,7 @@ exports.getVenueBookings = async (req, res) => {
     // Owner mavjudligini tekshirish (optional, lekin tavsiya qilinadi)
     const ownerCheck = await pool.query('SELECT id FROM bookings WHERE id = $1', [venue_id]);
     if (ownerCheck.rowCount === 0) {
-      return res.status(403).json({ message: "Siz to‘yxona egasi emassiz yoki tizimda mavjud emassiz" });
+      return res.status(200).json({ message: "Sizda to'yxonangizda bronlar yo'q" });
     }
 
     // Bronlarni olish
