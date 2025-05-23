@@ -197,8 +197,7 @@ const Sidebar = () => {
         submenu: true,
         submenuName: "bookings",
         items: [
-          { title: "Barcha buyurtmalar", path: "/owner/bookings", icon: <List size={18} /> },
-          { title: "To‘yxona buyurtmalari", path: "/owner/venue-bookings", icon: <Calendar size={18} /> },
+           { title: "To‘yxona buyurtmalari", path: "/owner/bookings", icon: <Calendar size={18} /> },
         ],
       },
       {
@@ -207,9 +206,8 @@ const Sidebar = () => {
         submenu: true,
         submenuName: "districts",
         items: [
-          { title: "Chilonzor", path: "/owner/districts/chilonzor", icon: <MapPin size={18} /> },
-          { title: "Yunusobod", path: "/owner/districts/yunusobod", icon: <MapPin size={18} /> },
-        ],
+          { title: "Hamma tumanlar", path: "/owner/districts", icon: <MapPin size={18} /> },
+         ],
       },
     ]
 
