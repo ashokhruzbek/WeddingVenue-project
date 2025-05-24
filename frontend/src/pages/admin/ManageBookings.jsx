@@ -1,11 +1,30 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { motion, AnimatePresence } from "framer-motion"
-import { toast } from "react-hot-toast"
-import { Calendar, ChevronLeft, ChevronRight, User, MapPin, Phone, Mail, Clock, Building, AlertTriangle, X, Trash2, RefreshCw, Filter, CheckCircle, XCircle, CalendarDays, List } from 'lucide-react'
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Building,
+  AlertTriangle,
+  X,
+  Trash2,
+  RefreshCw,
+  Filter,
+  CheckCircle,
+  XCircle,
+  CalendarDays,
+  List,
+} from "lucide-react";
 
 // Animation variants
 const containerVariants = {
@@ -16,7 +35,7 @@ const containerVariants = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -29,258 +48,285 @@ const itemVariants = {
       damping: 12,
     },
   },
-}
+};
 
 // Status colors
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
     case "tasdiqlangan":
     case "confirmed":
-      return "bg-green-100 text-green-800 border-green-300"
+      return "bg-green-100 text-green-800 border-green-300";
     case "kutilmoqda":
     case "pending":
-      return "bg-yellow-100 text-yellow-800 border-yellow-300"
+      return "bg-yellow-100 text-yellow-800 border-yellow-300";
     case "bekor qilingan":
     case "cancelled":
-      return "bg-red-100 text-red-800 border-red-300"
+      return "bg-red-100 text-red-800 border-red-300";
     case "bo'lib o'tgan":
     case "completed":
-      return "bg-blue-100 text-blue-800 border-blue-300"
+      return "bg-blue-100 text-blue-800 border-blue-300";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-300"
+      return "bg-gray-100 text-gray-800 border-gray-300";
   }
-}
+};
 
 const getStatusIcon = (status) => {
   switch (status?.toLowerCase()) {
     case "tasdiqlangan":
     case "confirmed":
-      return <CheckCircle className="h-4 w-4 text-green-600" />
+      return <CheckCircle className="h-4 w-4 text-green-600" />;
     case "kutilmoqda":
     case "pending":
-      return <Clock className="h-4 w-4 text-yellow-600" />
+      return <Clock className="h-4 w-4 text-yellow-600" />;
     case "bekor qilingan":
     case "cancelled":
-      return <XCircle className="h-4 w-4 text-red-600" />
+      return <XCircle className="h-4 w-4 text-red-600" />;
     case "bo'lib o'tgan":
     case "completed":
-      return <CheckCircle className="h-4 w-4 text-blue-600" />
+      return <CheckCircle className="h-4 w-4 text-blue-600" />;
     default:
-      return <AlertTriangle className="h-4 w-4 text-gray-600" />
+      return <AlertTriangle className="h-4 w-4 text-gray-600" />;
   }
-}
+};
 
 const ManageBookings = () => {
-  const [bookings, setBookings] = useState([])
-  const [filteredBookings, setFilteredBookings] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedBooking, setSelectedBooking] = useState(null)
-  const [bookingUser, setBookingUser] = useState(null)
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
-  const [statusFilter, setStatusFilter] = useState("")
-  const [viewMode, setViewMode] = useState("calendar") // 'calendar' or 'list'
-  const navigate = useNavigate()
+  const [bookings, setBookings] = useState([]);
+  const [filteredBookings, setFilteredBookings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [bookingUser, setBookingUser] = useState(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [viewMode, setViewMode] = useState("calendar"); // 'calendar' or 'list'
+  const navigate = useNavigate();
 
   // Fetch all bookings
   const fetchBookings = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("Autentifikatsiya tokeni topilmadi")
+        throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const params = {}
-      if (statusFilter) params.status = statusFilter
+      const params = {};
+      if (statusFilter) params.status = statusFilter;
 
-      const response = await axios.get("http://localhost:4000/admin/view-all-bookings", {
-        headers: { Authorization: `Bearer ${token}` },
-        params,
-      })
+      const response = await axios.get(
+        "http://localhost:4000/admin/view-all-bookings",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params,
+        }
+      );
 
-      const data = Array.isArray(response.data) ? response.data : []
-      setBookings(data)
-      setFilteredBookings(data)
+      const data = Array.isArray(response.data) ? response.data : [];
+      setBookings(data);
+      setFilteredBookings(data);
     } catch (error) {
-      console.error("Error fetching bookings:", error)
-      setError(error.response?.data?.error || "Buyurtmalarni yuklashda xatolik yuz berdi")
-      toast.error(error.response?.data?.error || "Buyurtmalarni yuklashda xatolik yuz berdi")
+      console.error("Error fetching bookings:", error);
+      setError(
+        error.response?.data?.error ||
+          "Buyurtmalarni yuklashda xatolik yuz berdi"
+      );
+      toast.error(
+        error.response?.data?.error ||
+          "Buyurtmalarni yuklashda xatolik yuz berdi"
+      );
       if (error.response?.status === 401) {
-        localStorage.removeItem("token")
-        navigate("/login")
+        localStorage.removeItem("token");
+        navigate("/login");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [statusFilter, navigate])
+  }, [statusFilter, navigate]);
 
   // Fetch booking user details
   const fetchBookingUser = async (bookingId) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("Autentifikatsiya tokeni topilmadi")
+        throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.get(`http://localhost:4000/user/get-booking-user?booking_id=${bookingId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.get(
+        `http://localhost:4000/user/get-booking-user?booking_id=${bookingId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      return response.data
+      return response.data;
     } catch (error) {
-      console.error("Error fetching booking user:", error)
-      toast.error("Foydalanuvchi ma'lumotlarini yuklashda xatolik yuz berdi")
-      return null
+      console.error("Error fetching booking user:", error);
+      toast.error("Foydalanuvchi ma'lumotlarini yuklashda xatolik yuz berdi");
+      return null;
     }
-  }
+  };
 
   // Cancel booking
   const handleCancelBooking = async () => {
     if (!selectedBooking?.id) {
-      toast.error("Noto'g'ri buyurtma ID si")
-      return
+      toast.error("Noto'g'ri buyurtma ID si");
+      return;
     }
 
-    setDeleteLoading(true)
+    setDeleteLoading(true);
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("Autentifikatsiya tokeni topilmadi")
+        throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.delete(`http://localhost:4000/admin/cancel-booking/${selectedBooking.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.delete(
+        `http://localhost:4000/admin/cancel-booking/${selectedBooking.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      toast.success(response.data.message || "Buyurtma muvaffaqiyatli bekor qilindi")
-      setIsDeleteModalOpen(false)
-      setSelectedBooking(null)
-      fetchBookings()
+      toast.success(
+        response.data.message || "Buyurtma muvaffaqiyatli bekor qilindi"
+      );
+      setIsDeleteModalOpen(false);
+      setSelectedBooking(null);
+      fetchBookings();
     } catch (error) {
-      console.error("Error cancelling booking:", error)
-      toast.error(error.response?.data?.error || "Buyurtmani bekor qilishda xatolik yuz berdi")
+      console.error("Error cancelling booking:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "Buyurtmani bekor qilishda xatolik yuz berdi"
+      );
     } finally {
-      setDeleteLoading(false)
+      setDeleteLoading(false);
     }
-  }
+  };
 
   // Handle booking click
   const handleBookingClick = async (booking) => {
-    setSelectedBooking(booking)
-    const userData = await fetchBookingUser(booking.id)
-    setBookingUser(userData)
-    setIsUserModalOpen(true)
-  }
+    setSelectedBooking(booking);
+    const userData = await fetchBookingUser(booking.id);
+    setBookingUser(userData);
+    setIsUserModalOpen(true);
+  };
 
   // Open delete confirmation modal
   const handleDeleteClick = (booking) => {
-    setSelectedBooking(booking)
-    setIsDeleteModalOpen(true)
-  }
+    setSelectedBooking(booking);
+    setIsDeleteModalOpen(true);
+  };
 
   // Load bookings on component mount
   useEffect(() => {
-    fetchBookings()
-  }, [fetchBookings])
+    fetchBookings();
+  }, [fetchBookings]);
 
   // Filter bookings by month
   useEffect(() => {
     if (bookings.length > 0) {
-      const year = currentDate.getFullYear()
-      const month = currentDate.getMonth()
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
 
       const filtered = bookings.filter((booking) => {
-        const bookingDate = new Date(booking.date)
-        return bookingDate.getFullYear() === year && bookingDate.getMonth() === month
-      })
+        const bookingDate = new Date(booking.date);
+        return (
+          bookingDate.getFullYear() === year && bookingDate.getMonth() === month
+        );
+      });
 
-      setFilteredBookings(filtered)
+      setFilteredBookings(filtered);
     }
-  }, [bookings, currentDate])
+  }, [bookings, currentDate]);
 
   // Calendar navigation
   const handlePrevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))
-  }
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
+  };
 
   const handleNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
-  }
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
+  };
 
   // Generate calendar days
   const generateCalendarDays = () => {
-    const year = currentDate.getFullYear()
-    const month = currentDate.getMonth()
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
     // Get first day of month and last day of month
-    const firstDayOfMonth = new Date(year, month, 1)
-    const lastDayOfMonth = new Date(year, month + 1, 0)
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
 
     // Get day of week for first day (0 = Sunday, 1 = Monday, etc.)
-    const firstDayOfWeek = firstDayOfMonth.getDay()
-    
+    const firstDayOfWeek = firstDayOfMonth.getDay();
+
     // Adjust for Monday as first day of week
-    const adjustedFirstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1
+    const adjustedFirstDayOfWeek =
+      firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
 
     // Get total days in month
-    const daysInMonth = lastDayOfMonth.getDate()
+    const daysInMonth = lastDayOfMonth.getDate();
 
     // Create array for all days in calendar view
-    const calendarDays = []
+    const calendarDays = [];
 
     // Add empty cells for days before first day of month
     for (let i = 0; i < adjustedFirstDayOfWeek; i++) {
-      calendarDays.push({ day: null, isCurrentMonth: false })
+      calendarDays.push({ day: null, isCurrentMonth: false });
     }
 
     // Add cells for all days in month
     for (let day = 1; day <= daysInMonth; day++) {
-      calendarDays.push({ day, isCurrentMonth: true })
+      calendarDays.push({ day, isCurrentMonth: true });
     }
 
     // Add empty cells to complete the last week if needed
-    const remainingCells = 7 - (calendarDays.length % 7)
+    const remainingCells = 7 - (calendarDays.length % 7);
     if (remainingCells < 7) {
       for (let i = 0; i < remainingCells; i++) {
-        calendarDays.push({ day: null, isCurrentMonth: false })
+        calendarDays.push({ day: null, isCurrentMonth: false });
       }
     }
 
-    return calendarDays
-  }
+    return calendarDays;
+  };
 
   // Get bookings for a specific day
   const getBookingsForDay = (day) => {
-    if (!day) return []
+    if (!day) return [];
 
-    const year = currentDate.getFullYear()
-    const month = currentDate.getMonth()
-    const date = new Date(year, month, day)
-    
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const date = new Date(year, month, day);
+
     // Format date as YYYY-MM-DD for comparison
-    const formattedDate = date.toISOString().split("T")[0]
+    const formattedDate = date.toISOString().split("T")[0];
 
     return filteredBookings.filter((booking) => {
-      const bookingDate = new Date(booking.date).toISOString().split("T")[0]
-      return bookingDate === formattedDate
-    })
-  }
+      const bookingDate = new Date(booking.date).toISOString().split("T")[0];
+      return bookingDate === formattedDate;
+    });
+  };
 
   // Format date for display
   const formatDate = (date) => {
-    const options = { year: "numeric", month: "long" }
-    return date.toLocaleDateString("uz-UZ", options)
-  }
+    const options = { year: "numeric", month: "long" };
+    return date.toLocaleDateString("uz-UZ", options);
+  };
 
   // Get day of week names
   const getDayNames = () => {
-    return ["Dush", "Sesh", "Chor", "Pay", "Jum", "Shan", "Yak"]
-  }
+    return ["Dush", "Sesh", "Chor", "Pay", "Jum", "Shan", "Yak"];
+  };
 
   return (
     <div className="min-h-screen bg-white text-gray-800 p-4 sm:p-6">
@@ -292,7 +338,9 @@ const ManageBookings = () => {
       >
         <div className="flex items-center gap-2">
           <Calendar className="h-6 w-6 text-pink-500" />
-          <h1 className="text-2xl font-bold text-gray-800">Buyurtmalar kalendari</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Buyurtmalar kalendari
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -308,7 +356,9 @@ const ManageBookings = () => {
           <button
             onClick={() => setViewMode("list")}
             className={`p-2 rounded-md transition-colors ${
-              viewMode === "list" ? "bg-pink-100 text-pink-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              viewMode === "list"
+                ? "bg-pink-100 text-pink-600"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             <List className="h-5 w-5" />
@@ -361,7 +411,9 @@ const ManageBookings = () => {
               onClick={() => fetchBookings()}
               className="p-2 rounded-md bg-pink-500 text-white hover:bg-pink-600 transition-colors"
             >
-              <RefreshCw className={`h-5 w-5 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`h-5 w-5 ${loading ? "animate-spin" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -383,7 +435,10 @@ const ManageBookings = () => {
             <div className="h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-500 animate-spin"></div>
             <div
               className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-300 animate-spin"
-              style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
+              style={{
+                animationDirection: "reverse",
+                animationDuration: "1.5s",
+              }}
             ></div>
           </div>
         </div>
@@ -413,12 +468,14 @@ const ManageBookings = () => {
               {/* Calendar Grid */}
               <div className="grid grid-cols-7 auto-rows-fr">
                 {generateCalendarDays().map((calendarDay, index) => {
-                  const dayBookings = calendarDay.day ? getBookingsForDay(calendarDay.day) : []
+                  const dayBookings = calendarDay.day
+                    ? getBookingsForDay(calendarDay.day)
+                    : [];
                   const isToday =
                     calendarDay.isCurrentMonth &&
                     calendarDay.day === new Date().getDate() &&
                     currentDate.getMonth() === new Date().getMonth() &&
-                    currentDate.getFullYear() === new Date().getFullYear()
+                    currentDate.getFullYear() === new Date().getFullYear();
 
                   return (
                     <div
@@ -444,18 +501,20 @@ const ManageBookings = () => {
                                 key={booking.id}
                                 onClick={() => handleBookingClick(booking)}
                                 className={`px-2 py-1 text-xs rounded cursor-pointer flex items-center gap-1 ${getStatusColor(
-                                  booking.status,
+                                  booking.status
                                 )}`}
                               >
                                 {getStatusIcon(booking.status)}
-                                <span className="truncate">{booking.venue_name || "Noma'lum"}</span>
+                                <span className="truncate">
+                                  {booking.venue_name || "Noma'lum"}
+                                </span>
                               </div>
                             ))}
                           </div>
                         </>
                       )}
                     </div>
-                  )
+                  );
                 })}
               </div>
             </motion.div>
@@ -513,14 +572,19 @@ const ManageBookings = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredBookings.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                        <td
+                          colSpan={6}
+                          className="px-6 py-4 text-center text-gray-500"
+                        >
                           Buyurtmalar topilmadi
                         </td>
                       </tr>
                     ) : (
                       filteredBookings.map((booking) => (
                         <tr key={booking.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.id}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {booking.id}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {booking.venue_name || "Noma'lum"}
                           </td>
@@ -536,7 +600,7 @@ const ManageBookings = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
                               className={`px-2 py-1 text-xs rounded-full inline-flex items-center gap-1 ${getStatusColor(
-                                booking.status,
+                                booking.status
                               )}`}
                             >
                               {getStatusIcon(booking.status)}
@@ -547,7 +611,10 @@ const ManageBookings = () => {
                             <button
                               onClick={() => handleDeleteClick(booking)}
                               className="text-red-600 hover:text-red-800 transition-colors"
-                              disabled={booking.status === "bekor qilingan" || booking.status === "bo'lib o'tgan"}
+                              disabled={
+                                booking.status === "bekor qilingan" ||
+                                booking.status === "bo'lib o'tgan"
+                              }
                             >
                               <Trash2 className="h-5 w-5" />
                             </button>
@@ -579,7 +646,9 @@ const ManageBookings = () => {
               className="bg-white rounded-xl shadow-xl max-w-md w-full"
             >
               <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">Buyurtma ma'lumotlari</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Buyurtma ma'lumotlari
+                </h3>
                 <button
                   onClick={() => setIsUserModalOpen(false)}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
@@ -592,21 +661,30 @@ const ManageBookings = () => {
                 <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-center gap-3 mb-2">
                     <Building className="h-5 w-5 text-pink-500" />
-                    <h4 className="font-medium text-gray-800">To'yxona ma'lumotlari</h4>
+                    <h4 className="font-medium text-gray-800">
+                      To'yxona ma'lumotlari
+                    </h4>
                   </div>
                   <div className="ml-8 space-y-2">
                     <p className="text-gray-700">
-                      <span className="font-medium">Nomi:</span> {selectedBooking?.venue_name || "Noma'lum"}
+                      <span className="font-medium">Nomi:</span>{" "}
+                      {selectedBooking?.venue_name || "Noma'lum"}
                     </p>
                     <p className="text-gray-700">
                       <span className="font-medium">Sana:</span>{" "}
                       {selectedBooking?.date
-                        ? new Date(selectedBooking.date).toLocaleDateString("uz-UZ")
+                        ? new Date(selectedBooking.date).toLocaleDateString(
+                            "uz-UZ"
+                          )
                         : "Noma'lum"}
                     </p>
                     <p className="text-gray-700">
                       <span className="font-medium">Status:</span>{" "}
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(selectedBooking?.status)}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(
+                          selectedBooking?.status
+                        )}`}
+                      >
                         {selectedBooking?.status || "Noma'lum"}
                       </span>
                     </p>
@@ -617,11 +695,14 @@ const ManageBookings = () => {
                   <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex items-center gap-3 mb-2">
                       <User className="h-5 w-5 text-pink-500" />
-                      <h4 className="font-medium text-gray-800">Foydalanuvchi ma'lumotlari</h4>
+                      <h4 className="font-medium text-gray-800">
+                        Foydalanuvchi ma'lumotlari
+                      </h4>
                     </div>
                     <div className="ml-8 space-y-2">
                       <p className="text-gray-700">
-                        <span className="font-medium">Ism:</span> {bookingUser.name || "Noma'lum"}
+                        <span className="font-medium">Ism:</span>{" "}
+                        {bookingUser.name || "Noma'lum"}
                       </p>
                       <p className="text-gray-700 flex items-center gap-2">
                         <Phone className="h-4 w-4 text-gray-500" />
@@ -673,7 +754,9 @@ const ManageBookings = () => {
               className="bg-white rounded-xl shadow-xl max-w-md w-full"
             >
               <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">Buyurtmani bekor qilish</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Buyurtmani bekor qilish
+                </h3>
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
@@ -686,10 +769,15 @@ const ManageBookings = () => {
                 <div className="flex items-center gap-3 mb-4 text-amber-600 bg-amber-50 p-3 rounded-lg">
                   <AlertTriangle className="h-6 w-6 flex-shrink-0" />
                   <p>
-                    <span className="font-semibold">{selectedBooking?.venue_name}</span> to'yxonasiga{" "}
+                    <span className="font-semibold">
+                      {selectedBooking?.venue_name}
+                    </span>{" "}
+                    to'yxonasiga{" "}
                     <span className="font-semibold">
                       {selectedBooking?.date
-                        ? new Date(selectedBooking.date).toLocaleDateString("uz-UZ")
+                        ? new Date(selectedBooking.date).toLocaleDateString(
+                            "uz-UZ"
+                          )
                         : "Noma'lum"}
                     </span>{" "}
                     sanasidagi buyurtmani bekor qilishni tasdiqlaysizmi?
@@ -728,7 +816,7 @@ const ManageBookings = () => {
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default ManageBookings
+export default ManageBookings;
