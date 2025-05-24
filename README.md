@@ -118,7 +118,7 @@ backend/                             # Backend ilova papkasi
 │   │   └── userRouter.js
 │   └── venuesRouter.js         # To’yxonalar API yo‘llari
 ├── uploads/                    # Yuklangan fayllar saqlanadigan papka
-│   ├── user/                   # Foydalanuvchi rasmlari
+│   ├── users/                   # Foydalanuvchi rasmlari
 │   └── venues/                 # To’yxona rasmlari
 ├── .env                       # Muhit o‘zgaruvchilari (DB parollari, JWT kalit va h.k.)
 ├── .gitignore                 # Git uchun e'tiborga olinmasligi kerak bo‘lgan fayllar
