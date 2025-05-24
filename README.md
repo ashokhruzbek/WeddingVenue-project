@@ -68,6 +68,7 @@ frontend/                                # Frontend ilova papkasi
 ├── tailwind.config.js           # TailwindCSS konfiguratsiyasi
 └── vite.config.js               # Vite bundler konfiguratsiyasi
 ```
+### Backend
 ```bash
 backend/                             # Backend ilova papkasi
 ├── config/                         # Loyihaning konfiguratsiya fayllari
@@ -124,3 +125,4 @@ backend/                             # Backend ilova papkasi
 ├── package-lock.json          # Paketlar aniq versiyasi uchun
 ├── package.json               # NPM paketlar ro'yxati va skriptlar
 └── server.js                  # Express server boshlovchi fayl
+```
