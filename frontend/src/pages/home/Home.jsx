@@ -35,7 +35,7 @@ const handleClickCheck = () => {
       setIsLoading(true);
       try {
         const res = await axios.get(
-          "http://localhost:4000/user/get-venues-user"
+          "http://localhost:4000/venues"
         );
         setVenues(res.data.venues);
         setFilteredVenues(res.data.venues);

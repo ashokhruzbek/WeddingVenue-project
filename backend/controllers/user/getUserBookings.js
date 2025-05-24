@@ -2,7 +2,7 @@ const pool = require('../../config/db');
 
 exports.getUserBookings = async (req, res) => {
   try {
-    const userId = req.user.id; // Token orqali foydalanuvchi ID
+    const userId = req.params.id; // Token orqali foydalanuvchi ID
     const { sortBy = 'reservation_date', order = 'asc', status, venue, district } = req.query;
 
     let baseQuery = `
