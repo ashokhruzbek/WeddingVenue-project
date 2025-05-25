@@ -1,14 +1,18 @@
-import React from 'react'
-import Sidebar from '../components/sidebar/Sidebar'
-import { Outlet } from 'react-router-dom'
+import React from "react";
+import Sidebar from "../components/sidebar/Sidebar";
+import { Outlet } from "react-router-dom";
 
 function UserLayout() {
   return (
-    <div> 
-      <Sidebar/>
-      <Outlet/>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div style={{ width: "250px" }}>
+        <Sidebar />
+      </div>
+      <div style={{ flex: 1, padding: "20px" }}>
+        <Outlet />
+      </div>
     </div>
-  )
+  );
 }
 
-export default UserLayout
+export default UserLayout;
