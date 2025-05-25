@@ -2,7 +2,9 @@ import React from 'react'
 
 function UpdateVenues() {
   return (
-    <div>UpdateVenues</div>
+    <div>
+      UpdateVenues
+    </div>
   )
 }
 

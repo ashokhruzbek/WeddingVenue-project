@@ -211,7 +211,7 @@ function Owner() {
             <div className="absolute inset-0 bg-pattern opacity-10"></div>
             <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-black/30 to-transparent"></div>
             <div className="absolute bottom-4 left-6 text-white">
-              <h1 className="text-2xl font-bold">Administrator paneli</h1>
+              <h1 className="text-2xl font-bold">Dashboard </h1>
               <p className="text-white/80">To'yxona.uz tizimi boshqaruvi</p>
             </div>
           </div>

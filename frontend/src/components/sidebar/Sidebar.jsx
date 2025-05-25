@@ -186,10 +186,9 @@ const Sidebar = () => {
         submenu: true,
         submenuName: "venues",
         items: [
-          { title: "Barcha to‘yxonalar", path: "/owner/venues", icon: <List size={18} /> },
+          { title: "Barcha to‘yxonalar", path: "/owner/venues", icon: <Building size={18} /> },
           { title: "Yangi to‘yxona", path: "/owner/reg-owner", icon: <PlusCircle size={18} /> },
-          { title: "To‘yxona yangilash", path: "/owner/update-venue", icon: <Building size={18} /> },
-        ],
+         ],
       },
       {
         title: "Buyurtmalar",

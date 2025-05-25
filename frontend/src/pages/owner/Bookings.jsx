@@ -4,23 +4,24 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import DatePicker from "react-datepicker"
 import { format, isSameDay, isPast, isFuture } from "date-fns"
-import { Calendar, ChevronLeft, ChevronRight, Users, Phone, Clock, Search, Filter, User } from "lucide-react"
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  Phone,
+  Clock,
+  Search,
+  Filter,
+  User,
+  Star,
+  TrendingUp,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react"
 import "react-datepicker/dist/react-datepicker.css"
-
-// Tashkent districts array
-const tashkentDistricts = [
-  "Bektemir tumani",
-  "Chilonzor tumani",
-  "Mirobod tumani",
-  "Mirzo Ulugbek tumani",
-  "Olmazar tumani",
-  "Sergeli tumani",
-  "Shayxontohur tumani",
-  "Uchtepa tumani",
-  "Yakkasaray tumani",
-  "Yashnobod tumani",
-  "Yunusobod tumani",
-]
+import { toast } from "react-toastify"
 
 function Bookings() {
   const [bookings, setBookings] = useState([])
@@ -29,22 +30,23 @@ function Bookings() {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [filteredBookings, setFilteredBookings] = useState([])
   const [selectedDistrict, setSelectedDistrict] = useState("all")
-  const [activeTab, setActiveTab] = useState("calendar")  
+  const [activeTab, setActiveTab] = useState("calendar")
   const [searchTerm, setSearchTerm] = useState("")
   const [showBookingDetails, setShowBookingDetails] = useState(null)
 
-  // Token va user ma'lumotlarini olish (xatoliklarni oldini olish)
-  const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null
-  const user = typeof window !== 'undefined' && localStorage.getItem("user") 
-    ? JSON.parse(localStorage.getItem("user")) 
-    : { id: null }
+  // Token va user ma'lumotlarini olish
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+  const user =
+    typeof window !== "undefined" && localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : { id: null }
   const userId = user?.id
 
   useEffect(() => {
     const fetchBookings = async () => {
       setLoading(true)
       setError(null)
-      
+
       if (!token || !userId) {
         setError("Token yoki foydalanuvchi ma'lumotlari topilmadi")
         setLoading(false)
@@ -52,47 +54,42 @@ function Bookings() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:4000/owner/view-venue-booking/${userId}`, {
+        const response = await axios.get(`http://localhost:4000/owner/view-venue-booking/${ userId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         })
 
-        console.log("API Response:", response.data) // Debug uchun
+        console.log("API Response:", response.data)
 
-        // API dan kelgan ma'lumotni to'g'ri olish
         let bookingsData = []
-        
+
         if (response.data) {
-          // Turli formatlarni qo'llab-quvvatlash
           if (Array.isArray(response.data)) {
             bookingsData = response.data
           } else if (response.data.bookings && Array.isArray(response.data.bookings)) {
             bookingsData = response.data.bookings
           } else if (response.data.data && Array.isArray(response.data.data)) {
             bookingsData = response.data.data
-          } else if (typeof response.data === 'object' && response.data !== null) {
-            // Agar object bo'lsa, uni array ga aylantirish
+          } else if (typeof response.data === "object" && response.data !== null) {
             bookingsData = [response.data]
           }
         }
 
-        // Ma'lumotlarni tekshirish va formatlash
-        const formattedBookings = bookingsData.map(booking => ({
+        const formattedBookings = bookingsData.map((booking) => ({
           ...booking,
           booking_id: booking.booking_id || booking.id || booking._id || Date.now(),
-          venue_name: booking.venue_name || booking.name || 'Noma\'lum joy',
+          venue_name: booking.venue_name || booking.name || "Noma'lum joy",
           reservation_date: booking.reservation_date || booking.date || booking.booking_date,
           guest_count: booking.guest_count || booking.guests || booking.people_count || 0,
-          firstname: booking.firstname || booking.first_name || booking.client_name || '',
-          lastname: booking.lastname || booking.last_name || '',
-          client_phone: booking.client_phone || booking.phone || booking.contact || '',
-          status: booking.status || 'pending'
+          firstname: booking.firstname || booking.first_name || booking.client_name || "",
+          lastname: booking.lastname || booking.last_name || "",
+          client_phone: booking.client_phone || booking.phone || booking.contact || "",
+          status: booking.status || "pending",
         }))
 
         setBookings(formattedBookings)
-        
       } catch (error) {
         console.error("Error fetching bookings:", error)
         setError(error.response?.data?.message || error.message || "Ma'lumotlarni yuklashda xatolik yuz berdi")
@@ -104,7 +101,6 @@ function Bookings() {
     fetchBookings()
   }, [token, userId])
 
-  // Filter bookings when selected date changes
   useEffect(() => {
     if (Array.isArray(bookings) && bookings.length > 0 && selectedDate) {
       const filtered = bookings.filter((booking) => {
@@ -122,8 +118,7 @@ function Bookings() {
     }
   }, [selectedDate, bookings])
 
-  // Get upcoming bookings (faqat array bo'lsa)
-  const upcomingBookings = Array.isArray(bookings) 
+  const upcomingBookings = Array.isArray(bookings)
     ? bookings.filter((booking) => {
         if (!booking.reservation_date) return false
         try {
@@ -134,7 +129,6 @@ function Bookings() {
       })
     : []
 
-  // Get past bookings (faqat array bo'lsa)
   const pastBookings = Array.isArray(bookings)
     ? bookings.filter((booking) => {
         if (!booking.reservation_date) return false
@@ -147,7 +141,6 @@ function Bookings() {
       })
     : []
 
-  // Get today's bookings (faqat array bo'lsa)
   const todayBookings = Array.isArray(bookings)
     ? bookings.filter((booking) => {
         if (!booking.reservation_date) return false
@@ -159,10 +152,9 @@ function Bookings() {
       })
     : []
 
-  // Custom rendering for calendar dates to highlight dates with bookings
   const renderDayContents = (day, date) => {
     if (!Array.isArray(bookings)) return <div className="flex items-center justify-center h-8 w-8">{day}</div>
-    
+
     const hasBooking = bookings.some((booking) => {
       if (!booking.reservation_date) return false
       try {
@@ -194,255 +186,353 @@ function Bookings() {
     )
   }
 
-  // Get status color and text
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
         return {
-          color: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          color: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200",
           text: "Tasdiqlangan",
-          icon: <div className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></div>,
+          icon: <CheckCircle className="w-4 h-4 text-emerald-600" />,
         }
       case "pending":
         return {
-          color: "bg-amber-100 text-amber-800 border-amber-200",
+          color: "bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200",
           text: "Kutilmoqda",
-          icon: <div className="w-2 h-2 rounded-full bg-amber-500 mr-1.5"></div>,
+          icon: <Clock className="w-4 h-4 text-amber-600" />,
         }
       case "cancelled":
         return {
-          color: "bg-rose-100 text-rose-800 border-rose-200",
+          color: "bg-gradient-to-r from-rose-50 to-red-50 text-rose-700 border-rose-200",
           text: "Bekor qilingan",
-          icon: <div className="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></div>,
+          icon: <XCircle className="w-4 h-4 text-rose-600" />,
         }
       default:
         return {
-          color: "bg-gray-100 text-gray-800 border-gray-200",
+          color: "bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 border-gray-200",
           text: status || "Noma'lum",
-          icon: <div className="w-2 h-2 rounded-full bg-gray-500 mr-1.5"></div>,
+          icon: <AlertCircle className="w-4 h-4 text-gray-600" />,
         }
     }
   }
 
-  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "Noma'lum sana"
+    toast.info("Noma'lum sana")
     try {
       const date = new Date(dateString)
       return format(date, "dd.MM.yyyy")
     } catch {
-      return "Noto'g'ri sana"
+      return "Noto'g'ri sana",
+      toast.error("Noto'g'ri sana formatida")
     }
   }
 
-  // Handle booking card click
   const handleBookingCardClick = (booking) => {
     setShowBookingDetails(booking)
   }
 
-  // Close booking details modal
   const closeBookingDetails = () => {
     setShowBookingDetails(null)
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
+            <Calendar className="w-8 h-8 text-purple-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <p className="mt-6 text-lg font-medium text-gray-700 animate-pulse">Bronlar yuklanmoqda...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Bronlar Boshqaruvi</h1>
-            <p className="text-gray-500">Barcha bronlaringizni bir joyda boshqaring</p>
-          </div>
-
-          <div className="mt-4 md:mt-0 flex items-center space-x-2">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Qidirish..."
-                className="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+      {/* Header Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 py-16">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full mr-4">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">Bronlar Boshqaruvi</h1>
+                  <p className="text-xl text-purple-100 mt-2">Barcha bronlaringizni bir joyda boshqaring</p>
+                </div>
+              </div>
             </div>
 
-            <button className="bg-white p-2.5 rounded-full shadow-sm border border-gray-300 hover:bg-gray-50 transition-colors">
-              <Filter className="h-4 w-4 text-gray-500" />
-            </button>
+            <div className="mt-4 md:mt-0 flex items-center space-x-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Qidirish..."
+                  className="pl-12 pr-4 py-3 rounded-xl border-0 bg-white/20 backdrop-blur-sm text-white placeholder-purple-100 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/30 transition-all duration-300"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Search className="absolute left-4 top-3.5 h-5 w-5 text-purple-100" />
+              </div>
+
+              <button className="bg-white/20 backdrop-blur-sm p-3 rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/20">
+                <Filter className="h-5 w-5 text-white" />
+              </button>
+            </div>
           </div>
         </div>
 
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute top-20 right-20 w-32 h-32 bg-purple-300/20 rounded-full blur-xl"></div>
+          <div className="absolute bottom-10 left-1/3 w-24 h-24 bg-blue-300/20 rounded-full blur-xl"></div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Bugungi bronlar</p>
-                <h3 className="text-2xl font-bold mt-1">{todayBookings.length}</h3>
-              </div>
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <Calendar className="h-6 w-6 text-purple-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Bugungi bronlar</p>
+                  <h3 className="text-3xl font-bold mt-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    {todayBookings.length}
+                  </h3>
+                  <div className="flex items-center mt-2 text-sm text-emerald-600">
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    <span>Bugun</span>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-500 to-blue-500 p-4 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Calendar className="h-8 w-8 text-white" />
+                </div>
               </div>
             </div>
+            <div className="h-2 bg-gradient-to-r from-purple-500 to-blue-500"></div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Kelasi bronlar</p>
-                <h3 className="text-2xl font-bold mt-1">{upcomingBookings.length}</h3>
-              </div>
-              <div className="bg-emerald-100 p-3 rounded-lg">
-                <Clock className="h-6 w-6 text-emerald-600" />
+          <div className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Kelasi bronlar</p>
+                  <h3 className="text-3xl font-bold mt-2 bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+                    {upcomingBookings.length}
+                  </h3>
+                  <div className="flex items-center mt-2 text-sm text-emerald-600">
+                    <Clock className="w-4 h-4 mr-1" />
+                    <span>Kelajak</span>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-emerald-500 to-green-500 p-4 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Clock className="h-8 w-8 text-white" />
+                </div>
               </div>
             </div>
+            <div className="h-2 bg-gradient-to-r from-emerald-500 to-green-500"></div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Jami bronlar</p>
-                <h3 className="text-2xl font-bold mt-1">{Array.isArray(bookings) ? bookings.length : 0}</h3>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
+          <div className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Jami bronlar</p>
+                  <h3 className="text-3xl font-bold mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    {Array.isArray(bookings) ? bookings.length : 0}
+                  </h3>
+                  <div className="flex items-center mt-2 text-sm text-blue-600">
+                    <Star className="w-4 h-4 mr-1" />
+                    <span>Barcha</span>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-500 p-4 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
               </div>
             </div>
+            <div className="h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 mb-6">
-          <button
-            className={`px-4 py-2 font-medium text-sm ${
-              activeTab === "calendar"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("calendar")}
-          >
-            Kalendar ko'rinishi
-          </button>
-          <button
-            className={`px-4 py-2 font-medium text-sm ${
-              activeTab === "list"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("list")}
-          >
-            Ro'yxat ko'rinishi
-          </button>
-        </div>
-
-        {loading && (
-          <div className="flex flex-col items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-            <p className="text-gray-600">Ma'lumotlar yuklanmoqda...</p>
-          </div>
-        )}
 
         {error && (
-          <div className="bg-rose-100 border border-rose-300 text-rose-800 p-4 rounded-lg text-center mb-6">
-            <p className="font-medium">Xatolik yuz berdi:</p>
-            <p className="text-sm mt-1">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="mt-3 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded text-sm"
+          <div className="mb-8 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center">
+              <AlertCircle className="w-6 h-6 text-red-600 mr-3" />
+              <div>
+                <p className="text-red-800 font-medium">Xatolik yuz berdi:</p>
+                <p className="text-red-700 text-sm mt-1">{error}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105"
             >
               Qaytadan yuklash
             </button>
           </div>
         )}
 
-        {!loading && !error && activeTab === "calendar" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Tabs */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-2 mb-8 inline-flex">
+          <button
+            className={`px-6 py-3 font-medium text-sm rounded-xl transition-all duration-300 ${
+              activeTab === "calendar"
+                ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg transform scale-105"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+            }`}
+            onClick={() => setActiveTab("calendar")}
+          >
+            <Calendar className="w-4 h-4 inline mr-2" />
+            Kalendar ko'rinishi
+          </button>
+          <button
+            className={`px-6 py-3 font-medium text-sm rounded-xl transition-all duration-300 ${
+              activeTab === "list"
+                ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg transform scale-105"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+            }`}
+            onClick={() => setActiveTab("list")}
+          >
+            <Users className="w-4 h-4 inline mr-2" />
+            Ro'yxat ko'rinishi
+          </button>
+        </div>
+
+        {!error && activeTab === "calendar" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Calendar Section */}
-            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-                  <Calendar className="h-5 w-5 text-purple-600" />
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold flex items-center gap-3 text-gray-800 mb-4">
+                  <div className="p-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
                   Kalendar
                 </h2>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <span className="inline-block h-2.5 w-2.5 bg-emerald-500 rounded-full mr-1.5"></span>
-                    Kelasi bronlar
+                <div className="grid grid-cols-1 gap-3 text-sm">
+                  <div className="flex items-center p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <span className="inline-block h-3 w-3 bg-emerald-500 rounded-full mr-3"></span>
+                    <span className="text-emerald-700 font-medium">Kelasi bronlar</span>
                   </div>
-                  <div className="flex items-center">
-                    <span className="inline-block h-2.5 w-2.5 bg-gray-400 rounded-full mr-1.5"></span>
-                    O'tgan bronlar
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <span className="inline-block h-3 w-3 bg-gray-400 rounded-full mr-3"></span>
+                    <span className="text-gray-700 font-medium">O'tgan bronlar</span>
                   </div>
-                  <div className="flex items-center">
-                    <span className="inline-block h-2.5 w-2.5 bg-purple-500 rounded-full mr-1.5"></span>
-                    Bugungi bronlar
+                  <div className="flex items-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <span className="inline-block h-3 w-3 bg-purple-500 rounded-full mr-3"></span>
+                    <span className="text-purple-700 font-medium">Bugungi bronlar</span>
                   </div>
                 </div>
               </div>
 
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                inline
-                renderDayContents={renderDayContents}
-                calendarClassName="w-full"
-                wrapperClassName="w-full"
-                previousMonthButtonLabel={<ChevronLeft className="h-4 w-4" />}
-                nextMonthButtonLabel={<ChevronRight className="h-4 w-4" />}
-                dayClassName={(date) =>
-                  isSameDay(date, selectedDate)
-                    ? "bg-purple-600 text-white rounded-full hover:bg-purple-700"
-                    : undefined
-                }
-              />
+             <div className="calendar-container">
+  <DatePicker
+    selected={selectedDate}
+    onChange={(date) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Bugunning boshini olish (12:47 PM dan foydalanmaydi, faqat sana hisoblanadi)
+
+      if (date && isPast(date) && !isSameDay(date, today)) {
+        toast.error("Bu o‘tgan kun, tanlay olmaysiz!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return; // Sana o‘zgartirilmaydi
+      }
+      setSelectedDate(date); // Faqat bugun yoki kelajakdagi sanalar uchun o‘zgartirish
+    }}
+    inline
+    renderDayContents={renderDayContents}
+    calendarClassName="w-full custom-calendar"
+    wrapperClassName="w-full"
+    previousMonthButtonLabel={<ChevronLeft className="h-4 w-4" />}
+    nextMonthButtonLabel={<ChevronRight className="h-4 w-4" />}
+    dayClassName={(date) =>
+      isSameDay(date, selectedDate)
+        ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600"
+        : "hover:bg-purple-50 rounded-full transition-colors duration-200"
+    }
+  />
+</div>
             </div>
 
             {/* Selected Date Bookings */}
-            <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-              <h2 className="text-lg font-semibold mb-4 text-gray-800">
-                {format(selectedDate, "dd.MM.yyyy")} sanasidagi bronlar
-              </h2>
+            <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  {format(selectedDate, "dd.MM.yyyy")} sanasidagi bronlar
+                </h2>
+                <div className="bg-gradient-to-r from-purple-100 to-blue-100 px-4 py-2 rounded-full">
+                  <span className="text-purple-700 font-semibold text-sm">{filteredBookings.length} ta bron</span>
+                </div>
+              </div>
 
               {filteredBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                  <Calendar className="h-16 w-16 mb-4 text-gray-300" />
-                  <p>Bu sana uchun bronlar mavjud emas</p>
+                  <div className="p-6 bg-gradient-to-br from-gray-50 to-slate-50 rounded-full mb-4">
+                    <Calendar className="h-16 w-16 text-gray-300" />
+                  </div>
+                  <p className="text-lg font-medium text-gray-500">Bu sana uchun bronlar mavjud emas</p>
+                  <p className="text-sm text-gray-400 mt-1">Boshqa sanani tanlang</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {filteredBookings.map((booking) => {
+                  {filteredBookings.map((booking, index) => {
                     const statusInfo = getStatusInfo(booking.status)
                     return (
                       <div
                         key={booking.booking_id || Math.random()}
-                        className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                        className="group bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
                         onClick={() => handleBookingCardClick(booking)}
+                        style={{
+                          animationDelay: `${index * 100}ms`,
+                          animation: "fadeInUp 0.5s ease-out forwards",
+                        }}
                       >
-                        <div className="flex justify-between items-start">
+                        <div className="flex justify-between items-start mb-4">
                           <div>
-                            <h3 className="font-medium text-gray-800">{booking.venue_name || "Noma'lum joy"}</h3>
-                            <div className="flex items-center mt-1 text-sm text-gray-500">
-                              <Users className="h-4 w-4 mr-1.5" />
-                              {booking.guest_count || 0} mehmon
+                            <h3 className="font-bold text-gray-800 text-lg group-hover:text-purple-600 transition-colors duration-300">
+                              {booking.venue_name || "Noma'lum joy"}
+                            </h3>
+                            <div className="flex items-center mt-2 text-gray-600">
+                              <Users className="h-4 w-4 mr-2 text-blue-500" />
+                              <span className="font-medium">{booking.guest_count || 0} mehmon</span>
                             </div>
                           </div>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs border ${statusInfo.color} flex items-center`}
+                          <div
+                            className={`px-4 py-2 rounded-xl border ${statusInfo.color} flex items-center gap-2 shadow-sm`}
                           >
                             {statusInfo.icon}
-                            {statusInfo.text}
-                          </span>
+                            <span className="font-medium text-sm">{statusInfo.text}</span>
+                          </div>
                         </div>
 
-                        <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-2 text-sm">
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                           <div className="flex items-center text-gray-600">
-                            <User className="h-4 w-4 mr-1.5 text-gray-400" />
-                            {`${booking.firstname || ""} ${booking.lastname || ""}`.trim() || "Noma'lum"}
+                            <User className="h-4 w-4 mr-2 text-purple-500" />
+                            <span className="text-sm font-medium">
+                              {`${booking.firstname || ""} ${booking.lastname || ""}`.trim() || "Noma'lum"}
+                            </span>
                           </div>
                           <div className="flex items-center text-gray-600">
-                            <Phone className="h-4 w-4 mr-1.5 text-gray-400" />
-                            {booking.client_phone || "Noma'lum"}
+                            <Phone className="h-4 w-4 mr-2 text-green-500" />
+                            <span className="text-sm">{booking.client_phone || "Noma'lum"}</span>
                           </div>
                         </div>
                       </div>
@@ -454,46 +544,34 @@ function Bookings() {
           </div>
         )}
 
-        {!loading && !error && activeTab === "list" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        {!error && activeTab === "list" && (
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             {!Array.isArray(bookings) || bookings.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                <Calendar className="h-16 w-16 mb-4 text-gray-300" />
-                <p>Bronlar mavjud emas</p>
+              <div className="flex flex-col items-center justify-center h-64 text-gray-400 p-8">
+                <div className="p-6 bg-gradient-to-br from-gray-50 to-slate-50 rounded-full mb-4">
+                  <Calendar className="h-16 w-16 text-gray-300" />
+                </div>
+                <p className="text-lg font-medium text-gray-500">Bronlar mavjud emas</p>
+                <p className="text-sm text-gray-400 mt-1">Hozircha hech qanday bron yo'q</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gradient-to-r from-purple-50 to-blue-50">
                     <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Joy nomi
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Sana
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Mijoz
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Mehmonlar
                       </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Holati
                       </th>
                     </tr>
@@ -504,8 +582,10 @@ function Bookings() {
                       return (
                         <tr
                           key={booking.booking_id || index}
-                          className={`hover:bg-gray-50 cursor-pointer ${
-                            booking.reservation_date && isSameDay(new Date(booking.reservation_date), selectedDate) ? "bg-purple-50" : ""
+                          className={`hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 cursor-pointer transition-all duration-300 ${
+                            booking.reservation_date && isSameDay(new Date(booking.reservation_date), selectedDate)
+                              ? "bg-gradient-to-r from-purple-50 to-blue-50 border-l-4 border-purple-500"
+                              : ""
                           }`}
                           onClick={() => {
                             if (booking.reservation_date) {
@@ -515,26 +595,37 @@ function Bookings() {
                           }}
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{booking.venue_name || "Noma'lum joy"}</div>
-                            <div className="text-xs text-gray-500">ID: {booking.booking_id || 'N/A'}</div>
+                            <div className="text-sm font-bold text-gray-900">
+                              {booking.venue_name || "Noma'lum joy"}
+                            </div>
+                            <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full inline-block mt-1">
+                              ID: {booking.booking_id || "N/A"}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{formatDate(booking.reservation_date)}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {formatDate(booking.reservation_date)}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
+                            <div className="text-sm font-medium text-gray-900">
                               {`${booking.firstname || ""} ${booking.lastname || ""}`.trim() || "Noma'lum"}
                             </div>
                             <div className="text-xs text-gray-500">{booking.client_phone || "Noma'lum"}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{booking.guest_count || 0}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-xs border ${statusInfo.color} flex items-center w-fit`}
+                            <div className="flex items-center">
+                              <Users className="w-4 h-4 text-blue-500 mr-2" />
+                              <span className="text-sm font-medium text-gray-900">{booking.guest_count || 0}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div
+                              className={`px-3 py-2 rounded-xl border ${statusInfo.color} flex items-center gap-2 w-fit`}
                             >
                               {statusInfo.icon}
-                              {statusInfo.text}
-                            </span>
+                              <span className="font-medium text-xs">{statusInfo.text}</span>
+                            </div>
                           </td>
                         </tr>
                       )
@@ -549,99 +640,105 @@ function Bookings() {
 
       {/* Booking Details Modal */}
       {showBookingDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Bron ma'lumotlari</h2>
-                <button onClick={closeBookingDetails} className="text-gray-400 hover:text-gray-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-200">
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Bron ma'lumotlari</h2>
+                  <p className="text-gray-500 mt-1">Batafsil ma'lumotlar</p>
+                </div>
+                <button
+                  onClick={closeBookingDetails}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                >
+                  <XCircle className="h-6 w-6 text-gray-400 hover:text-gray-600" />
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-lg text-gray-800">{showBookingDetails.venue_name || "Noma'lum joy"}</h3>
-                  <p className="text-sm text-gray-500 mt-1">Bron ID: {showBookingDetails.booking_id || 'N/A'}</p>
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border border-purple-200">
+                  <h3 className="font-bold text-xl text-gray-800 mb-2">
+                    {showBookingDetails.venue_name || "Noma'lum joy"}
+                  </h3>
+                  <div className="bg-white px-3 py-1 rounded-full inline-block">
+                    <p className="text-sm text-gray-600">
+                      Bron ID: <span className="font-mono font-medium">{showBookingDetails.booking_id || "N/A"}</span>
+                    </p>
+                  </div>
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Bron ma'lumotlari</h4>
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                    <div className="flex items-start">
-                      <Calendar className="h-5 w-5 text-gray-400 mr-3 mt-0.5" />
+                  <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-purple-600" />
+                    Bron ma'lumotlari
+                  </h4>
+                  <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <div className="flex items-start p-4 bg-white rounded-lg shadow-sm">
+                      <Calendar className="h-6 w-6 text-purple-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">Sana</p>
-                        <p className="text-sm text-gray-600">{formatDate(showBookingDetails.reservation_date)}</p>
+                        <p className="text-sm font-bold text-gray-800">Sana</p>
+                        <p className="text-lg text-gray-600 font-medium">
+                          {formatDate(showBookingDetails.reservation_date)}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start">
-                      <Users className="h-5 w-5 text-gray-400 mr-3 mt-0.5" />
+                    <div className="flex items-start p-4 bg-white rounded-lg shadow-sm">
+                      <Users className="h-6 w-6 text-blue-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">Mehmonlar soni</p>
-                        <p className="text-sm text-gray-600">{showBookingDetails.guest_count || 0} kishi</p>
+                        <p className="text-sm font-bold text-gray-800">Mehmonlar soni</p>
+                        <p className="text-lg text-gray-600 font-medium">{showBookingDetails.guest_count || 0} kishi</p>
                       </div>
                     </div>
 
-                    <div className="flex items-start">
-                      <div className="h-5 w-5 flex items-center justify-center text-gray-400 mr-3 mt-0.5">
+                    <div className="flex items-start p-4 bg-white rounded-lg shadow-sm">
+                      {getStatusInfo(showBookingDetails.status).icon}
+                      <div className="ml-4">
+                        <p className="text-sm font-bold text-gray-800">Holati</p>
                         <div
-                          className={`w-3 h-3 rounded-full ${
-                            showBookingDetails.status === "confirmed"
-                              ? "bg-emerald-500"
-                              : showBookingDetails.status === "pending"
-                                ? "bg-amber-500"
-                                : showBookingDetails.status === "cancelled"
-                                  ? "bg-rose-500"
-                                  : "bg-gray-500"
-                          }`}
-                        ></div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">Holati</p>
-                        <p className="text-sm text-gray-600">{getStatusInfo(showBookingDetails.status).text}</p>
+                          className={`px-3 py-1 rounded-lg border ${getStatusInfo(showBookingDetails.status).color} inline-block mt-1`}
+                        >
+                          <p className="text-sm font-medium">{getStatusInfo(showBookingDetails.status).text}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Mijoz ma'lumotlari</h4>
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                    <div className="flex items-start">
-                      <User className="h-5 w-5 text-gray-400 mr-3 mt-0.5" />
+                  <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <User className="w-5 h-5 text-green-600" />
+                    Mijoz ma'lumotlari
+                  </h4>
+                  <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+                    <div className="flex items-start p-4 bg-white rounded-lg shadow-sm">
+                      <User className="h-6 w-6 text-green-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">Mijoz ismi</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm font-bold text-gray-800">Mijoz ismi</p>
+                        <p className="text-lg text-gray-600 font-medium">
                           {`${showBookingDetails.firstname || ""} ${showBookingDetails.lastname || ""}`.trim() ||
                             "Noma'lum"}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start">
-                      <Phone className="h-5 w-5 text-gray-400 mr-3 mt-0.5" />
+                    <div className="flex items-start p-4 bg-white rounded-lg shadow-sm">
+                      <Phone className="h-6 w-6 text-indigo-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">Telefon raqami</p>
-                        <p className="text-sm text-gray-600">{showBookingDetails.client_phone || "Noma'lum"}</p>
+                        <p className="text-sm font-bold text-gray-800">Telefon raqami</p>
+                        <p className="text-lg text-gray-600 font-medium">
+                          {showBookingDetails.client_phone || "Noma'lum"}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 flex space-x-3">
+              <div className="mt-8 flex space-x-4">
                 <button
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                   onClick={closeBookingDetails}
                 >
                   Yopish
@@ -651,6 +748,55 @@ function Bookings() {
           </div>
         </div>
       )}
+
+    <style jsx>{`
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .custom-calendar {
+    width: 240px !important; /* Kenglikni oshirish, agar kerak bo'lsa */
+  }
+
+  .custom-calendar .react-datepicker__header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .custom-calendar .react-datepicker__current-month {
+    color: white;
+    font-weight: bold;
+  }
+
+  .custom-calendar .react-datepicker__day-name {
+    color: white;
+    font-weight: 600;
+  }
+
+  /* Strelkalarni yashirish */
+  .custom-calendar .react-datepicker__navigation {
+    display: block !important; /* Strelkalarni butunlay yashiradi */
+  }
+
+  /* Quyidagi qismlar endi kerak emas, lekin o'chirishni xohlamasangiz qoldirishingiz mumkin */
+  .custom-calendar .react-datepicker__navigation--previous {
+    left: 12px;
+  }
+
+  .custom-calendar .react-datepicker__navigation--next {
+    right: 12px;
+  }
+`}</style>
     </div>
-  )}
-  export default Bookings
+  )
+}
+
+export default Bookings
