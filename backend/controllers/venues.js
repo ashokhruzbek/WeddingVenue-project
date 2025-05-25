@@ -1,18 +1,17 @@
 const pool = require("../config/db");
 
-
 exports.viewVenues = async (req, res) => {
   try {
-    // Barcha to'yxonalarni olamiz
+    // Barcha to'yxonalarni olish
     const venuesResult = await pool.query('SELECT * FROM venues');
     const venues = venuesResult.rows;
 
-    // Hamma venues id larini olamiz
+    // Barcha venues id larini olish
     const venueIds = venues.map(v => v.id);
 
-    // Hamma rasmlarni olamiz
+    // Barcha rasmlarni olish (agar venueIds bo‘lsa)
     let images = [];
-    if (venueIds.length) {
+    if (venueIds.length > 0) {
       const imagesResult = await pool.query(
         'SELECT * FROM images WHERE venue_id = ANY($1)',
         [venueIds]
@@ -20,12 +19,15 @@ exports.viewVenues = async (req, res) => {
       images = imagesResult.rows;
     }
 
-    // Rasmlarni venuesga biriktiramiz
+    // Rasmlarni venuesga biriktirish va to‘liq URL qilish
     const venuesWithImages = venues.map(venue => ({
       ...venue,
       images: images
         .filter(img => img.venue_id === venue.id)
-        .map(img => img.image_url)
+        .map(img => ({
+          id: img.id,
+          image_url: `http://localhost:4000/uploads/${img.image_url}`
+        }))
     }));
 
     res.status(200).json({

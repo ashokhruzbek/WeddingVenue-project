@@ -11,14 +11,17 @@ exports.getAllVenues = async (req, res) => {
       });
     }
 
-    const result = await pool.query(
+    // 1. Ownerga tegishli to'yxonalarni olish
+    const venuesResult = await pool.query(
       `SELECT id, name, address, capacity, price_seat, phone_number FROM venues
        WHERE owner_id = $1
-        `,
+      `,
       [ownerId]
     );
 
-    if (result.rows.length === 0) {
+    const venues = venuesResult.rows;
+
+    if (venues.length === 0) {
       return res.status(200).json({ 
         message: "Sizga tegishli to'yxonalar topilmadi",
         venues: [],
@@ -26,9 +29,31 @@ exports.getAllVenues = async (req, res) => {
       });
     }
 
+    // 2. To'yxona IDlarini olish
+    const venueIds = venues.map(v => v.id);
+
+    // 3. Tegishli rasmlarni olish
+    const imagesResult = await pool.query(
+      `SELECT id, venue_id, image_url FROM images WHERE venue_id = ANY($1)`,
+      [venueIds]
+    );
+
+    const images = imagesResult.rows;
+
+    // 4. Rasm URLlarini to‘liq qilib biriktirish
+    const venuesWithImages = venues.map(venue => ({
+      ...venue,
+      images: images
+        .filter(img => img.venue_id === venue.id)
+        .map(img => ({
+          id: img.id,
+          image_url: `http://localhost:4000/uploads/${img.image_url}`
+        }))
+    }));
+
     return res.status(200).json({
       message: "To'yxonalar muvaffaqiyatli olindi",
-      venues: result.rows,
+      venues: venuesWithImages,
       success: true
     });
 
@@ -40,5 +65,3 @@ exports.getAllVenues = async (req, res) => {
     });
   }
 };
-
- 
