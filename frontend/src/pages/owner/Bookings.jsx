@@ -434,39 +434,23 @@ function Bookings() {
                 </div>
               </div>
 
-             <div className="calendar-container">
-  <DatePicker
-    selected={selectedDate}
-    onChange={(date) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Bugunning boshini olish (12:47 PM dan foydalanmaydi, faqat sana hisoblanadi)
-
-      if (date && isPast(date) && !isSameDay(date, today)) {
-        toast.error("Bu o‘tgan kun, tanlay olmaysiz!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        return; // Sana o‘zgartirilmaydi
-      }
-      setSelectedDate(date); // Faqat bugun yoki kelajakdagi sanalar uchun o‘zgartirish
-    }}
-    inline
-    renderDayContents={renderDayContents}
-    calendarClassName="w-full custom-calendar"
-    wrapperClassName="w-full"
-    previousMonthButtonLabel={<ChevronLeft className="h-4 w-4" />}
-    nextMonthButtonLabel={<ChevronRight className="h-4 w-4" />}
-    dayClassName={(date) =>
-      isSameDay(date, selectedDate)
-        ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600"
-        : "hover:bg-purple-50 rounded-full transition-colors duration-200"
-    }
-  />
-</div>
+       <div className="calendar-container">
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  inline
+                  renderDayContents={renderDayContents}
+                  calendarClassName="w-full custom-calendar"
+                  wrapperClassName="w-full"
+                  previousMonthButtonLabel={<ChevronLeft className="h-4 w-4" />}
+                  nextMonthButtonLabel={<ChevronRight className="h-4 w-4" />}
+                  dayClassName={(date) =>
+                    isSameDay(date, selectedDate)
+                      ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600"
+                      : "hover:bg-purple-50 rounded-full transition-colors duration-200"
+                  }
+                />
+              </div>
             </div>
 
             {/* Selected Date Bookings */}
