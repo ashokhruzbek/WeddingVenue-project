@@ -24,12 +24,43 @@ exports.getAllVenuesForUser = async (req, res) => {
 
     baseQuery += ` ORDER BY ${sortField} ${sortOrder}`;
 
-    const result = await pool.query(baseQuery, params);
+    // 1. To'yxonalarni olish
+    const venuesResult = await pool.query(baseQuery, params);
+    const venues = venuesResult.rows;
+
+    if (venues.length === 0) {
+      return res.status(200).json({
+        message: "To‘yxonalar topilmadi",
+        count: 0,
+        venues: []
+      });
+    }
+
+    // 2. To'yxona IDlarini olish
+    const venueIds = venues.map(v => v.id);
+
+    // 3. Tegishli rasmlarni olish
+    const imagesResult = await pool.query(
+      `SELECT id, venue_id, image_url FROM images WHERE venue_id = ANY($1)`,
+      [venueIds]
+    );
+    const images = imagesResult.rows;
+
+    // 4. Har bir venue ga rasmlarni biriktirish va URLni to'liq qilish
+    const venuesWithImages = venues.map(venue => ({
+      ...venue,
+      images: images
+        .filter(img => img.venue_id === venue.id)
+        .map(img => ({
+          id: img.id,
+          image_url: `http://localhost:4000/uploads/${img.image_url}`
+        }))
+    }));
 
     res.status(200).json({
       message: "Tasdiqlangan to‘yxonalar ro‘yxati",
-      count: result.rowCount,
-      venues: result.rows
+      count: venuesWithImages.length,
+      venues: venuesWithImages
     });
   } catch (error) {
     console.error("To‘yxonalarni olishda xatolik:", error);
