@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Slider from "react-slick";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Users, DollarSign, Phone, Filter } from "lucide-react";
 import { toast } from "react-toastify";
+
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function Home() {
   const [venues, setVenues] = useState([]);
@@ -12,9 +16,9 @@ function Home() {
   const [districtFilter, setDistrictFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem("token");
- const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const handleClickCheck = () => {
+  const handleClickCheck = () => {
     if (!token) {
       toast.error("Iltimos, avval tizimga kiring!", {
         duration: 3000,
@@ -28,19 +32,17 @@ const handleClickCheck = () => {
       navigate("/login");
     }
   };
- 
 
+  // Backenddan to’yxonalar va ularning rasmlarini olish
   useEffect(() => {
     const fetchVenues = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(
-          "http://localhost:4000/venues"
-        );
+        const res = await axios.get("http://localhost:4000/venues");
         setVenues(res.data.venues);
         setFilteredVenues(res.data.venues);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -48,51 +50,48 @@ const handleClickCheck = () => {
     fetchVenues();
   }, []);
 
+  // Qidiruv va tuman bo‘yicha filtr
   useEffect(() => {
     const result = venues.filter((item) => {
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
+      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
       const matchesDistrict =
-        districtFilter === "all" ||
-        item.district_id === Number.parseInt(districtFilter);
+        districtFilter === "all" || item.district_id === Number(districtFilter);
       return matchesSearch && matchesDistrict;
     });
     setFilteredVenues(result);
   }, [search, districtFilter, venues]);
 
-  const handleClick = (id) => {
-    navigate(`/booking/${id}`);
-  };
-
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
 
   const cardVariants = {
     hidden: { y: 50, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12,
-      },
-    },
+    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100, damping: 12 } },
     hover: {
       y: -10,
       boxShadow:
-        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
       transition: { type: "spring", stiffness: 400, damping: 10 },
     },
     tap: { scale: 0.98 },
+  };
+
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 400,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: true,
+    adaptiveHeight: true,
+  };
+
+  // URLdagi backslashni to‘g‘rilash va ortiqcha uploads ni bitta qilish
+  const fixImageUrl = (url) => {
+    if (!url) return "";
+    return url.replace(/\\/g, "/").replace(/(\/uploads)+/g, "/uploads");
   };
 
   return (
@@ -121,7 +120,7 @@ const handleClickCheck = () => {
           Toshkent shahridagi eng yaxshi to'yxonalarni toping va band qiling
         </motion.p>
 
-        {/* Search and Filter Section */}
+        {/* Search va filter */}
         <motion.div
           className="max-w-4xl mx-auto mb-12 bg-white rounded-2xl shadow-lg p-6"
           initial={{ opacity: 0, y: 20 }}
@@ -154,53 +153,23 @@ const handleClickCheck = () => {
                 onChange={(e) => setDistrictFilter(e.target.value)}
               >
                 <option value="all">Barcha tumanlar</option>
-                <option value="bektemir">Bektemir</option>
-                <option value="mirzo_ulugbek">Mirzo Ulugʻbek</option>
-                <option value="mirobod">Mirobod</option>
-                <option value="olmazor">Olmazor</option>
-                <option value="sergeli">Sergeli</option>
-                <option value="shayxontohur">Shayxontohur</option>
-                <option value="uchtepa">Uchtepa</option>
-                <option value="chilonzor">Chilonzor</option>
-                <option value="yunusobod">Yunusobod</option>
-                <option value="yakkasaroy">Yakkasaroy</option>
-                <option value="yangihayot">Yangihayot</option>
-                <option value="bekobod">Bekobod</option>
-                <option value="boʻka">Boʻka</option>
-                <option value="qibray">Qibray</option>
-                <option value="zangiota">Zangiota</option>
-                <option value="yangiyoʻl">Yangiyoʻl</option>
-                <option value="nurafshon">Nurafshon (shahar)</option>
-                <option value="parkent">Parkent</option>
-                <option value="ohangaron">Ohangaron</option>
-                <option value="piskent">Piskent</option>
-                <option value="olmaliq">Olmaliq (shahar)</option>
-                <option value="angren">Angren (shahar)</option>
-                <option value="chinoz">Chinoz</option>
-                <option value="oroltog">O‘rta Chirchiq</option>
-                <option value="quyichirchiq">Quyi Chirchiq</option>
-                <option value="yuqorichirchiq">Yuqori Chirchiq</option>
-                <option value="toshkent_vil_shahar">
-                  
-                </option>
+                {/* Boshqa optionlarni ham qo‘shing */}
               </select>
             </div>
           </div>
         </motion.div>
 
-        {/* Results Count */}
+        {/* Natijalar soni */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
           className="max-w-7xl mx-auto mb-6"
         >
-          <p className="text-gray-600 font-medium">
-            {filteredVenues.length} ta natija topildi
-          </p>
+          <p className="text-gray-600 font-medium">{filteredVenues.length} ta natija topildi</p>
         </motion.div>
 
-        {/* Venue Cards */}
+        {/* To’yxona kartalari */}
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -222,72 +191,62 @@ const handleClickCheck = () => {
                   Hech narsa topilmadi...
                 </motion.p>
               ) : (
-                filteredVenues.map((toy) => (
+                filteredVenues.map((venue) => (
                   <motion.div
-                    key={toy.id}
+                    key={venue.id}
                     variants={cardVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    
                     className="bg-white rounded-2xl overflow-hidden cursor-pointer"
-                    layoutId={`venue-${toy.id}`}
+                    layoutId={`venue-${venue.id}`}
                   >
-                    <div className="h-40 bg-gradient-to-r from-blue-400 to-purple-500 relative">
-                      <div className="absolute inset-0 bg-black opacity-20"></div>
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <motion.h3
-                          className="text-2xl font-bold text-white mb-1"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1 }}
-                        >
-                          {toy.name}
-                        </motion.h3>
-                      </div>
-                    </div>
+                    {/* Rasm slayderi */}
+                    <Slider {...sliderSettings} className="h-40 rounded-t-2xl overflow-hidden">
+                      {venue.images && venue.images.length > 0 ? (
+                        venue.images.map((img, idx) => (
+                          <div key={idx} className="h-40">
+                            <img
+                              src={fixImageUrl(img.image_url)}
+                              alt={`${venue.name} - ${idx + 1}`}
+                              className="w-full h-40 object-cover"
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="h-40 bg-gray-200 flex items-center justify-center rounded-t-2xl">
+                          <span className="text-gray-400">Rasm mavjud emas</span>
+                        </div>
+                      )}
+                    </Slider>
 
+                    {/* To’yxona ma’lumotlari */}
                     <div className="p-6 space-y-3">
                       <div className="flex items-start gap-3">
-                        <MapPin
-                          className="text-blue-500 shrink-0 mt-0.5"
-                          size={18}
-                        />
-                        <p className="text-gray-700">{toy.address}</p>
+                        <MapPin className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                        <p className="text-gray-700">{venue.address}</p>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Users
-                          className="text-blue-500 shrink-0 mt-0.5"
-                          size={18}
-                        />
+                        <Users className="text-blue-500 shrink-0 mt-0.5" size={18} />
                         <p className="text-gray-700">
-                          <span className="font-semibold">{toy.capacity}</span>{" "}
-                          kishi
+                          <span className="font-semibold">{venue.capacity}</span> kishi
                         </p>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <DollarSign
-                          className="text-blue-500 shrink-0 mt-0.5"
-                          size={18}
-                        />
+                        <DollarSign className="text-blue-500 shrink-0 mt-0.5" size={18} />
                         <p className="text-gray-700">
-                          <span className="font-semibold">
-                            {toy.price_seat}
-                          </span>{" "}
-                          ming so'm
+                          <span className="font-semibold">{venue.price_seat}</span> ming so'm
                         </p>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Phone
-                          className="text-blue-500 shrink-0 mt-0.5"
-                          size={18}
-                        />
-                        <p className="text-gray-700">{toy.phone_number}</p>
+                        <Phone className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                        <p className="text-gray-700">{venue.phone_number}</p>
                       </div>
 
-                      <motion.button onClick={handleClickCheck}
+                      <motion.button
+                        onClick={handleClickCheck}
                         className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors duration-200"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
