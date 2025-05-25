@@ -24,10 +24,10 @@ function UserBookings() {
   // Token va user_id ni olish
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
   const user =
-    typeof window !== "undefined" && localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user"))
+    typeof window !== "undefined" && localStorage.getItem('user')
+      ? JSON.parse(localStorage.getItem('user'))
       : { id: null }
-  const userId = user?.id
+  const userId = user.id
 
   // To'yxonalarni olish
   useEffect(() => {
@@ -127,7 +127,7 @@ function UserBookings() {
         status: "endi bo`ladigan",
       })
     } catch (err) {
-      console.error("Bron qo'shishda xatolik:", err)
+      console.error("Bron qo'shishda xatolik:", err.message)
       const errorMessage = err.response?.data?.error || "Bron qo'shishda xatolik yuz berdi"
       setError(errorMessage)
       toast.error(errorMessage, {

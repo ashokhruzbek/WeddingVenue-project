@@ -9,8 +9,9 @@ exports.addBooking = async (req, res) => {
     }
 
     const user_id = req.user.id;
-    const venue_id = req.params.id; // venue_id ni URL parametridan olish
-    const { reservation_date, guest_count, client_phone, status: incomingStatus } = req.body;
+    const { venue_id, reservation_date, guest_count, client_phone, status: incomingStatus } = req.body;
+    console.log(user_id);
+    
 
     // Default holat: "endi bo‘ladigan"
     let status = 'endi bo`ladigan';
