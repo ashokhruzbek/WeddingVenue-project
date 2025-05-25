@@ -95,7 +95,7 @@ function UserBookings() {
 
     try {
       const response = await axios.post(
-        `http://localhost:4000/user/add-booking${userId}`,
+        `http://localhost:4000/user/add-booking/${userId}`,
         {
           venue_id: Number(formData.venue_id),
           reservation_date: formData.reservation_date.toISOString().split("T")[0],
