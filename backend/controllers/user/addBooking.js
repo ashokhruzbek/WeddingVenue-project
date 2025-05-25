@@ -1,17 +1,15 @@
-const pool = require('../../config/db'); // db.js faylga havola
+// controllers/bookingController.js
+const pool = require('../../config/db');
 
 exports.addBooking = async (req, res) => {
   try {
-    // req.user ni tekshirish (autentifikatsiya middleware orqali kelishi kerak)
+    // req.user ni xavfsiz tekshirish
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: 'Foydalanuvchi autentifikatsiyadan o‘tmadi' });
     }
 
     const user_id = req.user.id;
-
-    // venue_id URL parametrlardan olinadi, body dan emas (shu holda)
-    const venue_id = req.params.id || req.body.venue_id;
-
+    const venue_id = req.params.id; // venue_id ni URL parametridan olish
     const { reservation_date, guest_count, client_phone, status: incomingStatus } = req.body;
 
     // Default holat: "endi bo‘ladigan"
@@ -27,8 +25,16 @@ exports.addBooking = async (req, res) => {
       return res.status(400).json({ error: 'Barcha maydonlar to‘ldirilishi shart' });
     }
 
+    // Telefon raqam validatsiyasi
+    const phoneRegex = /^\+998\d{9}$/;
+    if (!phoneRegex.test(client_phone)) {
+      return res.status(400).json({ error: 'Telefon raqami noto‘g‘ri formatda (masalan: +998901234567)' });
+    }
+
     const bookingDate = new Date(reservation_date);
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Bugungi sanani 00:00:00 ga o‘rnatamiz
+    bookingDate.setHours(0, 0, 0, 0); // Bron sanasini 00:00:00 ga o‘rnatamiz
 
     // Sana tekshiruvi: faqat kelajak bo‘lishi kerak, faqat "endi bo‘ladigan" holatda
     if (status === 'endi bo`ladigan' && bookingDate <= today) {
@@ -72,9 +78,8 @@ exports.addBooking = async (req, res) => {
 
     res.status(201).json({
       message: 'Bron muvaffaqiyatli qo‘shildi',
-      booking: result.rows[0]
+      booking: result.rows[0],
     });
-
   } catch (err) {
     console.error('Bron qo‘shishda xatolik:', err);
     res.status(500).json({ error: 'Bron qo‘shishda xatolik yuz berdi' });

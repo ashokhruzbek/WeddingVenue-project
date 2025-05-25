@@ -1,11 +1,24 @@
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { Building, Phone, Users, DollarSign, ImageIcon, Heart } from "lucide-react";
+import {
+  Building,
+  Phone,
+  Users,
+  DollarSign,
+  ImageIcon,
+  Heart,
+  MapPin,
+  Star,
+  Sparkles,
+  Eye,
+  Calendar,
+  Crown,
+} from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -37,11 +50,21 @@ const heartVariants = {
   },
 };
 
+const modalVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 100, damping: 15 },
+  },
+  exit: { opacity: 0, y: 50, scale: 0.8, transition: { duration: 0.2 } },
+};
+
 const Venues = () => {
   const [venues, setVenues] = useState([]);
-  // localStorage-dan darhol yuklash
   const [favorites, setFavorites] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const storedFavorites = localStorage.getItem("favorites");
       return storedFavorites ? JSON.parse(storedFavorites) : [];
     }
@@ -49,11 +72,28 @@ const Venues = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [formData, setFormData] = useState({
+    reservation_date: null,
+    guest_count: "",
+    client_phone: "",
+    status: "endi bo`ladigan",
+  });
+
   const navigate = useNavigate();
 
-  // localStorage-ga saqlash
+  // Tokenni tekshirish va yo‘naltirish
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Iltimos, tizimga kiring");
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
       localStorage.setItem("favorites", JSON.stringify(favorites));
     }
   }, [favorites]);
@@ -73,19 +113,11 @@ const Venues = () => {
       const filteredVenues = (response.data.venues || response.data).filter(
         (venue) => venue.status === "tasdiqlangan"
       );
-
       setVenues(filteredVenues);
     } catch (error) {
       console.error("Xatolik yuz berdi:", error);
-      setError(
-        error.response?.data?.error ||
-          error.message ||
-          "To'yxonalarni olishda xatolik yuz berdi"
-      );
-      toast.error(
-        error.response?.data?.error ||
-          "To'yxonalarni olishda xatolik yuz berdi"
-      );
+      setError(error.response?.data?.error || error.message || "To'yxonalarni olishda xatolik yuz berdi");
+      toast.error(error.response?.data?.error || "To'yxonalarni olishda xatolik yuz berdi");
       if (error.response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");
@@ -101,21 +133,18 @@ const Venues = () => {
 
   const toggleFavorite = (venueId) => {
     setFavorites((prev) => {
-      const newFavorites = prev.includes(venueId)
-        ? prev.filter((id) => id !== venueId)
-        : [...prev, venueId];
-      
-      // Darhol localStorage-ga saqlash
-      if (typeof window !== 'undefined') {
+      const newFavorites = prev.includes(venueId) ? prev.filter((id) => id !== venueId) : [...prev, venueId];
+
+      if (typeof window !== "undefined") {
         localStorage.setItem("favorites", JSON.stringify(newFavorites));
       }
-      
+
       if (prev.includes(venueId)) {
-        toast.success("To'yxona sevimlilardan o'chirildi");
+        toast.success("💔 To'yxona sevimlilardan o'chirildi");
       } else {
-        toast.success("To'yxona sevimlilarga qo'shildi");
+        toast.success("💕 To'yxona sevimlilarga qo'shildi");
       }
-      
+
       return newFavorites;
     });
   };
@@ -124,170 +153,460 @@ const Venues = () => {
     navigate("/user/favorites");
   };
 
-  // Sevimli cardlarni yuqorida ko'rsatish uchun sorting
+  const openModal = (venueId) => {
+    const venue = venues.find((v) => v.id === venueId);
+    setSelectedVenue(venue);
+    setFormData({
+      reservation_date: null,
+      guest_count: "",
+      client_phone: "",
+      status: "endi bo`ladigan",
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedVenue(null);
+    setFormData({
+      reservation_date: null,
+      guest_count: "",
+      client_phone: "",
+      status: "endi bo`ladigan",
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleDateChange = (date) => {
+    setFormData((prev) => ({
+      ...prev,
+      reservation_date: date,
+    }));
+  };
+
+  const validateForm = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (!formData.reservation_date) return "Bron sanasi tanlanmadi";
+    const selectedDate = new Date(formData.reservation_date);
+    selectedDate.setHours(0, 0, 0, 0);
+    if (selectedDate < today) return "Bron sanasi bugundan keyin bo'lishi kerak";
+    if (!formData.guest_count || formData.guest_count <= 0) return "Mehmonlar soni noto'g'ri";
+    if (!formData.client_phone || !/^\+998\d{9}$/.test(formData.client_phone))
+      return "Telefon raqami noto'g'ri formatda (masalan: +998901234567)";
+    if (selectedVenue && formData.guest_count > selectedVenue.capacity)
+      return "Mehmonlar soni to‘yxona sig‘imidan oshib ketdi";
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token topilmadi, iltimos tizimga qayta kiring");
+      }
+
+      const response = await axios.post(
+        `http://localhost:4000/user/add-booking/${selectedVenue.id}`, // venue_id ni URL’da yuboramiz
+        {
+          reservation_date: formData.reservation_date.toISOString().split("T")[0],
+          guest_count: Number(formData.guest_count),
+          client_phone: formData.client_phone,
+          status: formData.status,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("Bron qo'shildi:", response.data);
+      toast.success("Bron muvaffaqiyatli qo'shildi!");
+      closeModal();
+    } catch (error) {
+      console.error("Bron qilishda xatolik:", error);
+      toast.error(error.response?.data?.error || "Bron qilishda xatolik yuz berdi");
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    }
+  };
+
   const sortedVenues = venues.sort((a, b) => {
     const aIsFavorite = favorites.includes(a.id);
     const bIsFavorite = favorites.includes(b.id);
-    
-    // Sevimlilar yuqorida bo'lsin (true > false)
+
     if (aIsFavorite && !bIsFavorite) return -1;
     if (!aIsFavorite && bIsFavorite) return 1;
-    return 0; // Agar ikkalasi ham sevimli yoki ikkalasi ham sevimli bo'lmasa
+    return 0;
   });
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 p-4 sm:p-6">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex items-center justify-between mb-6"
-      >
-        <div className="flex items-center gap-2">
-          <Building className="h-6 w-6 text-pink-500" />
-          <h1 className="text-2xl font-bold text-gray-800">Tasdiqlangan to'yxonalar</h1>
-        </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={navigateToFavorites}
-          className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors"
-        >
-          <Heart className="h-5 w-5" />
-          <span>Sevimlilar</span>
-        </motion.button>
-      </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-white">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-200/20 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-rose-200/30 rounded-full blur-xl"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-pink-100/40 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-10 w-28 h-28 bg-rose-100/50 rounded-full blur-xl"></div>
+      </div>
 
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg mb-6"
-        >
-          {error}
-        </motion.div>
-      )}
-
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="relative">
-            <div className="h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-500 animate-spin"></div>
-            <div
-              className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-300 animate-spin"
-              style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
-            ></div>
-          </div>
-        </div>
-      ) : venues.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="text-center py-20 text-gray-500"
-        >
-          Tasdiqlangan to'yxonalar topilmadi
-        </motion.div>
-      ) : (
-        <AnimatePresence>
+      <div className="relative overflow-hidden bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 py-12">
+        <div className="absolute inset-0 bg-white/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col sm:flex-row items-center justify-between gap-4"
           >
-            {sortedVenues.map((venue, index) => (
-              <motion.div
-                key={venue.id}
-                variants={itemVariants}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 relative"
-              >
-                <motion.div
-                  className="absolute top-3 right-3 z-10"
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleFavorite(venue.id)}
-                >
-                  <Heart
-                    className={`h-6 w-6 cursor-pointer transition-colors duration-200 ${
-                      favorites.includes(venue.id)
-                        ? "fill-pink-500 text-pink-500"
-                        : "text-gray-500 hover:text-pink-300"
-                    }`}
-                    variants={heartVariants}
-                    animate={favorites.includes(venue.id) ? "filled" : "unfilled"}
-                  />
-                </motion.div>
-
-                {venue.images && venue.images.length > 0 ? (
-                  <div className="relative h-56 overflow-hidden bg-gray-100">
-                    <img
-                      src={`http://localhost:4000/${venue.images[0]}`}
-                      alt={venue.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                    <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      <span>{venue.images.length}</span>
-                      <ImageIcon className="h-3 w-3" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="h-56 bg-gray-100 flex items-center justify-center">
-                    <ImageIcon className="h-12 w-12 text-gray-400" />
-                  </div>
-                )}
-
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-bold text-gray-800">
-                      {index + 1}. {venue.name}
-                    </h3>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 border border-green-300`}
-                    >
-                      {venue.status}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-pink-500" />
-                      <span>{venue.phone_number}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-pink-500" />
-                      <span>O'rindiqlar: {venue.capacity}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-pink-500" />
-                      <span>
-                        Narxi: {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm
-                      </span>
-                    </div>
-                  </div>
-
-                  {venue.images && venue.images.length > 1 && (
-                    <div className="mt-4 grid grid-cols-3 gap-2">
-                      {venue.images.slice(1, 4).map((image, imgIndex) => (
-                        <div
-                          key={imgIndex}
-                          className="relative h-16 rounded-md overflow-hidden bg-gray-100"
-                        >
-                          <img
-                            src={`http://localhost:4000/${image}`}
-                            alt={`${venue.name} image ${imgIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full">
+                  <Building className="h-8 w-8 text-white" />
                 </div>
-              </motion.div>
-            ))}
+                <Sparkles className="w-5 h-5 text-white absolute -top-1 -right-1 animate-pulse" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">💒 Tasdiqlangan To'yxonalar</h1>
+                <p className="text-pink-100 text-sm mt-1">Eng yaxshi to'yxonalarni tanlang</p>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={navigateToFavorites}
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/20"
+            >
+              <Heart className="h-5 w-5" />
+              <span>💕 Sevimlilar ({favorites.length})</span>
+            </motion.button>
           </motion.div>
+        </div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-6 shadow-lg"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-red-500">⚠️</span>
+              {error}
+            </div>
+          </motion.div>
+        )}
+
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="relative">
+              <div className="h-20 w-20 rounded-full border-t-4 border-b-4 border-pink-400 animate-spin"></div>
+              <div
+                className="absolute top-0 left-0 h-20 w-20 rounded-full border-t-4 border-b-4 border-rose-300 animate-spin"
+                style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
+              ></div>
+              <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-pink-500" />
+            </div>
+            <div className="ml-4">
+              <p className="text-lg font-medium text-gray-700">To'yxonalar yuklanmoqda...</p>
+              <div className="flex mt-2 space-x-1">
+                <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
+                <div
+                  className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.1s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        ) : venues.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center py-20"
+          >
+            <div className="mb-4">
+              <Building className="h-16 w-16 text-pink-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">To'yxonalar topilmadi</h3>
+              <p className="text-gray-500">Hozirda tasdiqlangan to'yxonalar mavjud emas</p>
+            </div>
+          </motion.div>
+        ) : (
+          <>
+            <div className="mb-8 bg-white rounded-xl shadow-lg p-4 border border-pink-100">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <Building className="h-5 w-5 text-pink-500" />
+                  <span className="text-sm text-gray-600">
+                    Jami: <span className="font-semibold text-gray-800">{venues.length}</span> ta to'yxona
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Star className="h-4 w-4 text-yellow-400" />
+                  Sevimlilar yuqorida ko'rsatiladi
+                </div>
+              </div>
+            </div>
+
+            <AnimatePresence>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {sortedVenues.map((venue, index) => (
+                  <motion.div
+                    key={venue.id}
+                    variants={itemVariants}
+                    whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                    className={`bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border-2 relative group ${
+                      favorites.includes(venue.id)
+                        ? "border-pink-300 bg-gradient-to-br from-pink-50 to-white"
+                        : "border-pink-100 hover:border-pink-200"
+                    }`}
+                  >
+                    {favorites.includes(venue.id) && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <div className="bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <Crown className="h-3 w-3" />
+                          Sevimli
+                        </div>
+                      </div>
+                    )}
+
+                    <motion.div
+                      className="absolute top-3 right-3 z-10"
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => toggleFavorite(venue.id)}
+                    >
+                      <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                        <Heart
+                          className={`h-5 w-5 cursor-pointer transition-all duration-200 ${
+                            favorites.includes(venue.id)
+                              ? "fill-pink-500 text-pink-500"
+                              : "text-gray-500 hover:text-pink-400"
+                          }`}
+                          variants={heartVariants}
+                          animate={favorites.includes(venue.id) ? "filled" : "unfilled"}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {venue.images && venue.images.length > 0 ? (
+                      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
+                        <img
+                          src={`http://localhost:4000/${venue.images[0]}`}
+                          alt={venue.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                        <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <ImageIcon className="h-3 w-3" />
+                          <span>{venue.images.length}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-48 bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
+                        <div className="text-center">
+                          <ImageIcon className="h-12 w-12 text-pink-300 mx-auto mb-2" />
+                          <p className="text-sm text-pink-400">Rasm mavjud emas</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="p-5">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg font-bold text-gray-800 line-clamp-1">
+                          {index + 1}. {venue.name}
+                        </h3>
+                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200 flex items-center gap-1">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          {venue.status}
+                        </span>
+                      </div>
+
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Phone className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                          <span className="truncate">{venue.phone_number}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Users className="h-4 w-4 text-rose-500 flex-shrink-0" />
+                          <span>👥 Sig'im: {venue.capacity} kishi</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <DollarSign className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                          <span className="font-semibold text-gray-800">
+                            💰 {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm
+                          </span>
+                        </div>
+                        {venue.address && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <MapPin className="h-4 w-4 text-rose-500 flex-shrink-0" />
+                            <span className="truncate text-xs">{venue.address}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {venue.images && venue.images.length > 1 && (
+                        <div className="mt-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Eye className="h-4 w-4 text-pink-500" />
+                            <span className="text-xs text-gray-600">Qo'shimcha rasmlar</span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            {venue.images.slice(1, 4).map((image, imgIndex) => (
+                              <div
+                                key={imgIndex}
+                                className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100 border border-pink-200"
+                              >
+                                <img
+                                  src={`http://localhost:4000/${image}`}
+                                  alt={`${venue.name} image ${imgIndex + 1}`}
+                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-4 pt-3 border-t border-pink-100">
+                        <button
+                          onClick={() => openModal(venue.id)}
+                          className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-sm font-medium"
+                        >
+                          <Calendar className="h-4 w-4" />
+                          Bron qilish
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </>
+        )}
+
+        <AnimatePresence>
+          {isModalOpen && (
+            <motion.div
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              onClick={closeModal}
+            >
+              <motion.div
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h2 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                  <Calendar className="h-6 w-6 text-pink-500" />
+                  Bron qilish
+                </h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  To‘yxona: <span className="font-semibold">{selectedVenue?.name}</span>
+                </p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bron sanasi
+                    </label>
+                    <DatePicker
+                      selected={formData.reservation_date}
+                      onChange={handleDateChange}
+                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                      dateFormat="dd.MM.yyyy"
+                      placeholderText="Sanani tanlang"
+                      minDate={new Date()}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mehmonlar soni (Sig‘im: {selectedVenue?.capacity})
+                    </label>
+                    <input
+                      type="number"
+                      name="guest_count"
+                      value={formData.guest_count}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                      placeholder="10"
+                      min="1"
+                      max={selectedVenue?.capacity}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Telefon raqami
+                    </label>
+                    <input
+                      type="text"
+                      name="client_phone"
+                      value={formData.client_phone}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                      placeholder="+998901234567"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Holati
+                    </label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                    >
+                      <option value="endi bo`ladigan">Endi bo‘ladigan</option>
+                      <option value="bo`lib o`tgan">Bo‘lib o‘tgan</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <Heart className="h-4 w-4" /> Bron qilish
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-lg transition-all duration-300"
+                    >
+                      Yopish
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
-      )}
+      </div>
     </div>
   );
 };

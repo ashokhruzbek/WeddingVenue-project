@@ -16,6 +16,12 @@ import {
   Maximize2,
   X,
   Info,
+  Heart,
+  Sparkles,
+  Crown,
+  Star,
+  Camera,
+  Gift,
 } from "lucide-react"
 
 // Toshkent tumanlari ro'yxati
@@ -35,16 +41,21 @@ const tashkentDistricts = [
 
 // Toast notification component
 const Toast = ({ message, type, onClose }) => {
-  const bgColor = type === "success" ? "bg-green-500" : type === "error" ? "bg-red-500" : "bg-blue-500"
+  const bgColor =
+    type === "success"
+      ? "bg-gradient-to-r from-green-400 to-emerald-400"
+      : type === "error"
+        ? "bg-gradient-to-r from-red-400 to-pink-400"
+        : "bg-gradient-to-r from-blue-400 to-indigo-400"
 
   return (
     <div
-      className={`fixed top-4 right-4 ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 max-w-sm`}
+      className={`fixed top-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-lg z-50 flex items-center gap-2 max-w-sm backdrop-blur-sm`}
     >
       {type === "success" && <CheckCircle className="w-4 h-4 flex-shrink-0" />}
       {type === "error" && <AlertCircle className="w-4 h-4 flex-shrink-0" />}
-      <span className="text-sm">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:bg-white/20 rounded p-1 flex-shrink-0">
+      <span className="text-sm font-medium">{message}</span>
+      <button onClick={onClose} className="ml-2 hover:bg-white/20 rounded p-1 flex-shrink-0 transition-colors">
         <X className="w-3 h-3" />
       </button>
     </div>
@@ -136,7 +147,7 @@ function AddVenues() {
       preview: URL.createObjectURL(file),
     }))
     setImages((prev) => [...prev, ...newImages])
-    showToast(`${files.length} ta rasm muvaffaqiyatli yuklandi!`, "success")
+    showToast(`🎉 ${files.length} ta rasm muvaffaqiyatli yuklandi!`, "success")
   }
 
   // Rasmni o'chirish
@@ -144,7 +155,7 @@ function AddVenues() {
     const imageToRemove = images[index]
     URL.revokeObjectURL(imageToRemove.preview)
     setImages((prev) => prev.filter((_, i) => i !== index))
-    showToast("Rasm o'chirildi!", "success")
+    showToast("🗑️ Rasm o'chirildi!", "success")
   }
 
   // Rasmni kattalashtirib ko'rish
@@ -250,7 +261,7 @@ function AddVenues() {
       }
 
       // Muvaffaqiyatli yuborildi
-      showToast(data.message || "To'yxona muvaffaqiyatli qo'shildi", "success")
+      showToast(`🎉 ${data.message || "To'yxona muvaffaqiyatli qo'shildi"}`, "success")
 
       // Formni tozalash
       setFormData({
@@ -275,62 +286,75 @@ function AddVenues() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-white">
       {/* Toast notifications */}
       {toasts.map((toast) => (
         <Toast key={toast.id} message={toast.message} type={toast.type} onClose={() => removeToast(toast.id)} />
       ))}
 
-      {/* Compact Header Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 py-8 md:py-12">
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Decorative Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-200/20 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-rose-200/30 rounded-full blur-xl"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-pink-100/40 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-10 w-28 h-28 bg-rose-100/50 rounded-full blur-xl"></div>
+      </div>
+
+      {/* Header Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 py-10">
+        <div className="absolute inset-0 bg-white/10"></div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full">
-                <Plus className="w-8 h-8 text-white" />
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-full">
+                  <Plus className="w-8 h-8 text-white" />
+                </div>
+                <Sparkles className="w-5 h-5 text-white absolute -top-1 -right-1 animate-pulse" />
               </div>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">Yangi To'yxona Qo'shish</h1>
-            <p className="text-purple-100 max-w-xl mx-auto">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">
+              🏰 Yangi To'yxona Qo'shish
+            </h1>
+            <p className="text-pink-100 max-w-2xl mx-auto">
               Yangi to'yxona ma'lumotlarini kiriting va ro'yxatga qo'shing
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-xl border-2 border-pink-100 overflow-hidden">
               {/* Form Header */}
-              <div className="bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-4">
+              <div className="bg-gradient-to-r from-pink-400 to-rose-400 px-6 py-4">
                 <div className="flex items-center">
                   <Building2 className="w-6 h-6 text-white mr-3" />
                   <div>
-                    <h2 className="text-xl font-bold text-white">To'yxona Ma'lumotlari</h2>
-                    <p className="text-purple-100 text-sm mt-1">Barcha maydonlarni to'ldiring</p>
+                    <h2 className="text-xl font-bold text-white">💒 To'yxona Ma'lumotlari</h2>
+                    <p className="text-pink-100 text-sm mt-1">Barcha maydonlarni to'ldiring</p>
                   </div>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="p-6 space-y-4">
+                <div className="p-6 space-y-5">
                   {/* To'yxona nomi */}
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <label className="flex items-center text-sm font-medium text-gray-700">
-                      <Building2 className="w-4 h-4 mr-2 text-purple-500" />
+                      <Building2 className="w-4 h-4 mr-2 text-pink-500" />
                       To'yxona nomi
                     </label>
                     <input
                       type="text"
                       name="name"
-                      placeholder="Masalan: Guliston To'yxonasi"
+                      placeholder="🏰 Masalan: Guliston To'yxonasi"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                        errors.name ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-purple-400"
+                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
+                        errors.name ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
                       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                       disabled={loading}
                     />
@@ -342,23 +366,23 @@ function AddVenues() {
                     )}
                   </div>
 
-                  {/* Tuman va Manzil */}
+                  {/* Tuman va Telefon */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <label className="flex items-center text-sm font-medium text-gray-700">
-                        <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+                        <MapPin className="w-4 h-4 mr-2 text-rose-500" />
                         Tuman
                       </label>
                       <select
                         name="district_id"
                         value={formData.district_id}
                         onChange={handleChange}
-                        className={`w-full px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                          errors.district_id ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-purple-400"
+                        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white ${
+                          errors.district_id ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       >
-                        <option value="">Tumanni tanlang</option>
+                        <option value="">🏘️ Tumanni tanlang</option>
                         {tashkentDistricts.map((district) => (
                           <option key={district.id} value={district.id}>
                             {district.name}
@@ -373,7 +397,7 @@ function AddVenues() {
                       )}
                     </div>
 
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <label className="flex items-center text-sm font-medium text-gray-700">
                         <Phone className="w-4 h-4 mr-2 text-pink-500" />
                         Telefon raqam
@@ -381,11 +405,11 @@ function AddVenues() {
                       <input
                         type="tel"
                         name="phone_number"
-                        placeholder="+998901234567"
+                        placeholder="📱 +998901234567"
                         value={formData.phone_number}
                         onChange={handleChange}
-                        className={`w-full px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                          errors.phone_number ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-purple-400"
+                        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
+                          errors.phone_number ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       />
@@ -399,19 +423,19 @@ function AddVenues() {
                   </div>
 
                   {/* Manzil */}
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <label className="flex items-center text-sm font-medium text-gray-700">
-                      <MapPin className="w-4 h-4 mr-2 text-green-500" />
+                      <MapPin className="w-4 h-4 mr-2 text-rose-500" />
                       Manzil
                     </label>
                     <textarea
                       name="address"
-                      placeholder="To'liq manzilni kiriting"
+                      placeholder="📍 To'liq manzilni kiriting"
                       value={formData.address}
                       onChange={handleChange}
-                      rows={2}
-                      className={`w-full px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
-                        errors.address ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-purple-400"
+                      rows={3}
+                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent resize-none ${
+                        errors.address ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
                       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                       disabled={loading}
                     />
@@ -425,20 +449,20 @@ function AddVenues() {
 
                   {/* Sig'im va Narx */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <label className="flex items-center text-sm font-medium text-gray-700">
-                        <Users className="w-4 h-4 mr-2 text-indigo-500" />
+                        <Users className="w-4 h-4 mr-2 text-pink-500" />
                         Sig'im (kishi)
                       </label>
                       <input
                         type="number"
                         name="capacity"
-                        placeholder="300"
+                        placeholder="👥 300"
                         value={formData.capacity}
                         onChange={handleChange}
                         min="1"
-                        className={`w-full px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                          errors.capacity ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-purple-400"
+                        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
+                          errors.capacity ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       />
@@ -450,7 +474,7 @@ function AddVenues() {
                       )}
                     </div>
 
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <label className="flex items-center text-sm font-medium text-gray-700">
                         <DollarSign className="w-4 h-4 mr-2 text-emerald-500" />
                         Narx (so'm)
@@ -458,12 +482,12 @@ function AddVenues() {
                       <input
                         type="number"
                         name="price_seat"
-                        placeholder="150000"
+                        placeholder="💰 150000"
                         value={formData.price_seat}
                         onChange={handleChange}
                         min="1"
-                        className={`w-full px-3 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                          errors.price_seat ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-purple-400"
+                        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
+                          errors.price_seat ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       />
@@ -477,24 +501,29 @@ function AddVenues() {
                   </div>
 
                   {/* Rasm Yuklash */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <label className="flex items-center text-sm font-medium text-gray-700">
-                        <Upload className="w-4 h-4 mr-2 text-purple-500" />
+                        <Camera className="w-4 h-4 mr-2 text-pink-500" />
                         Rasmlar
                       </label>
-                      <span className="text-xs text-gray-500">{images.length}/5 rasm</span>
+                      <span className="text-xs text-gray-500 bg-pink-50 px-2 py-1 rounded-full">
+                        {images.length}/5 rasm
+                      </span>
                     </div>
                     <div
                       onClick={handleImageUpload}
-                      className={`border-2 border-dashed rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                      className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ${
                         loading
-                          ? "border-purple-300/30 bg-gray-50"
-                          : "border-purple-400 bg-purple-50/50 hover:border-purple-500 hover:bg-purple-50"
+                          ? "border-pink-300/30 bg-gray-50"
+                          : "border-pink-300 bg-gradient-to-br from-pink-50 to-rose-50 hover:border-pink-400 hover:from-pink-100 hover:to-rose-100"
                       }`}
                     >
-                      <Upload className="h-6 w-6 text-purple-500 mb-1" />
-                      <p className="text-sm text-gray-700">Rasmlarni yuklash</p>
+                      <div className="relative mb-3">
+                        <Upload className="h-8 w-8 text-pink-400" />
+                        <Sparkles className="h-4 w-4 text-pink-500 absolute -top-1 -right-1 animate-pulse" />
+                      </div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">📸 Rasmlarni yuklash</p>
                       <p className="text-xs text-gray-500">JPG, PNG, GIF (max 5MB)</p>
                       <input
                         ref={fileInputRef}
@@ -514,38 +543,38 @@ function AddVenues() {
                     )}
                   </div>
 
-                  {/* Yuklangan Rasmlar - Compact Grid */}
+                  {/* Yuklangan Rasmlar */}
                   {images.length > 0 && (
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">Yuklangan rasmlar</label>
-                      <div className="grid grid-cols-5 gap-2">
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-gray-700">📷 Yuklangan rasmlar</label>
+                      <div className="grid grid-cols-5 gap-3">
                         {images.map((image, index) => (
                           <div key={index} className="relative group">
-                            <div className="relative h-12 rounded-md overflow-hidden border border-purple-300">
+                            <div className="relative h-16 rounded-xl overflow-hidden border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-rose-50">
                               <img
                                 src={image.preview || "/placeholder.svg"}
                                 alt={`Preview ${index}`}
                                 className="w-full h-full object-cover"
                               />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                 <button
                                   type="button"
                                   onClick={() => openImagePreview(image.preview)}
-                                  className="p-1 bg-purple-500/80 rounded-full text-white mr-1"
+                                  className="p-1 bg-pink-500/90 rounded-full text-white mr-1 hover:bg-pink-600 transition-colors"
                                 >
-                                  <Maximize2 className="h-2 w-2" />
+                                  <Maximize2 className="h-3 w-3" />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveImage(index)}
-                                  className="p-1 bg-red-500/80 rounded-full text-white"
+                                  className="p-1 bg-red-500/90 rounded-full text-white hover:bg-red-600 transition-colors"
                                   disabled={loading}
                                 >
-                                  <Trash2 className="h-2 w-2" />
+                                  <Trash2 className="h-3 w-3" />
                                 </button>
                               </div>
                             </div>
-                            <div className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                            <div className="absolute -top-2 -right-2 bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
                               {index + 1}
                             </div>
                           </div>
@@ -555,21 +584,20 @@ function AddVenues() {
                   )}
 
                   {/* Submit Button */}
-                  <div className="pt-4">
+                  <div className="pt-6">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-xl disabled:shadow-md flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-xl disabled:shadow-md flex items-center justify-center gap-3"
                     >
                       {loading ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-5 h-5 animate-spin" />
                           Yuklanmoqda...
                         </>
                       ) : (
                         <>
-                          <CheckCircle className="w-4 h-4" />
-                          To'yxona Qo'shish
+                          <Heart className="w-5 h-5" />💕 To'yxona Qo'shish
                         </>
                       )}
                     </button>
@@ -581,38 +609,74 @@ function AddVenues() {
 
           {/* Sidebar Info */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
-              <div className="flex items-center mb-3">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
-                  <Info className="w-4 h-4 text-white" />
+            <div className="bg-white rounded-xl shadow-lg p-5 border-2 border-pink-100">
+              <div className="flex items-center mb-4">
+                <div className="p-2 bg-gradient-to-r from-pink-400 to-rose-400 rounded-lg">
+                  <Info className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-sm font-bold text-gray-800 ml-2">Ma'lumot</h3>
+                <h3 className="text-lg font-bold text-gray-800 ml-3">💡 Ma'lumot</h3>
               </div>
-              <p className="text-gray-600 text-xs leading-relaxed">
+              <p className="text-gray-600 text-sm leading-relaxed">
                 To'yxona qo'shgandan so'ng, u sizning shaxsiy kabinetingizda ko'rinadi va mijozlar uni bron qilishlari
                 mumkin bo'ladi.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
-              <div className="flex items-center mb-3">
-                <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg">
-                  <CheckCircle className="w-4 h-4 text-white" />
+            <div className="bg-white rounded-xl shadow-lg p-5 border-2 border-pink-100">
+              <div className="flex items-center mb-4">
+                <div className="p-2 bg-gradient-to-r from-emerald-400 to-green-400 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-sm font-bold text-gray-800 ml-2">Maslahat</h3>
+                <h3 className="text-lg font-bold text-gray-800 ml-3">💡 Maslahat</h3>
               </div>
-              <p className="text-gray-600 text-xs leading-relaxed">
+              <p className="text-gray-600 text-sm leading-relaxed">
                 To'yxona ma'lumotlarini to'liq va aniq kiriting. Bu mijozlarga to'g'ri tanlov qilishda yordam beradi.
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl shadow-lg p-4 text-white">
-              <h3 className="text-sm font-bold mb-2">Qo'shimcha xizmatlar</h3>
-              <ul className="text-xs space-y-1">
-                <li>• Professional fotosurat</li>
-                <li>• Virtual tur</li>
-                <li>• Marketing yordami</li>
-                <li>• Mijozlar bilan aloqa</li>
+            <div className="bg-gradient-to-br from-pink-400 to-rose-400 rounded-xl shadow-lg p-5 text-white">
+              <div className="flex items-center mb-3">
+                <Crown className="w-5 h-5 mr-2" />
+                <h3 className="text-lg font-bold">🎁 Qo'shimcha xizmatlar</h3>
+              </div>
+              <ul className="text-sm space-y-2">
+                <li className="flex items-center">
+                  <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Professional fotosurat
+                </li>
+                <li className="flex items-center">
+                  <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Virtual tur
+                </li>
+                <li className="flex items-center">
+                  <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Marketing yordami
+                </li>
+                <li className="flex items-center">
+                  <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Mijozlar bilan aloqa
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl shadow-lg p-5 text-white">
+              <div className="flex items-center mb-3">
+                <Gift className="w-5 h-5 mr-2" />
+                <h3 className="text-lg font-bold">🎉 Bonus imkoniyatlar</h3>
+              </div>
+              <ul className="text-sm space-y-2">
+                <li className="flex items-center">
+                  <Heart className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Bepul reklama
+                </li>
+                <li className="flex items-center">
+                  <Heart className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Premium ko'rinish
+                </li>
+                <li className="flex items-center">
+                  <Heart className="w-4 h-4 mr-2 flex-shrink-0" />
+                  Analitika hisobotlari
+                </li>
               </ul>
             </div>
           </div>
@@ -625,17 +689,17 @@ function AddVenues() {
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           onClick={closeImagePreview}
         >
-          <div className="relative max-w-3xl max-h-[80vh] w-full">
+          <div className="relative max-w-4xl max-h-[90vh] w-full">
             <button
               onClick={closeImagePreview}
-              className="absolute -top-10 right-0 text-white hover:text-purple-400 transition-colors"
+              className="absolute -top-12 right-0 text-white hover:text-pink-400 transition-colors bg-black/50 rounded-full p-2"
             >
               <X className="h-6 w-6" />
             </button>
             <img
               src={previewImage || "/placeholder.svg"}
               alt="Preview"
-              className="w-full h-full object-contain rounded-lg"
+              className="w-full h-full object-contain rounded-xl"
               onClick={(e) => e.stopPropagation()}
             />
           </div>
