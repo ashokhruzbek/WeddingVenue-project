@@ -3,10 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
-// const { authentication } = require("./middlewares/authentication");
+// Routers
 const authRoutes = require("./routes/auth/authRoutes");
 const adminRouter = require("./routes/admin/adminRoutes");
-// const { authentication } = require("./middlewares/authentication");
 const userRouter = require("./routes/user/userRoutes");
 const ownerRouter = require("./routes/owner/ownerRoutes");
 const venueRouter = require("./routes/venuesRouter/venuesRouter");
@@ -17,19 +16,16 @@ app.use(express.json());
 app.use((req, res, next) => {
     console.log(req.url);
     next();
-  })
+});
 
+// Statik papka (uploads ichidagi fayllarni brauzerga ko'rsatish uchun)
+app.use('/uploads', express.static('uploads'));
 
 app.use("/", authRoutes);
-
-
- 
-
 app.use("/admin", adminRouter);
 app.use('/user', userRouter);
-app.use('/owner', ownerRouter )
-app.use('/', venueRouter)
-
+app.use('/owner', ownerRouter );
+app.use('/', venueRouter);
 
 const PORT = process.env.PORT || 4000;
 
