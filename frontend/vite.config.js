@@ -6,7 +6,20 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),  // Bu yerda @ -> src papkaga yo'naltiriladi
+      '@': path.resolve(__dirname, './src'),  // @ belgisi src papkaga yo'naltiriladi
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // node_modules ichidagi paketlarni alohida vendor chunkga ajratish
+            return 'vendor';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,  // Ogohlantirish uchun chunk limitini 1000 KB ga oshirish
+  }
 });
