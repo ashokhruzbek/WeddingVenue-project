@@ -278,9 +278,9 @@ function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.7 }}
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Mukammal To\\'y Marosimi Uchun</h1>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Mukammal To'y Marosimi Uchun</h1>
               <p className="text-lg md:text-xl opacity-90 mb-8">
-                Toshkent shahridagi eng sara to\\'yxonalarni toping va o\\'z to\\'yingizni unutilmas qiling
+                Toshkent shahridagi eng sara to'yxonalarni toping va o'z to'yingizni unutilmas qiling
               </p>
               <div className="flex flex-wrap gap-4">
                 <motion.button
@@ -325,7 +325,7 @@ function Home() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400" size={20} />
               <input
                 type="text"
-                placeholder="Qidiruv (nomi bo\\'yicha)..."
+                placeholder="Qidiruv (nomi bo'yicha)..."
                 className="pl-10 pr-4 py-3 rounded-xl border border-blue-200 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 outline-none"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -464,7 +464,7 @@ function Home() {
                       )}
                     </div>
 
-                    {/* To\\'yxona ma\\'lumotlari */}
+                    {/* To'yxona ma'lumotlari */}
                     <div className="p-5 space-y-3">
                       <div className="flex justify-between items-start">
                         <h3 className="text-xl font-semibold text-blue-600 truncate" title={venue.name}>
@@ -501,7 +501,7 @@ function Home() {
                       <div className="flex items-start gap-2.5 text-sm pt-1">
                         <DollarSign className="text-blue-500 shrink-0 mt-0.5" size={16} />
                         <p className="text-gray-600">
-                          Narx: <span className="font-medium text-blue-600">{venue.price_per_hour} so\\'m</span> / soat
+                          Narx: <span className="font-medium text-blue-600">{venue.price_seat} so'm</span> 
                         </p>
                       </div>
 
@@ -520,7 +520,7 @@ function Home() {
                         }}
                       >
                         <Sparkles size={18} />
-                        Batafsil ko\\'rish
+                        Batafsil ko'rish
                       </motion.button>
                     </div>
                   </motion.div>
@@ -632,7 +632,7 @@ function Home() {
                       <div className="flex items-start gap-3">
                         <Users className="text-blue-500 shrink-0 mt-1" size={18} />
                         <div>
-                          <p className="font-medium text-gray-700">Sig\'imi:</p>
+                          <p className="font-medium text-gray-700">Sig'imi:</p>
                           <p className="text-gray-600">{selectedVenue.capacity} kishi</p>
                         </div>
                       </div>
@@ -641,7 +641,7 @@ function Home() {
                         <div>
                           <p className="font-medium text-gray-700">Narxi (soatiga):</p>
                           <p className="font-semibold text-blue-600">
-                            {selectedVenue.price_per_hour} so\\'m
+                            {selectedVenue.price_per_hour} so'm
                           </p>
                         </div>
                       </div>
@@ -660,7 +660,7 @@ function Home() {
                           <div>
                             <p className="font-medium text-gray-700">Tuman:</p>
                             <p className="text-gray-600">
-                              {tashkentDistricts.find(d => d.id === Number(selectedVenue.district_id))?.name || "Noma\\'lum"}
+                              {tashkentDistricts.find(d => d.id === Number(selectedVenue.district_id))?.name || "Noma'lum"}
                             </p>
                           </div>
                         </div>
