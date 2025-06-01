@@ -1,11 +1,27 @@
-"use client"
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { Search, Filter, SortAsc, SortDesc, RefreshCw, Building, Phone, Users, DollarSign, ImageIcon, ChevronLeft, ChevronRight, Edit, Trash2, X } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  SortAsc,
+  SortDesc,
+  RefreshCw,
+  Building,
+  Phone,
+  Users,
+  DollarSign,
+  ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+  Edit,
+  Trash2,
+  X,
+} from "lucide-react";
 
 // Animation variants
 const containerVariants = {
@@ -56,25 +72,27 @@ const VenuesList = () => {
     capacity: "",
     price_seat: "",
     district_id: "",
+    address: "", // Add address field
   });
   const [formError, setFormError] = useState(null);
   const navigate = useNavigate();
 
   // Fetch districts for dropdown
-  const fetchDistricts = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
-
-      const response = await axios.get("http://localhost:4000/admin/districts", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setDistricts(response.data.districts || []);
-    } catch (error) {
-      console.error("Error fetching districts:", error);
-      toast.error("Tumanlarni olishda xatolik yuz berdi");
-    }
+  const fetchDistricts = useCallback(() => {
+    const tashkentDistricts = [
+      { id: 1, name: "Bektemir" },
+      { id: 2, name: "Chilonzor" },
+      { id: 3, name: "Yashnobod" },
+      { id: 4, name: "Mirobod" },
+      { id: 5, name: "Mirzo Ulug‘bek" },
+      { id: 6, name: "Sergeli" },
+      { id: 7, name: "Shayxontohur" },
+      { id: 8, name: "Olmazor" },
+      { id: 9, name: "Uchtepa" },
+      { id: 10, name: "Yakkasaroy" },
+      { id: 11, name: "Yunusobod" },
+    ];
+    setDistricts(tashkentDistricts);
   }, []);
 
   const fetchVenues = useCallback(async () => {
@@ -86,7 +104,7 @@ const VenuesList = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const params = { page: currentPage, limit: 6 };
+      const params = { page: currentPage, limit: 10 }; // Changed limit to 10
       if (filterStatus) params.status = filterStatus;
       if (searchTerm) params.search = searchTerm;
       if (sortBy) params.sort_by = sortBy;
@@ -98,6 +116,10 @@ const VenuesList = () => {
         },
         params,
       });
+      console.log("Venues fetched:", response.data.venues);
+      if (!response.data.venues) {
+        throw new Error("To'yxonalar ma'lumotlari topilmadi");
+      }
 
       setVenues(response.data.venues || []);
       setCurrentPage(response.data.currentPage || 1);
@@ -110,8 +132,7 @@ const VenuesList = () => {
           "Ma'lumotlarni olishda xatolik"
       );
       toast.error(
-        error.response?.data?.error ||
-          "To'yxonalarni olishda xatolik yuz berdi"
+        error.response?.data?.error || "To'yxonalarni olishda xatolik yuz berdi"
       );
       if (error.response?.status === 401) {
         localStorage.removeItem("token");
@@ -134,9 +155,12 @@ const VenuesList = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
-      await axios.delete(`http://localhost:4000/admin/delete-venue/${venueId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `http://localhost:4000/admin/delete-venue/${venueId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       toast.success("To'yxona muvaffaqiyatli o'chirildi", { duration: 3000 });
       fetchVenues();
@@ -162,6 +186,7 @@ const VenuesList = () => {
       capacity: venue.capacity || "",
       price_seat: venue.price_seat || "",
       district_id: venue.district_id || "",
+      address: venue.address || "", // Initialize address field
     });
     setFormError(null);
     setIsModalOpen(true);
@@ -176,6 +201,13 @@ const VenuesList = () => {
     e.preventDefault();
     if (!selectedVenue) return;
 
+    // Basic validation for address
+    if (!formData.address || formData.address.trim() === "") {
+      setFormError("Manzil kiritilishi shart.");
+      toast.error("Manzil kiritilishi shart.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
@@ -185,7 +217,8 @@ const VenuesList = () => {
         phone_number: formData.phone_number,
         capacity: Number(formData.capacity),
         price_seat: Number(formData.price_seat),
-        district_id: Number(formData.district_id), // Ensure district_id is a number
+        district_id: formData.district_id ? Number(formData.district_id) : null,
+        address: formData.address, // Include address in updatedData
       };
 
       const response = await axios.put(
@@ -196,7 +229,10 @@ const VenuesList = () => {
         }
       );
 
-      toast.success(response.data.message || "To'yxona muvaffaqiyatli yangilandi", { duration: 3000 });
+      toast.success(
+        response.data.message || "To'yxona muvaffaqiyatli yangilandi",
+        { duration: 3000 }
+      );
       setIsModalOpen(false);
       setSelectedVenue(null);
       fetchVenues();
@@ -350,7 +386,13 @@ const VenuesList = () => {
         <div className="flex justify-center items-center py-20">
           <div className="relative">
             <div className="h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-500 animate-spin"></div>
-            <div className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-300 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+            <div
+              className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-300 animate-spin"
+              style={{
+                animationDirection: "reverse",
+                animationDuration: "1.5s",
+              }}
+            ></div>
           </div>
         </div>
       ) : (
@@ -379,10 +421,10 @@ const VenuesList = () => {
                     whileHover={{ y: -5, transition: { duration: 0.2 } }}
                     className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200"
                   >
-                    {venue.images && venue.images.length > 0 ? (
+                    {venue.images && venue.images.length > 0 && venue.images[0].image_url ? (
                       <div className="relative h-56 overflow-hidden bg-gray-100">
                         <img
-                          src={`http://localhost:4000/${venue.images[0]}`}
+                          src={venue.images[0].image_url} // Use the direct image_url from the backend
                           alt={venue.name}
                           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                         />
@@ -396,17 +438,21 @@ const VenuesList = () => {
                         <ImageIcon className="h-12 w-12 text-gray-400" />
                       </div>
                     )}
-                    
+
                     <div className="p-5">
                       <div className="flex justify-between items-start mb-3">
                         <h3 className="text-lg font-bold text-gray-800">
                           {index + 1}. {venue.name}
                         </h3>
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(venue.status)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
+                            venue.status
+                          )}`}
+                        >
                           {venue.status}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-3 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                           <Phone className="h-4 w-4 text-pink-500" />
@@ -418,20 +464,29 @@ const VenuesList = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-pink-500" />
-                          <span>Narxi: {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm</span>
+                          <span>
+                            Narxi:{" "}
+                            {Number(venue.price_seat).toLocaleString("uz-UZ")}{" "}
+                            so'm
+                          </span>
                         </div>
                       </div>
-                      
+
                       {venue.images && venue.images.length > 1 && (
                         <div className="mt-4 grid grid-cols-3 gap-2">
                           {venue.images.slice(1, 4).map((image, imgIndex) => (
-                            <div key={imgIndex} className="relative h-16 rounded-md overflow-hidden bg-gray-100">
+                            image.image_url && (
+                            <div
+                              key={imgIndex}
+                              className="relative h-16 rounded-md overflow-hidden bg-gray-100"
+                            >
                               <img
-                                src={`http://localhost:4000/${image}`}
+                                src={image.image_url} // Use the direct image_url from the backend
                                 alt={`${venue.name} image ${imgIndex + 1}`}
                                 className="w-full h-full object-cover"
                               />
                             </div>
+                            )
                           ))}
                         </div>
                       )}
@@ -510,7 +565,9 @@ const VenuesList = () => {
               className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
             >
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">To'yxonani tahrirlash</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  To'yxonani tahrirlash
+                </h2>
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="text-gray-500 hover:text-gray-700"
@@ -593,7 +650,6 @@ const VenuesList = () => {
                     value={formData.district_id}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                     
                   >
                     <option value="">Tuman tanlang</option>
                     {districts.map((district) => (
@@ -602,6 +658,20 @@ const VenuesList = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Manzil
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    required
+                  />
                 </div>
 
                 <div className="flex gap-3">

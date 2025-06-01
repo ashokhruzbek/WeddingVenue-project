@@ -5,11 +5,9 @@ exports.viewAllVenues = async (req, res) => {
     const userRole = req.user.role;
     const userId = req.user.id;
 
-    console.log("✅ Foydalanuvchi roli:", userRole);
-    console.log("✅ Foydalanuvchi ID:", userId);
-
-    let query = "";
-    let params = [];
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; // Default limit 10
+    const offset = (page - 1) * limit;
 
     // Rasm URLlarini to'liq qilib qaytaruvchi funksiya
     const buildVenueResponse = (rows) => {
@@ -20,7 +18,7 @@ exports.viewAllVenues = async (req, res) => {
             ? venue.images.map(
                 (img) => ({
                   id: img.id,
-                  image_url: `http://localhost:4000/uploads/${img.image_url}`
+                  image_url: img.image_url // Assuming image_url from DB is already full or handled by subquery
                 })
               )
             : [],
@@ -28,64 +26,72 @@ exports.viewAllVenues = async (req, res) => {
       });
     };
 
+    let baseQuery = "";
+    let countQuery = "";
+    let queryParams = [];
+    let countParams = [];
+
+    const selectClause = `
+      v.*,
+      COALESCE(
+        (
+          SELECT json_agg(
+            json_build_object(
+              'id', i.id,
+              'image_url', CASE 
+                             WHEN i.image_url IS NOT NULL AND i.image_url != '' THEN CONCAT('http://localhost:4000/uploads/venues/', i.image_url)
+                             ELSE NULL
+                           END
+            ) ORDER BY i.id
+          )
+          FROM images i
+          WHERE i.venue_id = v.id
+        ), '[]'::json
+      ) AS images
+    `;
+
     if (userRole === "admin") {
-      query = `
-        SELECT 
-          v.*,
-          COALESCE(
-            (
-              SELECT json_agg(
-                json_build_object(
-                  'id', i.id,
-                  'image_url', i.image_url
-                )
-              )
-              FROM images i
-              WHERE i.venue_id = v.id
-            ), '[]'::json
-          ) AS images
-        FROM venues v
-        ORDER BY v.id DESC
-      `;
+      baseQuery = `FROM venues v ORDER BY v.id DESC`;
+      countQuery = `SELECT COUNT(*) AS total FROM venues v`;
     } else if (userRole === "owner") {
-      query = `
-        SELECT 
-          v.*,
-          COALESCE(
-            (
-              SELECT json_agg(
-                json_build_object(
-                  'id', i.id,
-                  'image_url', i.image_url
-                )
-              )
-              FROM images i
-              WHERE i.venue_id = v.id
-            ), '[]'::json
-          ) AS images
-        FROM venues v
-        WHERE v.owner_id = $1
-        ORDER BY v.id DESC
-      `;
-      params = [userId];
+      baseQuery = `FROM venues v WHERE v.owner_id = $1 ORDER BY v.id DESC`;
+      countQuery = `SELECT COUNT(*) AS total FROM venues v WHERE v.owner_id = $1`;
+      queryParams.push(userId);
+      countParams.push(userId);
     } else {
       return res.status(403).json({ message: "Sizga ruxsat yo‘q" });
     }
 
-    const result = await pool.query(query, params);
+    // Get total count for pagination
+    const totalResult = await pool.query(countQuery, countParams);
+    const totalCount = parseInt(totalResult.rows[0].total);
+    const totalPages = Math.ceil(totalCount / limit);
 
-    console.log("✅ Qaytgan venue soni:", result.rowCount);
-    console.log("🔁 Birinchi venue:", result.rows[0]);
+    // Add LIMIT and OFFSET for pagination to queryParams
+    // The order of params in queryParams should match the order of $ placeholders
+    const paginatedQueryParams = [...queryParams];
+    if (userRole === "admin") {
+      paginatedQueryParams.push(limit, offset);
+    } else if (userRole === "owner") {
+      // userId is $1, limit will be $2, offset will be $3
+      paginatedQueryParams.push(limit, offset);
+    }
+    
+    const dataQueryString = `SELECT ${selectClause} ${baseQuery} LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+    
+    const result = await pool.query(dataQueryString, paginatedQueryParams);
 
     const venuesWithFullImageURLs = buildVenueResponse(result.rows);
 
     res.status(200).json({
       message: "To'yxonalar ro'yxati",
-      count: result.rowCount,
       venues: venuesWithFullImageURLs,
+      currentPage: page,
+      totalPages: totalPages,
+      totalCount: totalCount,
     });
   } catch (error) {
-    console.error("❌ Venue ko‘rsatishda xatolik:", error.message);
-    res.status(500).json({ message: "Server xatosi" });
+    console.error("❌ Venue ko‘rsatishda xatolik:", error);
+    res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };
