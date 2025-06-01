@@ -1,6 +1,6 @@
-"use client";
+// frontend/src/components/ManageBookings.jsx
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,21 +50,19 @@ const itemVariants = {
   },
 };
 
-// Status colors
+// Status colors (Uzbek only, matching backend)
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
     case "tasdiqlangan":
-    case "confirmed":
       return "bg-green-100 text-green-800 border-green-300";
     case "kutilmoqda":
-    case "pending":
       return "bg-yellow-100 text-yellow-800 border-yellow-300";
     case "bekor qilingan":
-    case "cancelled":
       return "bg-red-100 text-red-800 border-red-300";
     case "bo'lib o'tgan":
-    case "completed":
       return "bg-blue-100 text-blue-800 border-blue-300";
+    case "endi bo`ladigan":
+      return "bg-purple-100 text-purple-800 border-purple-300";
     default:
       return "bg-gray-100 text-gray-800 border-gray-300";
   }
@@ -73,16 +71,12 @@ const getStatusColor = (status) => {
 const getStatusIcon = (status) => {
   switch (status?.toLowerCase()) {
     case "tasdiqlangan":
-    case "confirmed":
       return <CheckCircle className="h-4 w-4 text-green-600" />;
     case "kutilmoqda":
-    case "pending":
       return <Clock className="h-4 w-4 text-yellow-600" />;
     case "bekor qilingan":
-    case "cancelled":
       return <XCircle className="h-4 w-4 text-red-600" />;
     case "bo'lib o'tgan":
-    case "completed":
       return <CheckCircle className="h-4 w-4 text-blue-600" />;
     default:
       return <AlertTriangle className="h-4 w-4 text-gray-600" />;
@@ -101,10 +95,9 @@ const ManageBookings = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
-  const [viewMode, setViewMode] = useState("calendar"); // 'calendar' or 'list'
+  const [viewMode, setViewMode] = useState("calendar");
   const navigate = useNavigate();
 
-  // Fetch all bookings
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -115,7 +108,7 @@ const ManageBookings = () => {
       }
 
       const params = {};
-      if (statusFilter) params.status = statusFilter;
+      if (statusFilter) params.status = statusFilter.toLowerCase();
 
       const response = await axios.get(
         "http://localhost:4000/admin/view-all-bookings",
@@ -124,24 +117,33 @@ const ManageBookings = () => {
           params,
         }
       );
+      console.log("API Response:", response.data);
 
-      const data = Array.isArray(response.data) ? response.data : [];
+      const data = Array.isArray(response.data.bookings)
+        ? response.data.bookings
+        : [];
+
+      // Date field mapping ni tekshirish
+      console.log("First booking sample:", data[0]);
+
       setBookings(data);
       setFilteredBookings(data);
     } catch (error) {
       console.error("Error fetching bookings:", error);
-      setError(
-        error.response?.data?.error ||
-          "Buyurtmalarni yuklashda xatolik yuz berdi"
-      );
-      toast.error(
-        error.response?.data?.error ||
-          "Buyurtmalarni yuklashda xatolik yuz berdi"
-      );
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        navigate("/login");
+      let errorMessage = "Buyurtmalarni yuklashda xatolik yuz berdi";
+      if (error.response) {
+        errorMessage = error.response.data?.error || errorMessage;
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          setBookings([]);
+          setFilteredBookings([]);
+          navigate("/login");
+        }
+      } else if (error.request) {
+        errorMessage = "Server bilan bog'lanishda xatolik yuz berdi";
       }
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -156,7 +158,7 @@ const ManageBookings = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:4000/user/get-booking-user?booking_id=${bookingId}`,
+        `http://localhost:4000/admin/get-booking-user?booking_id=${bookingId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -170,12 +172,14 @@ const ManageBookings = () => {
     }
   };
 
-  // Cancel booking
+  // Cancel booking - TUZATILDI
   const handleCancelBooking = async () => {
     if (!selectedBooking?.id) {
       toast.error("Noto'g'ri buyurtma ID si");
       return;
     }
+    console.log("Selected booking:", selectedBooking);
+    console.log("Selected booking ID:", selectedBooking?.id);
 
     setDeleteLoading(true);
     try {
@@ -184,19 +188,23 @@ const ManageBookings = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.delete(
+      // API endpoint ni to'g'ri format bilan
+      const response = await axios.put(
         `http://localhost:4000/admin/cancel-booking/${selectedBooking.id}`,
+        {}, // Empty body for PUT request
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+
+      console.log("Cancel response:", response);
 
       toast.success(
         response.data.message || "Buyurtma muvaffaqiyatli bekor qilindi"
       );
       setIsDeleteModalOpen(false);
       setSelectedBooking(null);
-      fetchBookings();
+      await fetchBookings(); // Refresh bookings
     } catch (error) {
       console.error("Error cancelling booking:", error);
       toast.error(
@@ -227,22 +235,51 @@ const ManageBookings = () => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Filter bookings by month
-  useEffect(() => {
-    if (bookings.length > 0) {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
+  // Filter bookings by month - TUZATILDI
+  const filteredBookingsByMonth = useMemo(() => {
+    if (!Array.isArray(bookings) || bookings.length === 0) return [];
 
-      const filtered = bookings.filter((booking) => {
-        const bookingDate = new Date(booking.date);
-        return (
-          bookingDate.getFullYear() === year && bookingDate.getMonth() === month
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    return bookings.filter((booking) => {
+      if (!booking) return false;
+
+      // Turli date field nomlarini tekshirish
+      const dateField =
+        booking.reservation_date || booking.date || booking.booking_date;
+
+      if (!dateField) {
+        console.log("No date field found for booking:", booking);
+        return false;
+      }
+
+      const bookingDate = new Date(dateField);
+      const isValidDate = !isNaN(bookingDate.getTime());
+
+      if (!isValidDate) {
+        console.log(
+          "Invalid date for booking:",
+          booking,
+          "Date field:",
+          dateField
         );
-      });
+        return false;
+      }
 
-      setFilteredBookings(filtered);
-    }
+      return (
+        bookingDate.getFullYear() === year && bookingDate.getMonth() === month
+      );
+    });
   }, [bookings, currentDate]);
+
+  useEffect(() => {
+    if (viewMode === "calendar") {
+      setFilteredBookings(filteredBookingsByMonth);
+    } else if (viewMode === "list") {
+      setFilteredBookings(bookings);
+    }
+  }, [viewMode, bookings, filteredBookingsByMonth]);
 
   // Calendar navigation
   const handlePrevMonth = () => {
@@ -261,61 +298,55 @@ const ManageBookings = () => {
   const generateCalendarDays = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-
-    // Get first day of month and last day of month
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
-
-    // Get day of week for first day (0 = Sunday, 1 = Monday, etc.)
     const firstDayOfWeek = firstDayOfMonth.getDay();
-
-    // Adjust for Monday as first day of week
     const adjustedFirstDayOfWeek =
       firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
-
-    // Get total days in month
     const daysInMonth = lastDayOfMonth.getDate();
 
-    // Create array for all days in calendar view
     const calendarDays = [];
-
-    // Add empty cells for days before first day of month
     for (let i = 0; i < adjustedFirstDayOfWeek; i++) {
       calendarDays.push({ day: null, isCurrentMonth: false });
     }
-
-    // Add cells for all days in month
     for (let day = 1; day <= daysInMonth; day++) {
       calendarDays.push({ day, isCurrentMonth: true });
     }
-
-    // Add empty cells to complete the last week if needed
     const remainingCells = 7 - (calendarDays.length % 7);
     if (remainingCells < 7) {
       for (let i = 0; i < remainingCells; i++) {
         calendarDays.push({ day: null, isCurrentMonth: false });
       }
     }
-
     return calendarDays;
   };
 
-  // Get bookings for a specific day
-  const getBookingsForDay = (day) => {
-    if (!day) return [];
+  // Get bookings for a specific day - TUZATILDI
+  const getBookingsForDay = useCallback(
+    (day) => {
+      if (!day) return [];
 
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const date = new Date(year, month, day);
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const date = new Date(year, month, day);
+      const formattedDate = date.toISOString().split("T")[0];
 
-    // Format date as YYYY-MM-DD for comparison
-    const formattedDate = date.toISOString().split("T")[0];
+      return filteredBookings.filter((booking) => {
+        // Turli date field nomlarini tekshirish
+        const dateField =
+          booking.reservation_date || booking.date || booking.booking_date;
 
-    return filteredBookings.filter((booking) => {
-      const bookingDate = new Date(booking.date).toISOString().split("T")[0];
-      return bookingDate === formattedDate;
-    });
-  };
+        if (!dateField) return false;
+
+        const bookingDate = new Date(dateField);
+        return (
+          !isNaN(bookingDate.getTime()) &&
+          bookingDate.toISOString().split("T")[0] === formattedDate
+        );
+      });
+    },
+    [filteredBookings, currentDate]
+  );
 
   // Format date for display
   const formatDate = (date) => {
@@ -350,6 +381,7 @@ const ManageBookings = () => {
                 ? "bg-pink-100 text-pink-600"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
+            aria-label="Kalendar ko'rinishi"
           >
             <CalendarDays className="h-5 w-5" />
           </button>
@@ -360,6 +392,7 @@ const ManageBookings = () => {
                 ? "bg-pink-100 text-pink-600"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
+            aria-label="Ro'yxat ko'rinishi"
           >
             <List className="h-5 w-5" />
           </button>
@@ -377,6 +410,7 @@ const ManageBookings = () => {
             <button
               onClick={handlePrevMonth}
               className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="Oldingi oy"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -386,6 +420,7 @@ const ManageBookings = () => {
             <button
               onClick={handleNextMonth}
               className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="Keyingi oy"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -398,10 +433,12 @@ const ManageBookings = () => {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent appearance-none bg-white text-gray-800"
+                aria-label="Status bo'yicha filtr"
               >
                 <option value="">Barcha statuslar</option>
                 <option value="tasdiqlangan">Tasdiqlangan</option>
                 <option value="kutilmoqda">Kutilmoqda</option>
+                <option value="endi bo`ladigan">Endi bo`ladigan</option>
                 <option value="bekor qilingan">Bekor qilingan</option>
                 <option value="bo'lib o'tgan">Bo'lib o'tgan</option>
               </select>
@@ -410,6 +447,7 @@ const ManageBookings = () => {
             <button
               onClick={() => fetchBookings()}
               className="p-2 rounded-md bg-pink-500 text-white hover:bg-pink-600 transition-colors"
+              aria-label="Ma'lumotlarni yangilash"
             >
               <RefreshCw
                 className={`h-5 w-5 ${loading ? "animate-spin" : ""}`}
@@ -424,6 +462,7 @@ const ManageBookings = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg mb-6"
+          role="alert"
         >
           {error}
         </motion.div>
@@ -431,7 +470,7 @@ const ManageBookings = () => {
 
       {loading && bookings.length === 0 ? (
         <div className="flex justify-center items-center py-20">
-          <div className="relative">
+          <div className="relative" aria-label="Ma'lumotlar yuklanmoqda">
             <div className="h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-500 animate-spin"></div>
             <div
               className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-4 border-b-4 border-pink-300 animate-spin"
@@ -447,13 +486,13 @@ const ManageBookings = () => {
           {viewMode === "calendar" ? (
             <motion.div
               key="calendar"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
               transition={{ duration: 0.3 }}
               className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
             >
-              {/* Calendar Header - Days of Week */}
               <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
                 {getDayNames().map((day, index) => (
                   <div
@@ -464,8 +503,6 @@ const ManageBookings = () => {
                   </div>
                 ))}
               </div>
-
-              {/* Calendar Grid */}
               <div className="grid grid-cols-7 auto-rows-fr">
                 {generateCalendarDays().map((calendarDay, index) => {
                   const dayBookings = calendarDay.day
@@ -478,8 +515,9 @@ const ManageBookings = () => {
                     currentDate.getFullYear() === new Date().getFullYear();
 
                   return (
-                    <div
+                    <motion.div
                       key={index}
+                      variants={itemVariants}
                       className={`min-h-[120px] p-1 border-r border-b border-gray-200 last:border-r-0 ${
                         calendarDay.isCurrentMonth ? "bg-white" : "bg-gray-50"
                       } ${isToday ? "bg-pink-50" : ""}`}
@@ -513,7 +551,7 @@ const ManageBookings = () => {
                           </div>
                         </>
                       )}
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -521,14 +559,18 @@ const ManageBookings = () => {
           ) : (
             <motion.div
               key="list"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
               transition={{ duration: 0.3 }}
               className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
             >
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table
+                  className="min-w-full divide-y divide-gray-200"
+                  role="table"
+                >
                   <thead className="bg-gray-50">
                     <tr>
                       <th
@@ -580,47 +622,70 @@ const ManageBookings = () => {
                         </td>
                       </tr>
                     ) : (
-                      filteredBookings.map((booking) => (
-                        <tr key={booking.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {booking.id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {booking.venue_name || "Noma'lum"}
-                          </td>
-                          <td
-                            className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
-                            onClick={() => handleBookingClick(booking)}
-                          >
-                            {booking.user_name || "Noma'lum"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(booking.date).toLocaleDateString("uz-UZ")}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full inline-flex items-center gap-1 ${getStatusColor(
-                                booking.status
-                              )}`}
+                      filteredBookings.map((booking) => {
+                        // Date field mapping
+                        const dateField =
+                          booking.reservation_date ||
+                          booking.date ||
+                          booking.booking_date;
+
+                        return (
+                          <tr key={booking.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {booking.id}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              {booking.venue_name || "Noma'lum"}
+                            </td>
+                            <td
+                              className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+                              onClick={() => handleBookingClick(booking)}
+                              role="button"
+                              aria-label={`Foydalanuvchi ma'lumotlari: ${
+                                booking.user_name || "Noma'lum"
+                              }`}
                             >
-                              {getStatusIcon(booking.status)}
-                              {booking.status || "Noma'lum"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <button
-                              onClick={() => handleDeleteClick(booking)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
-                              disabled={
-                                booking.status === "bekor qilingan" ||
-                                booking.status === "bo'lib o'tgan"
-                              }
-                            >
-                              <Trash2 className="h-5 w-5" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))
+                              {booking.client_phone || "CD"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {dateField
+                                ? new Date(dateField).toLocaleDateString(
+                                    "uz-UZ"
+                                  )
+                                : "Noma'lum"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 text-xs rounded-full inline-flex items-center gap-1 ${getStatusColor(
+                                  booking.status
+                                )}`}
+                              >
+                                {getStatusIcon(booking.status)}
+                                {booking.status || "Noma'lum"}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <button
+                                onClick={() => handleDeleteClick(booking)}
+                                className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={
+                                  booking.status === "bekor qilingan" ||
+                                  booking.status === "bo'lib o'tgan"
+                                }
+                                title={
+                                  booking.status === "bekor qilingan" ||
+                                  booking.status === "bo'lib o'tgan"
+                                    ? "Bu buyurtma allaqachon bekor qilingan yoki bo'lib o'tgan"
+                                    : "Buyurtmani bekor qilish"
+                                }
+                                aria-label="Buyurtmani bekor qilish"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -638,6 +703,8 @@ const ManageBookings = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            role="dialog"
+            aria-labelledby="user-modal-title"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -646,12 +713,16 @@ const ManageBookings = () => {
               className="bg-white rounded-xl shadow-xl max-w-md w-full"
             >
               <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3
+                  id="user-modal-title"
+                  className="text-lg font-semibold text-gray-800"
+                >
                   Buyurtma ma'lumotlari
                 </h3>
                 <button
                   onClick={() => setIsUserModalOpen(false)}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Modalni yopish"
                 >
                   <X className="h-5 w-5 text-gray-500" />
                 </button>
@@ -668,15 +739,19 @@ const ManageBookings = () => {
                   <div className="ml-8 space-y-2">
                     <p className="text-gray-700">
                       <span className="font-medium">Nomi:</span>{" "}
-                      {selectedBooking?.venue_name || "Noma'lum"}
+                      {selectedBooking?.firstname || "Ma'lumot"}
                     </p>
                     <p className="text-gray-700">
                       <span className="font-medium">Sana:</span>{" "}
-                      {selectedBooking?.date
-                        ? new Date(selectedBooking.date).toLocaleDateString(
-                            "uz-UZ"
-                          )
-                        : "Noma'lum"}
+                      {(() => {
+                        const dateField =
+                          selectedBooking?.reservation_date ||
+                          selectedBooking?.date ||
+                          selectedBooking?.booking_date;
+                        return dateField
+                          ? new Date(dateField).toLocaleDateString("uz-UZ")
+                          : "Noma'lum";
+                      })()}
                     </p>
                     <p className="text-gray-700">
                       <span className="font-medium">Status:</span>{" "}
@@ -720,7 +795,7 @@ const ManageBookings = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4 text-gray-500">
-                    Foydalanuvchi ma'lumotlari mavjud emas
+                    Foydalanuvchi ma'lumotlari  
                   </div>
                 )}
 
@@ -728,6 +803,7 @@ const ManageBookings = () => {
                   <button
                     onClick={() => setIsUserModalOpen(false)}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors"
+                    aria-label="Modalni yopish"
                   >
                     Yopish
                   </button>
@@ -746,6 +822,8 @@ const ManageBookings = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            role="dialog"
+            aria-labelledby="delete-modal-title"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -754,12 +832,16 @@ const ManageBookings = () => {
               className="bg-white rounded-xl shadow-xl max-w-md w-full"
             >
               <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3
+                  id="delete-modal-title"
+                  className="text-lg font-semibold text-gray-800"
+                >
                   Buyurtmani bekor qilish
                 </h3>
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Modalni yopish"
                 >
                   <X className="h-5 w-5 text-gray-500" />
                 </button>
@@ -789,13 +871,16 @@ const ManageBookings = () => {
                     onClick={() => setIsDeleteModalOpen(false)}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                     disabled={deleteLoading}
+                    aria-label="Bekor qilishni rad etish"
                   >
                     Bekor qilish
                   </button>
                   <button
-                    onClick={handleCancelBooking}
+                    onClick={()=> handleCancelBooking( )}
+
                     disabled={deleteLoading}
                     className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                    aria-label="Buyurtmani bekor qilishni tasdiqlash"
                   >
                     {deleteLoading ? (
                       <>
