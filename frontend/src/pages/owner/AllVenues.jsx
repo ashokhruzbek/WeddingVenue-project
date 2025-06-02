@@ -22,6 +22,9 @@ import {
   Calendar,
   Eye,
   Settings,
+  ImageIcon,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 
 export function AllVenues() {
@@ -37,6 +40,10 @@ export function AllVenues() {
     price_seat: "",
     phone_number: "",
   })
+  // Rasmlar galereyasi uchun yangi state'lar
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [selectedVenue, setSelectedVenue] = useState(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -61,6 +68,7 @@ export function AllVenues() {
             Authorization: `Bearer ${token}`,
           },
         })
+        console.log("API javobi:", response.data)
 
         if (response.data?.venues && response.data.venues.length > 0) {
           setVenues(response.data.venues)
@@ -171,6 +179,32 @@ export function AllVenues() {
       const errorMsg = error.response?.data?.message || "To'yxonani o'chirishda xatolik yuz berdi"
       toast.error(errorMsg)
     }
+  }
+
+  // Rasmlar galereyasini ochish
+  const openGallery = (venue) => {
+    setSelectedVenue(venue)
+    setCurrentImageIndex(0)
+    setIsGalleryOpen(true)
+  }
+
+  // Keyingi rasmga o'tish
+  const nextImage = () => {
+    if (selectedVenue?.images?.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % selectedVenue.images.length)
+    }
+  }
+
+  // Oldingi rasmga qaytish
+  const prevImage = () => {
+    if (selectedVenue?.images?.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + selectedVenue.images.length) % selectedVenue.images.length)
+    }
+  }
+
+  // Rasmni tanlash
+  const selectImage = (index) => {
+    setCurrentImageIndex(index)
   }
 
   if (loading) {
@@ -350,10 +384,30 @@ export function AllVenues() {
                         <div className="absolute inset-0 bg-white/10"></div>
                         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                         <div className="relative h-full flex items-center justify-center">
-                          <div className="text-center">
-                            <Building2 className="w-10 h-10 text-white/90 mx-auto mb-1" />
-                            <div className="text-white/80 text-xs font-medium">To'yxona #{index + 1}</div>
-                          </div>
+                          {venue.images && venue.images.length > 0 && venue.images[0].image_url ? (
+                            <img
+                              src={venue.images[0].image_url || "/placeholder.svg"}
+                              alt={venue.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null; // Prevent infinite loop if placeholder also fails
+                                e.target.src = "/placeholder.svg";
+                              }}
+                            />
+                          ) : (
+                            <div className="text-center">
+                              <Building2 className="w-10 h-10 text-white/90 mx-auto mb-1" />
+                              <div className="text-white/80 text-xs font-medium">To'yxona #{index + 1}</div>
+                            </div>
+                          )}
+
+                          {/* Rasm soni ko'rsatiladi */}
+                          {venue.images && venue.images.length > 0 && (
+                            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3" />
+                              <span>{venue.images.length}</span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Decorative elements */}
@@ -434,7 +488,10 @@ export function AllVenues() {
 
                         {/* Additional Actions */}
                         <div className="mt-3 pt-3 border-t border-pink-100 flex gap-2">
-                          <button className="flex-1 bg-gradient-to-r from-blue-400 to-indigo-400 hover:from-blue-500 hover:to-indigo-500 text-white py-2 px-3 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-xs font-medium">
+                          <button
+                            className="flex-1 bg-gradient-to-r from-blue-400 to-indigo-400 hover:from-blue-500 hover:to-indigo-500 text-white py-2 px-3 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-xs font-medium"
+                            onClick={() => openGallery(venue)}
+                          >
                             <Eye className="w-3 h-3" />
                             Ko'rish
                           </button>
@@ -494,6 +551,122 @@ export function AllVenues() {
           )
         )}
       </div>
+
+      {/* Rasmlar galereyasi modali */}
+      {isGalleryOpen && selectedVenue && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 md:p-8"
+          onClick={() => setIsGalleryOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-pink-50 to-rose-50">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-pink-500" />
+                {selectedVenue.name} - Rasmlar
+              </h3>
+              <button
+                className="p-2 rounded-full hover:bg-pink-100 transition-colors"
+                onClick={() => setIsGalleryOpen(false)}
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Asosiy rasm ko'rsatish qismi */}
+            <div className="relative flex-1 min-h-[300px] bg-gray-100 flex items-center justify-center overflow-hidden">
+              {selectedVenue.images && selectedVenue.images.length > 0 ? (
+                <>
+                  <img
+                    src={selectedVenue.images[currentImageIndex]?.image_url || "/placeholder.svg"}
+                    alt={`${selectedVenue.name} - Rasm ${currentImageIndex + 1}`}
+                    className="max-h-[60vh] max-w-full object-contain"
+                    onError={(e) => {
+                      e.target.onerror = null; // Prevent infinite loop if placeholder also fails
+                      e.target.src = "/placeholder.svg";
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-gray-200"
+                    style={{ display: "none" }}
+                  >
+                    <div className="text-center">
+                      <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-500">Rasm yuklanmadi</p>
+                    </div>
+                  </div>
+
+                  {/* Navigatsiya tugmalari */}
+                  {selectedVenue.images.length > 1 && (
+                    <>
+                      <button
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          prevImage()
+                        }}
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </button>
+                      <button
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          nextImage()
+                        }}
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Rasm raqami */}
+                  <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                    {currentImageIndex + 1} / {selectedVenue.images.length}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center p-8">
+                  <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 text-lg">Bu to'yxona uchun rasmlar mavjud emas</p>
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail rasmlar */}
+            {selectedVenue.images && selectedVenue.images.length > 1 && (
+              <div className="p-4 bg-gray-50 border-t border-gray-200 overflow-x-auto">
+                <div className="flex gap-2 min-w-max">
+                  {selectedVenue.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                        currentImageIndex === index
+                          ? "border-pink-500 shadow-md scale-105"
+                          : "border-transparent hover:border-pink-300"
+                      }`}
+                      onClick={() => selectImage(index)}
+                    >
+                      <img
+                        src={image.image_url || "/placeholder.svg"}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null; // Prevent infinite loop if placeholder also fails
+                          e.target.src = "/placeholder.svg";
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes fadeInUp {
