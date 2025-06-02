@@ -53,7 +53,7 @@ exports.getAllVenuesForUser = async (req, res) => {
         .filter(img => img.venue_id === venue.id)
         .map(img => ({
           id: img.id,
-          image_url: `http://localhost:4000/uploads/${img.image_url}`
+          image_url: `http://localhost:4000/uploads/venues/${img.image_url}`
         }))
     }));
 
