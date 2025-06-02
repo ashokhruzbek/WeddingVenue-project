@@ -6,6 +6,7 @@ function Mybookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [cancellingBookingId, setCancellingBookingId] = useState(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -61,6 +62,63 @@ function Mybookings() {
     fetchBookings();
   }, []);
 
+  const handleCancelBooking = async (bookingId) => {
+    // Confirm dialog
+    if (!window.confirm("Rostdan ham bu bronni bekor qilmoqchimisiz?")) {
+      return;
+    }
+
+    setCancellingBookingId(bookingId);
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error("Avtorizatsiya tokeni topilmadi. Iltimos, qaytadan kiring.");
+        return;
+      }
+
+      const response = await axios.delete(
+        `http://localhost:4000/api/users/cancel-booking/${bookingId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // Remove the cancelled booking from the list
+        setBookings(prevBookings => 
+          prevBookings.filter(booking => booking.booking_id !== bookingId)
+        );
+        
+        toast.success("Bron muvaffaqiyatli bekor qilindi!");
+      }
+    } catch (error) {
+      console.error("Bronni bekor qilishda xatolik:", error);
+      
+      let errorMessage = "Bronni bekor qilishda xatolik yuz berdi.";
+      
+      if (error.response?.status === 404) {
+        errorMessage = "Bron topilmadi.";
+      } else if (error.response?.status === 403) {
+        errorMessage = "Bu bronni bekor qilish uchun ruxsatingiz yo'q.";
+      } else if (error.response?.status === 401) {
+        errorMessage = "Avtorizatsiya xatoligi. Iltimos, qaytadan kiring.";
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      toast.error(errorMessage);
+    } finally {
+      setCancellingBookingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -91,7 +149,7 @@ function Mybookings() {
         {bookings.length === 0 && !loading && (
           <div className="text-center bg-white p-8 rounded-xl shadow-lg border border-pink-100">
             <svg className="mx-auto h-12 w-12 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
             </svg>
             <p className="mt-4 text-xl text-gray-700">Sizda hozircha aktiv bronlar mavjud emas.</p>
             <p className="text-gray-500 mt-2">To'yxona bron qilish uchun asosiy sahifaga o'ting.</p>
@@ -145,10 +203,22 @@ function Mybookings() {
                     <div className="border-t border-pink-100 pt-4 mt-4 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                       {booking.status !== 'cancelled' && booking.status !== 'completed' && booking.status !== 'passed' && (
                         <button 
-                          onClick={() => alert(`ID ${booking.booking_id} bronni bekor qilish funksiyasi hali implement qilinmagan.`)}
-                          className="bg-gradient-to-r from-red-400 to-pink-400 hover:from-red-500 hover:to-pink-500 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-sm"
+                          onClick={() => handleCancelBooking(booking.booking_id)}
+                          disabled={cancellingBookingId === booking.booking_id}
+                          className={`bg-gradient-to-r from-red-400 to-pink-400 hover:from-red-500 hover:to-pink-500 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-sm ${
+                            cancellingBookingId === booking.booking_id 
+                              ? 'opacity-50 cursor-not-allowed transform-none' 
+                              : ''
+                          }`}
                         >
-                          Bronni bekor qilish
+                          {cancellingBookingId === booking.booking_id ? (
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                              Bekor qilinmoqda...
+                            </div>
+                          ) : (
+                            'Bronni bekor qilish'
+                          )}
                         </button>
                       )}
                         

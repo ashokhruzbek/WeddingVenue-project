@@ -15,6 +15,6 @@ userRouter.post('/add-booking/:id', addBooking )
 userRouter.get('/get-venues-user', getAllVenuesForUser)
 userRouter.get('/get-user-booking/:id', getUserBookings)
 userRouter.get('/get-available-dates', getAvailableDates)
-
+ 
 
 module.exports = userRouter;
