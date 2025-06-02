@@ -63,17 +63,6 @@ const heartVariants = {
   },
 };
 
-const modalVariants = {
-  hidden: { opacity: 0, y: 50, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring", stiffness: 100, damping: 15 },
-  },
-  exit: { opacity: 0, y: 50, scale: 0.8, transition: { duration: 0.2 } },
-};
-
 const fixImageUrl = (url) => {
   if (!url) return "";
   return url.replace(/\\/g, "/").replace(/(\/uploads)+/g, "/uploads");
@@ -90,14 +79,6 @@ const Venues = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const [formData, setFormData] = useState({
-    reservation_date: null,
-    guest_count: "",
-    client_phone: "",
-    status: "endi bo`ladigan",
-  });
 
   const navigate = useNavigate();
 
@@ -165,94 +146,6 @@ const Venues = () => {
 
   const navigateToFavorites = () => {
     navigate("/user/favorites");
-  };
-
-  const openModal = (venueId) => {
-    const venue = venues.find((v) => v.id === venueId);
-    setSelectedVenue(venue);
-    setFormData({
-      reservation_date: null,
-      guest_count: "",
-      client_phone: "",
-      status: "endi bo`ladigan",
-    });
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedVenue(null);
-    setFormData({
-      reservation_date: null,
-      guest_count: "",
-      client_phone: "",
-      status: "endi bo`ladigan",
-    });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleDateChange = (date) => {
-    setFormData((prev) => ({
-      ...prev,
-      reservation_date: date,
-    }));
-  };
-
-  const validateForm = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (!formData.reservation_date) return "Bron sanasi tanlanmadi";
-    const selDate = new Date(formData.reservation_date);
-    selDate.setHours(0, 0, 0, 0);
-    if (selDate < today) return "Bron sanasi bugundan keyin bo'lishi kerak";
-    if (!formData.guest_count || formData.guest_count <= 0) return "Mehmonlar soni noto'g'ri";
-    if (!formData.client_phone || !/^\+998\d{9}$/.test(formData.client_phone))
-      return "Telefon raqami noto'g'ri formatda (masalan: +998901234567)";
-    if (selectedVenue && formData.guest_count > selectedVenue.capacity)
-      return "Mehmonlar soni to‘yxona sig‘imidan oshib ketdi";
-    return null;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const validationError = validateForm();
-    if (validationError) {
-      toast.error(validationError);
-      return;
-    }
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Token topilmadi, iltimos tizimga qayta kiring");
-
-      await axios.post(
-        `http://localhost:4000/user/add-booking/${selectedVenue.id}`,
-        {
-          reservation_date: formData.reservation_date.toISOString().split("T")[0],
-          guest_count: Number(formData.guest_count),
-          client_phone: formData.client_phone,
-          status: formData.status,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      toast.success("Bron muvaffaqiyatli qo'shildi!");
-      closeModal();
-    } catch (err) {
-      console.error("Bron qilishda xatolik:", err);
-      toast.error(err.response?.data?.error || "Bron qilishda xatolik yuz berdi");
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        navigate("/login");
-      }
-    }
   };
 
   const sortedVenues = venues.sort((a, b) => {
@@ -482,7 +375,7 @@ const Venues = () => {
 
                       <div className="mt-4 pt-3 border-t border-pink-100">
                         <button
-                          onClick={() => openModal(venue.id)}
+                          onClick={() => navigate(`/user/bookings?venueId=${venue.id}`)}
                           className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-sm font-medium"
                         >
                           <Calendar className="h-4 w-4" />
@@ -496,105 +389,6 @@ const Venues = () => {
             </AnimatePresence>
           </>
         )}
-
-        {/* Booking modal */}
-        <AnimatePresence>
-          {isModalOpen && (
-            <motion.div
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-              onClick={closeModal}
-            >
-              <motion.div
-                variants={modalVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h2 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-                  <Calendar className="h-6 w-6 text-pink-500" />
-                  Bron qilish
-                </h2>
-                <p className="text-sm text-gray-600 mb-4">
-                  To‘yxona: <span className="font-semibold">{selectedVenue?.name}</span>
-                </p>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Bron sanasi
-                    </label>
-                    <DatePicker
-                      selected={formData.reservation_date}
-                      onChange={handleDateChange}
-                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
-                      dateFormat="dd.MM.yyyy"
-                      placeholderText="Sanani tanlang"
-                      minDate={new Date()}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Mehmonlar soni (Sig‘im: {selectedVenue?.capacity})
-                    </label>
-                    <input
-                      type="number"
-                      name="guest_count"
-                      value={formData.guest_count}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
-                      placeholder="10"
-                      min="1"
-                      max={selectedVenue?.capacity}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Telefon raqami
-                    </label>
-                    <input
-                      type="text"
-                      name="client_phone"
-                      value={formData.client_phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
-                      placeholder="+998901234567"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Holati
-                    </label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200"
-                    >
-                      <option value="endi bo`ladigan">Endi bo‘ladigan</option>
-                      <option value="bo`lib o`tgan">Bo‘lib o‘tgan</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-                    >
-                      <Heart className="h-4 w-4" /> Bron qilish
-                    </button>
-                    <button
-                      type="button"
-                      onClick={closeModal}
-                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-lg transition-all duration-300"
-                    >
-                      Yopish
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );

@@ -213,7 +213,8 @@ const Sidebar = () => {
     const userItems = [
       { title: "To‘yxonalar", icon: <Building size={20} />, path: "/user/venues", },
       { title: "Sevimlilar", icon: <Heart size={20} />, path: "/user/favorites", },
-      { title: "Buyurtmalarim", icon: <Calendar size={20} />, path: "/user/bookings", },
+      { title: "Bron qilish", icon: <Calendar size={20} />, path: "/user/bookings", },
+      { title: "Buyurtmalarim", icon: <Calendar size={20} />, path: "/user/my-bookings", },
     ]
 
     const profileSettings = [

@@ -1,4 +1,4 @@
-  "use client"
+"use client"
 
   import { useState, useEffect } from "react"
   import axios from "axios"
@@ -7,6 +7,7 @@
   import { ToastContainer, toast } from "react-toastify"
   import "react-toastify/dist/ReactToastify.css"
   import { Calendar, Users, Phone, CheckCircle, AlertCircle, MapPin, Clock, Heart, Sparkles, Star } from "lucide-react"
+  import { useLocation } from "react-router-dom"; // Import useLocation
 
   function UserBookings() {
     const [venues, setVenues] = useState([])
@@ -20,6 +21,8 @@
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [fetchingVenues, setFetchingVenues] = useState(true)
+
+    const location = useLocation(); // Get location object
 
     // Token va user_id ni olish
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
@@ -53,6 +56,24 @@
         setFetchingVenues(false)
       }
     }, [token, userId])
+
+    // Set venue_id from URL query parameter
+    useEffect(() => {
+      const searchParams = new URLSearchParams(location.search);
+      const venueIdFromUrl = searchParams.get("venueId");
+      if (venueIdFromUrl && venues.length > 0) {
+        // Check if the venueIdFromUrl exists in the fetched venues
+        const venueExists = venues.some(venue => venue.id.toString() === venueIdFromUrl);
+        if (venueExists) {
+          setFormData((prev) => ({
+            ...prev,
+            venue_id: venueIdFromUrl,
+          }));
+        } else {
+          console.warn(`Venue with ID ${venueIdFromUrl} not found in the list of venues.`);
+        }
+      }
+    }, [location.search, venues]); // Add venues to dependency array
 
     const handleChange = (e) => {
       const { name, value } = e.target

@@ -19,6 +19,7 @@ import OwnerVenue from "../pages/owner/UpdateVenues";
 import VenueBookings from "../pages/owner/VenueBookings";
 import User from "../pages/user";
 import FavoritesVenues from "../pages/user/FavoritesVenues";
+import Mybookings from "../pages/user/Mybookings";
 import UserBookings from "../pages/user/UserBookings";
 import Venues from "../pages/user/Venues";
 
@@ -45,7 +46,8 @@ export const routes = [
       { path: "", element: <User /> },
       { path: "venues", element: <Venues /> }, //To‘yxonalar
       { path: "favorites", element: <FavoritesVenues /> }, //Sevimlilar
-      { path: "bookings", element: <UserBookings /> }, //Buyurtmalarim
+      { path: "bookings", element: <UserBookings /> }, //bronlarim
+      {path: "my-bookings", element: <Mybookings /> }, //To‘yxona haqida
     ],
   },
   {
