@@ -91,7 +91,7 @@ function Mybookings() {
       if (response.status === 200) {
         // Remove the cancelled booking from the list
         setBookings(prevBookings => 
-          prevBookings.filter(booking => booking.booking_id !== bookingId)
+          prevBookings.filter(booking => booking.id !== bookingId)
         );
         
         toast.success("Bron muvaffaqiyatli bekor qilindi!");
@@ -161,7 +161,7 @@ function Mybookings() {
         {bookings.length > 0 && (
           <div className="space-y-6">
             {bookings.map((booking) => (
-              <div key={booking.booking_id} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition-transform duration-300 border-2 border-pink-100 hover:border-pink-300">
+              <div key={booking.id} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition-transform duration-300 border-2 border-pink-100 hover:border-pink-300">
                 <div className="md:flex">
                   <div className="p-6 flex-grow">
                     <div className="flex justify-between items-start">
@@ -203,15 +203,15 @@ function Mybookings() {
                     <div className="border-t border-pink-100 pt-4 mt-4 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                       {booking.status !== 'cancelled' && booking.status !== 'completed' && booking.status !== 'passed' && (
                         <button 
-                          onClick={() => handleCancelBooking(booking.booking_id)}
-                          disabled={cancellingBookingId === booking.booking_id}
+                          onClick={() => handleCancelBooking(booking.id)}
+                          disabled={cancellingBookingId === booking.id}
                           className={`bg-gradient-to-r from-red-400 to-pink-400 hover:from-red-500 hover:to-pink-500 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-sm ${
-                            cancellingBookingId === booking.booking_id 
+                            cancellingBookingId === booking.id 
                               ? 'opacity-50 cursor-not-allowed transform-none' 
                               : ''
                           }`}
                         >
-                          {cancellingBookingId === booking.booking_id ? (
+                          {cancellingBookingId === booking.id ? (
                             <div className="flex items-center">
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                               Bekor qilinmoqda...
