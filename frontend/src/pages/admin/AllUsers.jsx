@@ -90,7 +90,7 @@ const AllOwners = () => {
                 <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>To‘liq ism</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Telefon / Username</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Role</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -108,7 +108,7 @@ const AllOwners = () => {
                     {(owner.firstname || "") + " " + (owner.lastname || "") || "Noma'lum"}
                   </TableCell>
                   <TableCell>{owner.username || "Noma'lum"}</TableCell>
-                  <TableCell>-</TableCell>
+                  <TableCell>🇺🇿 {owner.role}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
