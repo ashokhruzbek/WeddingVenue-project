@@ -110,13 +110,10 @@ const ManageBookings = () => {
       const params = {};
       if (statusFilter) params.status = statusFilter.toLowerCase();
 
-      const response = await axios.get(
-        "http://13.51.241.247/api/admin/view-all-bookings",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params,
-        }
-      );
+      const response = await axios.get("api/admin/view-all-bookings", {
+        headers: { Authorization: `Bearer ${token}` },
+        params,
+      });
       console.log("API Response:", response.data);
 
       const data = Array.isArray(response.data.bookings)
@@ -158,7 +155,7 @@ const ManageBookings = () => {
       }
 
       const response = await axios.get(
-        `http://13.51.241.247/api/admin/get-booking-user?booking_id=${bookingId}`,
+        `api/admin/get-booking-user?booking_id=${bookingId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -190,7 +187,7 @@ const ManageBookings = () => {
 
       // API endpoint ni to'g'ri format bilan
       const response = await axios.put(
-        `http://13.51.241.247/api/admin/cancel-booking/${selectedBooking.id}`,
+        `api/admin/cancel-booking/${selectedBooking.id}`,
         {}, // Empty body for PUT request
         {
           headers: { Authorization: `Bearer ${token}` },

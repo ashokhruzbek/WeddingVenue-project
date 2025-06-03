@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import axios from "axios"
-import Slider from "react-slick"
-import { motion, AnimatePresence } from "framer-motion"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import Slider from "react-slick";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   MapPin,
@@ -23,11 +23,11 @@ import {
   Clock,
   Sparkles,
   Menu,
-} from "lucide-react"
-import { toast } from "react-toastify"
+} from "lucide-react";
+import { toast } from "react-toastify";
 
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // Custom arrow components for better control
 const CustomPrevArrow = ({ onClick }) => (
@@ -38,7 +38,7 @@ const CustomPrevArrow = ({ onClick }) => (
   >
     <ChevronLeft size={20} />
   </button>
-)
+);
 
 const CustomNextArrow = ({ onClick }) => (
   <button
@@ -48,7 +48,7 @@ const CustomNextArrow = ({ onClick }) => (
   >
     <ChevronRight size={20} />
   </button>
-)
+);
 
 // Toshkent shahri tumanlari ro'yxati
 const tashkentDistricts = [
@@ -64,22 +64,22 @@ const tashkentDistricts = [
   { id: 10, name: "Yakkasaroy" },
   { id: 11, name: "Yashnobod" },
   { id: 12, name: "Yangihayot" },
-]
+];
 
 function Home() {
-  const [venues, setVenues] = useState([])
-  const [filteredVenues, setFilteredVenues] = useState([])
-  const [search, setSearch] = useState("")
-  const [districtFilter, setDistrictFilter] = useState("all")
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedVenue, setSelectedVenue] = useState(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [favorites, setFavorites] = useState([])
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const token = localStorage.getItem("token")
-  const navigate = useNavigate()
-  const [currentPage, setCurrentPage] = useState(1)
-  const [venuesPerPage] = useState(10)
+  const [venues, setVenues] = useState([]);
+  const [filteredVenues, setFilteredVenues] = useState([]);
+  const [search, setSearch] = useState("");
+  const [districtFilter, setDistrictFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [venuesPerPage] = useState(10);
 
   const handleClickCheck = () => {
     if (!token) {
@@ -91,45 +91,49 @@ function Home() {
           label: "Kirish",
           onClick: () => navigate("/login"),
         },
-      })
-      navigate("/login")
+      });
+      navigate("/login");
     }
-  }
+  };
 
   // Backenddan to'yxonalar va ularning rasmlarini olish
   useEffect(() => {
     const fetchVenues = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const res = await axios.get("http://13.51.241.247/api/venues/venues")
-        setVenues(res.data.venues)
-        setFilteredVenues(res.data.venues)
-        console.log("Venues data:", res.data.venues)
+        const res = await axios.get("api/venues/venues");
+        setVenues(res.data.venues);
+        setFilteredVenues(res.data.venues);
+        console.log("Venues data:", res.data.venues);
       } catch (err) {
-        console.error("Error fetching venues:", err)
+        console.error("Error fetching venues:", err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    fetchVenues()
-  }, [])
+    };
+    fetchVenues();
+  }, []);
 
   // Qidiruv va tuman bo'yicha filtr
   useEffect(() => {
     const result = venues.filter((item) => {
-      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase())
+      const matchesSearch = item.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
       // Backenddan keladigan district_id string bo'lishi mumkin, shuning uchun Number() ishlatamiz
-      const matchesDistrict = districtFilter === "all" || Number(item.district_id) === Number(districtFilter)
-      return matchesSearch && matchesDistrict
-    })
-    setFilteredVenues(result)
-    setCurrentPage(1) // Reset to first page when filters change
-  }, [search, districtFilter, venues])
+      const matchesDistrict =
+        districtFilter === "all" ||
+        Number(item.district_id) === Number(districtFilter);
+      return matchesSearch && matchesDistrict;
+    });
+    setFilteredVenues(result);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [search, districtFilter, venues]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  }
+  };
 
   const cardVariants = {
     hidden: { y: 50, opacity: 0 },
@@ -140,11 +144,12 @@ function Home() {
     },
     hover: {
       y: -10,
-      boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+      boxShadow:
+        "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
       transition: { type: "spring", stiffness: 400, damping: 10 },
     },
     tap: { scale: 0.98 },
-  }
+  };
 
   // Improved slider settings
   const sliderSettings = {
@@ -160,62 +165,71 @@ function Home() {
     autoplaySpeed: 5000,
     pauseOnHover: true,
     dotsClass: "slick-dots custom-dots",
-  }
+  };
 
   // URLdagi backslashni to'g'rilash va ortiqcha uploads ni bitta qilish
   const fixImageUrl = (url) => {
-    if (!url) return ""
-    const fixedUrl = url.replace(/\\/g, "/").replace(/(\/uploads)+/g, "/uploads")
-    return fixedUrl
-  }
+    if (!url) return "";
+    const fixedUrl = url
+      .replace(/\\/g, "/")
+      .replace(/(\/uploads)+/g, "/uploads");
+    return fixedUrl;
+  };
 
   // Kartani bosganda modalni ochish uchun funksiya
   const handleCardClick = (venue) => {
-    setSelectedVenue(venue)
-    setIsModalOpen(true)
-  }
+    setSelectedVenue(venue);
+    setIsModalOpen(true);
+  };
 
   // Modalni yopish uchun funksiya
   const closeModal = () => {
-    setIsModalOpen(false)
-    setSelectedVenue(null)
-  }
+    setIsModalOpen(false);
+    setSelectedVenue(null);
+  };
 
   // Toggle favorite
   const toggleFavorite = (e, venueId) => {
-    e.stopPropagation()
-    setFavorites((prev) => (prev.includes(venueId) ? prev.filter((id) => id !== venueId) : [...prev, venueId]))
-  }
+    e.stopPropagation();
+    setFavorites((prev) =>
+      prev.includes(venueId)
+        ? prev.filter((id) => id !== venueId)
+        : [...prev, venueId]
+    );
+  };
 
   // Get random rating between 4.0 and 5.0
   const getRandomRating = () => {
-    return (4 + Math.random()).toFixed(1)
-  }
+    return (4 + Math.random()).toFixed(1);
+  };
 
   // Pagination logic
-  const indexOfLastVenue = currentPage * venuesPerPage
-  const indexOfFirstVenue = indexOfLastVenue - venuesPerPage
-  const currentVenues = filteredVenues.slice(indexOfFirstVenue, indexOfLastVenue)
-  const totalPages = Math.ceil(filteredVenues.length / venuesPerPage)
+  const indexOfLastVenue = currentPage * venuesPerPage;
+  const indexOfFirstVenue = indexOfLastVenue - venuesPerPage;
+  const currentVenues = filteredVenues.slice(
+    indexOfFirstVenue,
+    indexOfLastVenue
+  );
+  const totalPages = Math.ceil(filteredVenues.length / venuesPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const nextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
+      setCurrentPage(currentPage + 1);
     }
-  }
+  };
 
   const prevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
   // Toggle mobile menu
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-  }
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
@@ -225,15 +239,23 @@ function Home() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <span className="text-2xl">💍</span>
-              <span className="ml-2 text-xl font-bold text-blue-600">WeddingVenue</span>
+              <span className="ml-2 text-xl font-bold text-blue-600">
+                WeddingVenue
+              </span>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link
+                to="/"
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
                 Home
               </Link>
-              <Link to="/venue" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link
+                to="/venue"
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
                 To'yxonalar
               </Link>
               <Link
@@ -246,8 +268,15 @@ function Home() {
 
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <button onClick={toggleMobileMenu} className="text-gray-700 hover:text-blue-600 focus:outline-none">
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <button
+                onClick={toggleMobileMenu}
+                className="text-gray-700 hover:text-blue-600 focus:outline-none"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
@@ -364,7 +393,8 @@ function Home() {
                 Mukammal To'y Marosimi Uchun
               </h1>
               <p className="text-base sm:text-lg md:text-xl opacity-90 mb-6 sm:mb-8">
-                Toshkent shahridagi eng sara to'yxonalarni toping va o'z to'yingizni unutilmas qiling
+                Toshkent shahridagi eng sara to'yxonalarni toping va o'z
+                to'yingizni unutilmas qiling
               </p>
               <div className="flex flex-wrap gap-4">
                 <motion.button
@@ -406,7 +436,10 @@ function Home() {
         >
           <div className="flex flex-col md:flex-row gap-4 sm:gap-6 items-center">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400" size={20} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder="Qidiruv (nomi bo'yicha)..."
@@ -417,7 +450,10 @@ function Home() {
             </div>
 
             <div className="relative w-full md:w-1/3">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400" size={20} />
+              <Filter
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"
+                size={20}
+              />
               <select
                 className="pl-10 pr-4 py-2 sm:py-3 rounded-xl border border-blue-200 w-full appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 outline-none"
                 value={districtFilter}
@@ -442,7 +478,10 @@ function Home() {
           className="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0"
         >
           <p className="text-gray-600 font-medium">
-            <span className="text-blue-600 font-bold">{filteredVenues.length}</span> ta natija topildi
+            <span className="text-blue-600 font-bold">
+              {filteredVenues.length}
+            </span>{" "}
+            ta natija topildi
           </p>
 
           <div className="flex gap-2">
@@ -476,9 +515,12 @@ function Home() {
                 >
                   <div className="flex flex-col items-center gap-4">
                     <Search className="text-blue-300 w-16 h-16" />
-                    <h3 className="text-2xl font-semibold text-gray-700">Hech narsa topilmadi</h3>
+                    <h3 className="text-2xl font-semibold text-gray-700">
+                      Hech narsa topilmadi
+                    </h3>
                     <p className="text-gray-500 max-w-md">
-                      Boshqa kalit so'zlar bilan qidirib ko'ring yoki filtrlarni o'zgartiring
+                      Boshqa kalit so'zlar bilan qidirib ko'ring yoki filtrlarni
+                      o'zgartiring
                     </p>
                   </div>
                 </motion.div>
@@ -500,22 +542,28 @@ function Home() {
                           src={
                             fixImageUrl(
                               venue.images[0].image_url ||
-                                "https://avatars.mds.yandex.net/get-altay/4614377/2a000001775e0e2ae26077d653b135e522c3/orig",
+                                "https://avatars.mds.yandex.net/get-altay/4614377/2a000001775e0e2ae26077d653b135e522c3/orig"
                             ) || "/placeholder.svg"
                           }
                           alt={`${venue.name} - asosiy rasm`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
-                            console.error("Image failed to load:", venue.images[0].image_url)
-                            e.target.style.display = "none"
-                            e.target.nextSibling.style.display = "flex"
+                            console.error(
+                              "Image failed to load:",
+                              venue.images[0].image_url
+                            );
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
                           }}
                         />
                       ) : null}
                       <div
                         className="w-full h-full flex items-center justify-center"
                         style={{
-                          display: venue.images && venue.images.length > 0 ? "none" : "flex",
+                          display:
+                            venue.images && venue.images.length > 0
+                              ? "none"
+                              : "flex",
                         }}
                       >
                         <span className="text-gray-400">
@@ -533,13 +581,20 @@ function Home() {
                       >
                         <Heart
                           size={18}
-                          className={favorites.includes(venue.id) ? "fill-blue-500 text-blue-500" : "text-gray-500"}
+                          className={
+                            favorites.includes(venue.id)
+                              ? "fill-blue-500 text-blue-500"
+                              : "text-gray-500"
+                          }
                         />
                       </button>
 
                       {/* Rating badge */}
                       <div className="absolute bottom-3 left-3 bg-white/90 px-2 py-1 rounded-lg shadow-md flex items-center gap-1 text-sm">
-                        <Star size={14} className="text-amber-500 fill-amber-500" />
+                        <Star
+                          size={14}
+                          className="text-amber-500 fill-amber-500"
+                        />
                         <span className="font-medium">{getRandomRating()}</span>
                       </div>
 
@@ -547,7 +602,9 @@ function Home() {
                       {venue.images && venue.images.length > 1 && (
                         <div className="absolute bottom-3 right-3 bg-white/90 px-2 py-1 rounded-lg shadow-md flex items-center gap-1 text-sm">
                           <Camera size={14} className="text-blue-500" />
-                          <span className="font-medium">{venue.images.length}</span>
+                          <span className="font-medium">
+                            {venue.images.length}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -555,7 +612,10 @@ function Home() {
                     {/* To'yxona ma'lumotlari */}
                     <div className="p-4 sm:p-5 space-y-2 sm:space-y-3">
                       <div className="flex justify-between items-start">
-                        <h3 className="text-lg sm:text-xl font-semibold text-blue-600 truncate" title={venue.name}>
+                        <h3
+                          className="text-lg sm:text-xl font-semibold text-blue-600 truncate"
+                          title={venue.name}
+                        >
                           {venue.name}
                         </h3>
                         <div className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
@@ -564,22 +624,37 @@ function Home() {
                       </div>
 
                       <div className="flex items-start gap-2 text-sm">
-                        <MapPin className="text-blue-500 shrink-0 mt-0.5" size={16} />
-                        <p className="text-gray-600 truncate" title={venue.address}>
+                        <MapPin
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={16}
+                        />
+                        <p
+                          className="text-gray-600 truncate"
+                          title={venue.address}
+                        >
                           {venue.address}
                         </p>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-start gap-2 text-sm">
-                          <Users className="text-blue-500 shrink-0 mt-0.5" size={16} />
+                          <Users
+                            className="text-blue-500 shrink-0 mt-0.5"
+                            size={16}
+                          />
                           <p className="text-gray-600">
-                            <span className="font-medium">{venue.capacity}</span> kishi
+                            <span className="font-medium">
+                              {venue.capacity}
+                            </span>{" "}
+                            kishi
                           </p>
                         </div>
 
                         <div className="flex items-start gap-2 text-sm">
-                          <Clock className="text-blue-500 shrink-0 mt-0.5" size={16} />
+                          <Clock
+                            className="text-blue-500 shrink-0 mt-0.5"
+                            size={16}
+                          />
                           <p className="text-gray-600">
                             <span className="font-medium">24/7</span>
                           </p>
@@ -587,14 +662,23 @@ function Home() {
                       </div>
 
                       <div className="flex items-start gap-2 text-sm pt-1">
-                        <DollarSign className="text-blue-500 shrink-0 mt-0.5" size={16} />
+                        <DollarSign
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={16}
+                        />
                         <p className="text-gray-600">
-                          Narx: <span className="font-medium text-blue-600">{venue.price_seat} so'm</span>
+                          Narx:{" "}
+                          <span className="font-medium text-blue-600">
+                            {venue.price_seat} so'm
+                          </span>
                         </p>
                       </div>
 
                       <div className="flex items-start gap-2 text-sm">
-                        <Phone className="text-blue-500 shrink-0 mt-0.5" size={16} />
+                        <Phone
+                          className="text-blue-500 shrink-0 mt-0.5"
+                          size={16}
+                        />
                         <p className="text-gray-600">{venue.phone_number}</p>
                       </div>
 
@@ -603,8 +687,8 @@ function Home() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={(e) => {
-                          e.stopPropagation() // Prevent card click when clicking button
-                          handleCardClick(venue)
+                          e.stopPropagation(); // Prevent card click when clicking button
+                          handleCardClick(venue);
                         }}
                       >
                         <Sparkles size={18} />
@@ -677,7 +761,9 @@ function Home() {
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
               >
                 <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center">
-                  <h2 className="text-xl sm:text-2xl font-semibold text-blue-700">{selectedVenue.name}</h2>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-blue-700">
+                    {selectedVenue.name}
+                  </h2>
                   <button
                     onClick={closeModal}
                     className="text-gray-400 hover:text-blue-600 transition-colors p-1 rounded-full hover:bg-blue-100"
@@ -692,9 +778,15 @@ function Home() {
                     <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
                       <Slider {...sliderSettings}>
                         {selectedVenue.images.map((image, index) => (
-                          <div key={index} className="h-[250px] sm:h-[350px] md:h-[400px] bg-gray-100">
+                          <div
+                            key={index}
+                            className="h-[250px] sm:h-[350px] md:h-[400px] bg-gray-100"
+                          >
                             <img
-                              src={fixImageUrl(image.image_url) || "/placeholder.svg"}
+                              src={
+                                fixImageUrl(image.image_url) ||
+                                "/placeholder.svg"
+                              }
                               alt={`${selectedVenue.name} - rasm ${index + 1}`}
                               className="w-full h-full object-cover"
                             />
@@ -711,51 +803,83 @@ function Home() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 text-sm">
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
-                        <MapPin className="text-blue-500 shrink-0 mt-1" size={18} />
+                        <MapPin
+                          className="text-blue-500 shrink-0 mt-1"
+                          size={18}
+                        />
                         <div>
                           <p className="font-medium text-gray-700">Manzil:</p>
-                          <p className="text-gray-600">{selectedVenue.address}</p>
+                          <p className="text-gray-600">
+                            {selectedVenue.address}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <Users className="text-blue-500 shrink-0 mt-1" size={18} />
+                        <Users
+                          className="text-blue-500 shrink-0 mt-1"
+                          size={18}
+                        />
                         <div>
                           <p className="font-medium text-gray-700">Sig'imi:</p>
-                          <p className="text-gray-600">{selectedVenue.capacity} kishi</p>
+                          <p className="text-gray-600">
+                            {selectedVenue.capacity} kishi
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <DollarSign className="text-blue-500 shrink-0 mt-1" size={18} />
+                        <DollarSign
+                          className="text-blue-500 shrink-0 mt-1"
+                          size={18}
+                        />
                         <div>
-                          <p className="font-medium text-gray-700">Narxi (soatiga):</p>
-                          <p className="font-semibold text-blue-600">{selectedVenue.price_per_hour} so'm</p>
+                          <p className="font-medium text-gray-700">
+                            Narxi (soatiga):
+                          </p>
+                          <p className="font-semibold text-blue-600">
+                            {selectedVenue.price_per_hour} so'm
+                          </p>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
-                        <Phone className="text-blue-500 shrink-0 mt-1" size={18} />
+                        <Phone
+                          className="text-blue-500 shrink-0 mt-1"
+                          size={18}
+                        />
                         <div>
                           <p className="font-medium text-gray-700">Telefon:</p>
-                          <p className="text-gray-600">{selectedVenue.phone_number}</p>
+                          <p className="text-gray-600">
+                            {selectedVenue.phone_number}
+                          </p>
                         </div>
                       </div>
                       {selectedVenue.district_id && (
                         <div className="flex items-start gap-3">
-                          <MapPin className="text-blue-500 shrink-0 mt-1" size={18} />
+                          <MapPin
+                            className="text-blue-500 shrink-0 mt-1"
+                            size={18}
+                          />
                           <div>
                             <p className="font-medium text-gray-700">Tuman:</p>
                             <p className="text-gray-600">
-                              {tashkentDistricts.find((d) => d.id === Number(selectedVenue.district_id))?.name ||
-                                "Noma'lum"}
+                              {tashkentDistricts.find(
+                                (d) =>
+                                  d.id === Number(selectedVenue.district_id)
+                              )?.name || "Noma'lum"}
                             </p>
                           </div>
                         </div>
                       )}
                       <div className="flex items-start gap-3">
-                        <Clock className="text-blue-500 shrink-0 mt-1" size={18} />
+                        <Clock
+                          className="text-blue-500 shrink-0 mt-1"
+                          size={18}
+                        />
                         <div>
-                          <p className="font-medium text-gray-700">Ish vaqti:</p>
+                          <p className="font-medium text-gray-700">
+                            Ish vaqti:
+                          </p>
                           <p className="text-gray-600">24/7</p>
                         </div>
                       </div>
@@ -764,8 +888,12 @@ function Home() {
 
                   {selectedVenue.description && (
                     <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-blue-700 mb-2">Tavsif</h4>
-                      <p className="text-gray-600 leading-relaxed whitespace-pre-line">{selectedVenue.description}</p>
+                      <h4 className="text-lg font-semibold text-blue-700 mb-2">
+                        Tavsif
+                      </h4>
+                      <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                        {selectedVenue.description}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -779,10 +907,10 @@ function Home() {
                   </button>
                   <button
                     onClick={() => {
-                      handleClickCheck()
+                      handleClickCheck();
                       // Agar token mavjud bo'lsa, band qilish sahifasiga o'tish
-                      if (token) navigate(`/booking/${selectedVenue.id}`)
-                      closeModal()
+                      if (token) navigate(`/booking/${selectedVenue.id}`);
+                      closeModal();
                     }}
                     className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors flex items-center justify-center gap-2 order-1 sm:order-2"
                   >
@@ -796,7 +924,7 @@ function Home() {
         </AnimatePresence>
       </motion.div>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

@@ -63,15 +63,12 @@ export function AllVenues() {
       }
 
       try {
-        const response = await axios.get(
-          `http://13.51.241.247/api/owner/view-owner-venue/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`api/owner/view-owner-venue/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         console.log("API javobi:", response.data);
 
         if (response.data?.venues && response.data.venues.length > 0) {
@@ -137,7 +134,7 @@ export function AllVenues() {
 
     try {
       const response = await axios.put(
-        `http://13.51.241.247/api/owner/update-owner/${venueId}`,
+        `api/owner/update-owner/${venueId}`,
         formData,
         {
           headers: {
@@ -181,15 +178,12 @@ export function AllVenues() {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(
-        `http://13.51.241.247/api/owner/delete-owner-venue/${venueId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.delete(`api/owner/delete-owner-venue/${venueId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       toast.success("🗑️ To'yxona muvaffaqiyatli o'chirildi!");
       setVenues((prevVenues) =>

@@ -28,13 +28,9 @@ const Login = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post(
-        "http://13.51.241.247/api/auth/login",
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axios.post("api/auth/login", formData, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       const data = response.data;
       localStorage.setItem("token", data.token);

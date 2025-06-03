@@ -31,12 +31,9 @@ const AllOwners = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.get(
-        "http://13.51.241.247/api/admin/owners",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get("api/admin/owners", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = Array.isArray(response.data.owners)
         ? response.data.owners

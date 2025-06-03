@@ -66,13 +66,10 @@ const Favorites = () => {
         return;
       }
 
-      const response = await axios.get(
-        "http://13.51.241.247/api/user/get-venues-user",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { status: "tasdiqlangan" },
-        }
-      );
+      const response = await axios.get("api/user/get-venues-user", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { status: "tasdiqlangan" },
+      });
 
       // Faqat sevimli IDlarga mos keladiganlarni filterlash
       const allVenues = response.data.venues || response.data;
@@ -336,7 +333,7 @@ const Favorites = () => {
                     {venue.images && venue.images.length > 0 ? (
                       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
                         <img
-                          src={`http://13.51.241.247/api/${venue.images[0]}`}
+                          src={`api/${venue.images[0]}`}
                           alt={venue.name}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
@@ -412,7 +409,7 @@ const Favorites = () => {
                                 className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100 border border-pink-200"
                               >
                                 <img
-                                  src={`http://13.51.241.247/api/${image}`}
+                                  src={`api/${image}`}
                                   alt={`${venue.name} image ${imgIndex + 1}`}
                                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                                 />

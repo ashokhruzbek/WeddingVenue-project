@@ -56,7 +56,7 @@ function Bookings() {
 
       try {
         const response = await axios.get(
-          `http://13.51.241.247/api/owner/view-venue-booking/${userId}`,
+          `api/owner/view-venue-booking/${userId}`,
           {
             headers: {
               "Content-Type": "application/json",

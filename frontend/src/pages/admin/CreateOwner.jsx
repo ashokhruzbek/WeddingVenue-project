@@ -78,13 +78,9 @@ const CreateOwner = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token topilmadi");
 
-      const response = await axios.post(
-        "http://13.51.241.247/api/admin/create-owner",
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.post("api/admin/create-owner", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast.success(response.data.message || "Egasi yaratildi", {
         duration: 3000,

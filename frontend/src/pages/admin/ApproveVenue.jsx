@@ -68,12 +68,9 @@ const ApproveVenueDashboard = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.get(
-        "http://13.51.241.247/api/admin/venues",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get("api/admin/venues", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = Array.isArray(response.data.venues)
         ? response.data.venues
@@ -158,7 +155,7 @@ const ApproveVenueDashboard = () => {
       const endpoint = action === "approve" ? "approve-venue" : "reject-venue";
 
       const response = await axios.put(
-        `http://13.51.241.247/api/admin/${endpoint}/${venueId}`,
+        `api/admin/${endpoint}/${venueId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -523,7 +520,7 @@ const ApproveVenueDashboard = () => {
                     {selectedVenue.images && selectedVenue.images.length > 0 ? (
                       <div className="relative h-48 rounded-lg overflow-hidden">
                         <img
-                          src={`http://13.51.241.247/api/${selectedVenue.images[0].image_url}`}
+                          src={`api/${selectedVenue.images[0].image_url}`}
                           alt={selectedVenue.name}
                           className="w-full h-full object-cover"
                         />
@@ -562,7 +559,7 @@ const ApproveVenueDashboard = () => {
                                 className="h-16 rounded-md overflow-hidden"
                               >
                                 <img
-                                  src={`http://13.51.241.247/api/${image.image_url}`}
+                                  src={`api/${image.image_url}`}
                                   alt={`${selectedVenue.name} image ${
                                     index + 1
                                   }`}

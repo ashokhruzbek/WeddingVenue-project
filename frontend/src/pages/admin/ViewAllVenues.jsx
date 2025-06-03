@@ -73,16 +73,13 @@ const fixImageUrl = (url) => {
   );
 
   // 4. General fix for any consecutive duplicate "/uploads/" like "/uploads/uploads/"
-  correctedUrl = correctedUrl.replace(
-    new RegExp("(/uploads/)", "gi"),
-    "$1"
-  );
+  correctedUrl = correctedUrl.replace(new RegExp("(/uploads/)", "gi"), "$1");
 
   // 5. Remove multiple consecutive slashes (e.g., // or ///), but not after http: or https:
   correctedUrl = correctedUrl.replace(new RegExp("(?<!:)//+", "g"), "/");
 
   // 6. Ensure it starts with the base URL if it's a relative path
-  const baseUrl = "http://13.51.241.247/api";
+  const baseUrl = "api";
   if (correctedUrl.startsWith("/uploads")) {
     // Path like "/uploads/image.png" or "/uploads/venues/image.png"
     correctedUrl = baseUrl + correctedUrl;
@@ -113,7 +110,7 @@ const fixImageUrl = (url) => {
     }
   }
 
-  // 7. Final cleanup for double slashes immediately after base URL (e.g., http://13.51.241.247/api//uploads)
+  // 7. Final cleanup for double slashes immediately after base URL (e.g., api//uploads)
   if (correctedUrl.startsWith(baseUrl + "//")) {
     correctedUrl = baseUrl + correctedUrl.substring(baseUrl.length + 1);
   }
@@ -213,15 +210,12 @@ const VenuesList = () => {
       if (sortBy) params.sort_by = sortBy;
       if (sortOrder) params.order = sortOrder;
 
-      const response = await axios.get(
-        "http://13.51.241.247/api/admin/view-all-venues",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params,
-        }
-      );
+      const response = await axios.get("api/admin/view-all-venues", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params,
+      });
 
       if (!response.data.venues) {
         throw new Error("To'yxonalar ma'lumotlari topilmadi"); // Corrected escape
@@ -281,12 +275,9 @@ const VenuesList = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
-      await axios.delete(
-        `http://13.51.241.247/api/admin/delete-venue/${venueId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`api/admin/delete-venue/${venueId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast.success("To'yxona muvaffaqiyatli o'chirildi", { duration: 3000 });
       fetchVenues();
@@ -360,7 +351,7 @@ const VenuesList = () => {
       };
 
       const response = await axios.put(
-        `http://13.51.241.247/api/admin/update-venue/${selectedVenue.id}`,
+        `api/admin/update-venue/${selectedVenue.id}`,
         updatedData,
         {
           headers: { Authorization: `Bearer ${token}` },

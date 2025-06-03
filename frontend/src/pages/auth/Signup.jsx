@@ -71,10 +71,7 @@ function Signup() {
     setSubmitStatus(null);
 
     try {
-      const response = await axios.post(
-        "http://13.51.241.247/api/auth/signup",
-        formData
-      );
+      const response = await axios.post("api/auth/signup", formData);
 
       setSubmitStatus("success");
 

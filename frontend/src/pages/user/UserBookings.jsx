@@ -49,7 +49,7 @@ function UserBookings() {
     const fetchVenues = async () => {
       setFetchingVenues(true);
       try {
-        const response = await axios.get("http://13.51.241.247/api/venues/venues");
+        const response = await axios.get("api/venues/venues");
         setVenues(response.data.venues);
       } catch (err) {
         console.error("To'yxonalarni yuklashda xatolik:", err);
@@ -136,7 +136,7 @@ function UserBookings() {
 
     try {
       const response = await axios.post(
-        `http://13.51.241.247/api/user/add-booking/${userId}`,
+        `api/user/add-booking/${userId}`,
         {
           venue_id: Number(formData.venue_id),
           reservation_date: formData.reservation_date

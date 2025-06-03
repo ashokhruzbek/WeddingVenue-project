@@ -103,13 +103,10 @@ const Venues = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
-      const response = await axios.get(
-        "http://13.51.241.247/api/user/get-venues-user",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { status: "tasdiqlangan" },
-        }
-      );
+      const response = await axios.get("api/user/get-venues-user", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { status: "tasdiqlangan" },
+      });
 
       const filteredVenues = (response.data.venues || response.data).filter(
         (venue) => venue.status === "tasdiqlangan"

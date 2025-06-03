@@ -256,7 +256,7 @@ function AddVenues() {
       }
 
       // API ga so'rov yuborish
-      const response = await fetch("http://13.51.241.247/api/owner/reg-owner", {
+      const response = await fetch("api/owner/reg-owner", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
