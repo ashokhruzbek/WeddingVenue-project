@@ -26,7 +26,7 @@ exports.viewVenues = async (req, res) => {
         .filter((img) => img.venue_id === venue.id)
         .map((img) => ({
           id: img.id,
-          image_url: `http://13.51.241.247/api/uploads/${img.image_url}`,
+          image_url: `http://13.51.241.247/uploads/${img.image_url}`,
         })),
     }));
 

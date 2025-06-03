@@ -20,7 +20,7 @@ exports.viewAllVenues = async (req, res) => {
               'image_url', 
                 CASE 
                   WHEN i.image_url IS NOT NULL AND i.image_url != '' 
-                  THEN CONCAT('http://13.51.241.247/api/uploads/venues/', i.image_url)
+                  THEN CONCAT('http://13.51.241.247/uploads/venues/', i.image_url)
                   ELSE NULL
                 END
             ) ORDER BY i.id
