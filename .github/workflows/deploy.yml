@@ -2,32 +2,60 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main # Yoki sizning asosiy deployment branch'ingiz
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy via SSH
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Loyihangizga mos Node.js versiyasini kiriting
+
+      # (Ixtiyoriy) Frontend build qilish va artefakt sifatida saqlash (agar serverda build qilishni xohlamasangiz)
+      # - name: Build Frontend
+      #   run: |
+      #     cd frontend # Frontend papkasiga yo'l
+      #     npm install
+      #     npm run build
+      # - name: Upload Frontend Artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: frontend-build
+      #     path: frontend/build # Build papkasiga yo'l
+
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/myproject
-            git pull origin main
-            source venv/bin/activate
-            pip install -r backend/requirements.txt
-            python backend/manage.py migrate
-            python backend/manage.py collectstatic --noinput
-            pm2 restart backend
+            set -e # Xatolik yuz berganda scriptni to'xtatish
 
-            cd frontend
+            cd ${{ secrets.PROJECT_PATH }}
+            git pull origin main # Yoki sizning branch'ingiz
+
+            echo ">>> Installing backend dependencies..."
+            cd backend # Backend papkasiga yo'l
+            npm install --production # Faqat production bog'liqliklarni o'rnatish
+            # Agar backend build qilinishi kerak bo'lsa (masalan, TypeScript):
+            # npm run build
+
+            echo ">>> Restarting backend with PM2..."
+            pm2 reload ${{ secrets.BACKEND_APP_NAME }} || pm2 start your-main-server-file.js --name "${{ secrets.BACKEND_APP_NAME }}" # Yoki pm2 restart
+            pm2 save # O'zgarishlarni saqlash
+
+            echo ">>> Installing frontend dependencies and building..."
+            cd ../frontend # Frontend papkasiga yo'l
             npm install
+            # Agar .env fayli kerak bo'lsa, uni GitHub secrets dan yaratishingiz mumkin
+            # echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" > .env
             npm run build
-            pm2 restart frontend
+
+            echo ">>> Deployment finished!"
