@@ -394,7 +394,7 @@ function Home() {
             <span className="text-blue-600 font-bold">
               {filteredVenues.length}
             </span>{" "}
-            ta natija topildii
+            ta natija topildi
           </p>
 
           <div className="flex gap-2">
