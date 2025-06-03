@@ -68,7 +68,7 @@ const fixImageUrl = (url) => {
 
   // 3. Specific fix for duplicated path segments like "/uploads/venues/uploads/" or "/uploads/venues/uploads/venues/"
   correctedUrl = correctedUrl.replace(
-    new RegExp("(/uploads/venues/)(?:uploads/venues/|uploads/)", "gi"),
+    new RegExp("(/uploads/)(?:uploads/|uploads/)", "gi"),
     "$1"
   );
 
@@ -104,7 +104,7 @@ const fixImageUrl = (url) => {
         new RegExp("^(uploads/|venues/)+", "i"),
         ""
       );
-      correctedUrl = baseUrl + "/uploads/venues/" + imageName;
+      correctedUrl = baseUrl + "/uploads/" + imageName;
     } else {
       // Original URL did NOT explicitly suggest "venues/". Assume it belongs in /uploads/
       // Remove any leading "uploads/" from cleanedPath
