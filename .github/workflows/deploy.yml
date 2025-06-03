@@ -29,8 +29,8 @@ jobs:
 
             echo ">>> Navigating to project directory..."
             # PROJECT_PATH ni GitHub Secrets da to'g'ri yo'l bilan sozlang.
-            # Nginx loglarida /home/ubuntu/product_project/frontend/dist/ ko'ringan edi,
-            # shuning uchun PROJECT_PATH = /home/ubuntu/product_project bo'lishi mumkin.
+            # Nginx loglarida /home/ubuntu/WeddingVenue-project/frontend/dist/ ko'ringan edi,
+            # shuning uchun PROJECT_PATH = /home/ubuntu/WeddingVenue-project bo'lishi mumkin.
             cd ${{ secrets.PROJECT_PATH }} 
 
             echo ">>> Pulling latest changes from Git..."
