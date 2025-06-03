@@ -74,7 +74,7 @@ const fixImageUrl = (url) => {
 
   // 4. General fix for any consecutive duplicate "/uploads/" like "/uploads/uploads/"
   correctedUrl = correctedUrl.replace(
-    new RegExp("(/uploads/)uploads/", "gi"),
+    new RegExp("(/uploads/)", "gi"),
     "$1"
   );
 
