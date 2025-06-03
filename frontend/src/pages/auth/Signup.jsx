@@ -1,90 +1,108 @@
-import { useState } from "react"
-import { motion } from "framer-motion"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom"
-import { User, Lock, Mail, UserCheck, ArrowRight, Heart, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState } from "react";
+import { motion } from "framer-motion";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import {
+  User,
+  Lock,
+  Mail,
+  UserCheck,
+  ArrowRight,
+  Heart,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 function Signup() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
     username: "",
     password: "",
     role: "owner",
-  })
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState(null) // 'success', 'error', or null
+  });
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
 
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: null,
-      }))
+      }));
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
-    if (!formData.firstname.trim()) newErrors.firstname = "Ism kiritilishi shart"
-    if (!formData.lastname.trim()) newErrors.lastname = "Familiya kiritilishi shart"
-    if (!formData.username.trim()) newErrors.username = "Foydalanuvchi nomi kiritilishi shart"
-    if (formData.password.length < 4) newErrors.password = "Parol kamida 4 ta belgidan iborat bo'lishi kerak"
-    if (formData.password !== confirmPassword) newErrors.confirmPassword = "Parollar mos kelmadi"
+    if (!formData.firstname.trim())
+      newErrors.firstname = "Ism kiritilishi shart";
+    if (!formData.lastname.trim())
+      newErrors.lastname = "Familiya kiritilishi shart";
+    if (!formData.username.trim())
+      newErrors.username = "Foydalanuvchi nomi kiritilishi shart";
+    if (formData.password.length < 4)
+      newErrors.password = "Parol kamida 4 ta belgidan iborat bo'lishi kerak";
+    if (formData.password !== confirmPassword)
+      newErrors.confirmPassword = "Parollar mos kelmadi";
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsSubmitting(true)
-    setSubmitStatus(null)
+    setIsSubmitting(true);
+    setSubmitStatus(null);
 
     try {
-      const response = await axios.post("http://localhost:4000/signup", formData)
+      const response = await axios.post(
+        "http://13.51.241.247/api/signup",
+        formData
+      );
 
-      setSubmitStatus("success")
+      setSubmitStatus("success");
 
       // Redirect after successful signup (after showing success message)
       setTimeout(() => {
-        navigate("/login")
-      }, 2000)
+        navigate("/login");
+      }, 2000);
     } catch (error) {
-      console.error("Signup error:", error)
-      setSubmitStatus("error")
+      console.error("Signup error:", error);
+      setSubmitStatus("error");
 
       if (error.response?.data?.message) {
         // Handle specific error from backend
         setErrors((prev) => ({
           ...prev,
           server: error.response.data.message,
-        }))
+        }));
       } else {
         setErrors((prev) => ({
           ...prev,
-          server: "Ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
-        }))
+          server:
+            "Ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
+        }));
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -95,7 +113,7 @@ function Signup() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -104,7 +122,7 @@ function Signup() {
       opacity: 1,
       transition: { type: "spring", stiffness: 100, damping: 10 },
     },
-  }
+  };
 
   // Decorative hearts
   const hearts = Array.from({ length: 8 }).map((_, i) => ({
@@ -113,7 +131,7 @@ function Signup() {
     y: Math.random() * 100,
     delay: Math.random() * 5,
     duration: 3 + Math.random() * 5,
-  }))
+  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12 px-4 sm:px-6 relative overflow-hidden">
@@ -174,7 +192,10 @@ function Signup() {
                 animate={{ opacity: 1, height: "auto" }}
               >
                 <CheckCircle className="mr-2 text-green-500" size={20} />
-                <span>Ro'yxatdan muvaffaqiyatli o'tdingiz! Kirish sahifasiga yo'naltirilmoqdasiz...</span>
+                <span>
+                  Ro'yxatdan muvaffaqiyatli o'tdingiz! Kirish sahifasiga
+                  yo'naltirilmoqdasiz...
+                </span>
               </motion.div>
             )}
 
@@ -186,13 +207,19 @@ function Signup() {
                 animate={{ opacity: 1, height: "auto" }}
               >
                 <AlertCircle className="mr-2 text-red-500" size={20} />
-                <span>{errors.server || "Ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."}</span>
+                <span>
+                  {errors.server ||
+                    "Ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."}
+                </span>
               </motion.div>
             )}
 
             {/* First name */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <label htmlFor="firstname" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="firstname"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Ism
               </label>
               <div className="relative">
@@ -206,17 +233,24 @@ function Signup() {
                   value={formData.firstname}
                   onChange={handleChange}
                   className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.firstname ? "border-red-300 bg-red-50" : "border-gray-300"
+                    errors.firstname
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
                   } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
                   placeholder="Ismingizni kiriting"
                 />
               </div>
-              {errors.firstname && <p className="mt-1 text-sm text-red-600">{errors.firstname}</p>}
+              {errors.firstname && (
+                <p className="mt-1 text-sm text-red-600">{errors.firstname}</p>
+              )}
             </motion.div>
 
             {/* Last name */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <label htmlFor="lastname" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="lastname"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Familiya
               </label>
               <div className="relative">
@@ -230,17 +264,24 @@ function Signup() {
                   value={formData.lastname}
                   onChange={handleChange}
                   className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.lastname ? "border-red-300 bg-red-50" : "border-gray-300"
+                    errors.lastname
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
                   } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
                   placeholder="Familiyangizni kiriting"
                 />
               </div>
-              {errors.lastname && <p className="mt-1 text-sm text-red-600">{errors.lastname}</p>}
+              {errors.lastname && (
+                <p className="mt-1 text-sm text-red-600">{errors.lastname}</p>
+              )}
             </motion.div>
 
             {/* Username */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Foydalanuvchi nomi
               </label>
               <div className="relative">
@@ -254,17 +295,24 @@ function Signup() {
                   value={formData.username}
                   onChange={handleChange}
                   className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.username ? "border-red-300 bg-red-50" : "border-gray-300"
+                    errors.username
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
                   } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
                   placeholder="Foydalanuvchi nomini kiriting"
                 />
               </div>
-              {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+              )}
             </motion.div>
 
             {/* Password */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Parol
               </label>
               <div className="relative">
@@ -278,17 +326,24 @@ function Signup() {
                   value={formData.password}
                   onChange={handleChange}
                   className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.password ? "border-red-300 bg-red-50" : "border-gray-300"
+                    errors.password
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
                   } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
                   placeholder="Parolni kiriting"
                 />
               </div>
-              {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+              )}
             </motion.div>
 
             {/* Confirm Password */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Parolni tasdiqlang
               </label>
               <div className="relative">
@@ -302,17 +357,26 @@ function Signup() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.confirmPassword ? "border-red-300 bg-red-50" : "border-gray-300"
+                    errors.confirmPassword
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
                   } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
                   placeholder="Parolni qayta kiriting"
                 />
               </div>
-              {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.confirmPassword}
+                </p>
+              )}
             </motion.div>
 
             {/* Role selection */}
             <motion.div className="mb-6" variants={itemVariants}>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Ro'l
               </label>
               <div className="relative">
@@ -356,10 +420,16 @@ function Signup() {
             </motion.div>
 
             {/* Login link */}
-            <motion.div className="mt-6 text-center text-sm" variants={itemVariants}>
+            <motion.div
+              className="mt-6 text-center text-sm"
+              variants={itemVariants}
+            >
               <p className="text-gray-600">
                 Allaqachon ro'yxatdan o'tganmisiz?{" "}
-                <Link to="/login" className="text-pink-600 hover:text-pink-700 font-medium">
+                <Link
+                  to="/login"
+                  className="text-pink-600 hover:text-pink-700 font-medium"
+                >
                   Kirish
                 </Link>
               </p>
@@ -385,7 +455,7 @@ function Signup() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Signup
+export default Signup;

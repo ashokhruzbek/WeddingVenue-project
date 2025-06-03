@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
+import { useState, useRef } from "react";
 import {
   Building2,
   MapPin,
@@ -22,7 +22,7 @@ import {
   Star,
   Camera,
   Gift,
-} from "lucide-react"
+} from "lucide-react";
 
 // Toshkent tumanlari ro'yxati
 const tashkentDistricts = [
@@ -37,7 +37,7 @@ const tashkentDistricts = [
   { id: 9, name: "Yakkasaray tumani" },
   { id: 10, name: "Yashnobod tumani" },
   { id: 11, name: "Yunusobod tumani" },
-]
+];
 
 // Toast notification component
 const Toast = ({ message, type, onClose }) => {
@@ -45,8 +45,8 @@ const Toast = ({ message, type, onClose }) => {
     type === "success"
       ? "bg-gradient-to-r from-green-400 to-emerald-400"
       : type === "error"
-        ? "bg-gradient-to-r from-red-400 to-pink-400"
-        : "bg-gradient-to-r from-blue-400 to-indigo-400"
+      ? "bg-gradient-to-r from-red-400 to-pink-400"
+      : "bg-gradient-to-r from-blue-400 to-indigo-400";
 
   return (
     <div
@@ -55,12 +55,15 @@ const Toast = ({ message, type, onClose }) => {
       {type === "success" && <CheckCircle className="w-4 h-4 flex-shrink-0" />}
       {type === "error" && <AlertCircle className="w-4 h-4 flex-shrink-0" />}
       <span className="text-sm font-medium">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:bg-white/20 rounded p-1 flex-shrink-0 transition-colors">
+      <button
+        onClick={onClose}
+        className="ml-2 hover:bg-white/20 rounded p-1 flex-shrink-0 transition-colors"
+      >
         <X className="w-3 h-3" />
       </button>
     </div>
-  )
-}
+  );
+};
 
 function AddVenues() {
   const [formData, setFormData] = useState({
@@ -70,198 +73,209 @@ function AddVenues() {
     capacity: "",
     price_seat: "",
     phone_number: "",
-  })
-  const [images, setImages] = useState([])
-  const [previewImage, setPreviewImage] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [toasts, setToasts] = useState([])
-  const fileInputRef = useRef(null)
+  });
+  const [images, setImages] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [toasts, setToasts] = useState([]);
+  const fileInputRef = useRef(null);
 
   // Toast functions
   const showToast = (message, type = "info") => {
-    const id = Date.now()
-    const newToast = { id, message, type }
-    setToasts((prev) => [...prev, newToast])
+    const id = Date.now();
+    const newToast = { id, message, type };
+    setToasts((prev) => [...prev, newToast]);
 
     setTimeout(() => {
-      setToasts((prev) => prev.filter((toast) => toast.id !== id))
-    }, 5000)
-  }
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 5000);
+  };
 
   const removeToast = (id) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
 
   // Input o'zgarishini ushlash
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
 
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
-      }))
+      }));
     }
-  }
+  };
 
   // Rasm yuklashni boshlash
   const handleImageUpload = () => {
-    fileInputRef.current.click()
-  }
+    fileInputRef.current.click();
+  };
 
   // Rasm tanlash va validatsiya
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files)
-    const validImageTypes = ["image/jpeg", "image/png", "image/gif"]
-    const maxFileSize = 5 * 1024 * 1024 // 5MB
-    const maxImages = 5
+    const files = Array.from(e.target.files);
+    const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    const maxImages = 5;
 
-    const invalidFiles = files.filter((file) => !validImageTypes.includes(file.type) || file.size > maxFileSize)
+    const invalidFiles = files.filter(
+      (file) => !validImageTypes.includes(file.type) || file.size > maxFileSize
+    );
 
     if (invalidFiles.length > 0) {
-      showToast("Faqat JPG, PNG yoki GIF formatidagi rasmlar, 5MB dan kichik bo'lishi kerak", "error")
+      showToast(
+        "Faqat JPG, PNG yoki GIF formatidagi rasmlar, 5MB dan kichik bo'lishi kerak",
+        "error"
+      );
       setErrors((prev) => ({
         ...prev,
-        images: "Faqat JPG, PNG yoki GIF formatidagi rasmlar, 5MB dan kichik bo'lishi kerak",
-      }))
-      return
+        images:
+          "Faqat JPG, PNG yoki GIF formatidagi rasmlar, 5MB dan kichik bo'lishi kerak",
+      }));
+      return;
     }
 
     if (images.length + files.length > maxImages) {
       setErrors((prev) => ({
         ...prev,
         images: `Maksimal ${maxImages} ta rasm yuklash mumkin`,
-      }))
-      showToast(`Maksimal ${maxImages} ta rasm yuklash mumkin`, "error")
-      return
+      }));
+      showToast(`Maksimal ${maxImages} ta rasm yuklash mumkin`, "error");
+      return;
     }
 
-    setErrors((prev) => ({ ...prev, images: "" }))
+    setErrors((prev) => ({ ...prev, images: "" }));
     const newImages = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
-    }))
-    setImages((prev) => [...prev, ...newImages])
-    showToast(`🎉 ${files.length} ta rasm muvaffaqiyatli yuklandi!`, "success")
-  }
+    }));
+    setImages((prev) => [...prev, ...newImages]);
+    showToast(`🎉 ${files.length} ta rasm muvaffaqiyatli yuklandi!`, "success");
+  };
 
   // Rasmni o'chirish
   const handleRemoveImage = (index) => {
-    const imageToRemove = images[index]
-    URL.revokeObjectURL(imageToRemove.preview)
-    setImages((prev) => prev.filter((_, i) => i !== index))
-    showToast("🗑️ Rasm o'chirildi!", "success")
-  }
+    const imageToRemove = images[index];
+    URL.revokeObjectURL(imageToRemove.preview);
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    showToast("🗑️ Rasm o'chirildi!", "success");
+  };
 
   // Rasmni kattalashtirib ko'rish
   const openImagePreview = (imageUrl) => {
-    setPreviewImage(imageUrl)
-  }
+    setPreviewImage(imageUrl);
+  };
 
   // Rasm ko'rishni yopish
   const closeImagePreview = () => {
-    setPreviewImage(null)
-  }
+    setPreviewImage(null);
+  };
 
   // Validatsiya
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "To'yxona nomi kiritilishi shart"
+      newErrors.name = "To'yxona nomi kiritilishi shart";
     }
 
     if (!formData.district_id) {
-      newErrors.district_id = "Tumanni tanlang"
+      newErrors.district_id = "Tumanni tanlang";
     }
 
     if (!formData.address.trim()) {
-      newErrors.address = "Manzil kiritilishi shart"
+      newErrors.address = "Manzil kiritilishi shart";
     }
 
     if (!formData.capacity || formData.capacity <= 0) {
-      newErrors.capacity = "Sig'im musbat son bo'lishi kerak"
+      newErrors.capacity = "Sig'im musbat son bo'lishi kerak";
     }
 
     if (!formData.price_seat || formData.price_seat <= 0) {
-      newErrors.price_seat = "Narx musbat son bo'lishi kerak"
+      newErrors.price_seat = "Narx musbat son bo'lishi kerak";
     }
 
     if (!formData.phone_number.trim()) {
-      newErrors.phone_number = "Telefon raqam kiritilishi shart"
+      newErrors.phone_number = "Telefon raqam kiritilishi shart";
     } else if (!/^\+998\d{9}$/.test(formData.phone_number)) {
-      newErrors.phone_number = "Telefon raqam +998XXXXXXXXX formatida bo'lishi kerak"
+      newErrors.phone_number =
+        "Telefon raqam +998XXXXXXXXX formatida bo'lishi kerak";
     }
 
     if (images.length === 0) {
-      newErrors.images = "Kamida bitta rasm yuklang"
+      newErrors.images = "Kamida bitta rasm yuklang";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Form yuborish
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      showToast("Iltimos, barcha maydonlarni to'g'ri to'ldiring", "error")
-      return
+      showToast("Iltimos, barcha maydonlarni to'g'ri to'ldiring", "error");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       // Token olish (localStorage dan yoki cookies dan)
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token")
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) {
-        throw new Error("Tizimga kirish uchun token topilmadi")
+        throw new Error("Tizimga kirish uchun token topilmadi");
       }
 
       // FormData yaratish
-      const formDataToSend = new FormData()
-      formDataToSend.append("name", formData.name.trim())
-      formDataToSend.append("district_id", formData.district_id)
-      formDataToSend.append("address", formData.address.trim())
-      formDataToSend.append("capacity", formData.capacity)
-      formDataToSend.append("price_seat", formData.price_seat)
-      formDataToSend.append("phone_number", formData.phone_number.trim())
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name.trim());
+      formDataToSend.append("district_id", formData.district_id);
+      formDataToSend.append("address", formData.address.trim());
+      formDataToSend.append("capacity", formData.capacity);
+      formDataToSend.append("price_seat", formData.price_seat);
+      formDataToSend.append("phone_number", formData.phone_number.trim());
 
       // Rasmlarni qo'shish
       images.forEach((image) => {
-        formDataToSend.append("images", image.file)
-      })
+        formDataToSend.append("images", image.file);
+      });
 
       // Debug: FormData ni tekshirish
-      console.log("Yuborilayotgan ma'lumotlar:")
+      console.log("Yuborilayotgan ma'lumotlar:");
       for (const pair of formDataToSend.entries()) {
-        console.log(`${pair[0]}:`, pair[1])
+        console.log(`${pair[0]}:`, pair[1]);
       }
 
       // API ga so'rov yuborish
-      const response = await fetch("http://localhost:4000/owner/reg-owner", {
+      const response = await fetch("http://13.51.241.247/api/owner/reg-owner", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           // Content-Type ni qo'ymaslik kerak, browser o'zi qo'yadi multipart/form-data uchun
         },
         body: formDataToSend,
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `Server xatosi: ${response.status}`)
+        throw new Error(data.message || `Server xatosi: ${response.status}`);
       }
 
       // Muvaffaqiyatli yuborildi
-      showToast(`🎉 ${data.message || "To'yxona muvaffaqiyatli qo'shildi"}`, "success")
+      showToast(
+        `🎉 ${data.message || "To'yxona muvaffaqiyatli qo'shildi"}`,
+        "success"
+      );
 
       // Formni tozalash
       setFormData({
@@ -271,25 +285,30 @@ function AddVenues() {
         capacity: "",
         price_seat: "",
         phone_number: "",
-      })
+      });
 
       // Rasmlarni tozalash
-      images.forEach((image) => URL.revokeObjectURL(image.preview))
-      setImages([])
-      setErrors({})
+      images.forEach((image) => URL.revokeObjectURL(image.preview));
+      setImages([]);
+      setErrors({});
     } catch (error) {
-      console.error("Xatolik:", error)
-      showToast(error.message || "Xatolik yuz berdi", "error")
+      console.error("Xatolik:", error);
+      showToast(error.message || "Xatolik yuz berdi", "error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-white">
       {/* Toast notifications */}
       {toasts.map((toast) => (
-        <Toast key={toast.id} message={toast.message} type={toast.type} onClose={() => removeToast(toast.id)} />
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => removeToast(toast.id)}
+        />
       ))}
 
       {/* Decorative Background Elements */}
@@ -333,8 +352,12 @@ function AddVenues() {
                 <div className="flex items-center">
                   <Building2 className="w-6 h-6 text-white mr-3" />
                   <div>
-                    <h2 className="text-xl font-bold text-white">💒 To'yxona Ma'lumotlari</h2>
-                    <p className="text-pink-100 text-sm mt-1">Barcha maydonlarni to'ldiring</p>
+                    <h2 className="text-xl font-bold text-white">
+                      💒 To'yxona Ma'lumotlari
+                    </h2>
+                    <p className="text-pink-100 text-sm mt-1">
+                      Barcha maydonlarni to'ldiring
+                    </p>
                   </div>
                 </div>
               </div>
@@ -354,7 +377,9 @@ function AddVenues() {
                       value={formData.name}
                       onChange={handleChange}
                       className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
-                        errors.name ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
+                        errors.name
+                          ? "border-red-300 bg-red-50"
+                          : "border-pink-200 hover:border-pink-300"
                       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                       disabled={loading}
                     />
@@ -378,7 +403,9 @@ function AddVenues() {
                         value={formData.district_id}
                         onChange={handleChange}
                         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white ${
-                          errors.district_id ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
+                          errors.district_id
+                            ? "border-red-300 bg-red-50"
+                            : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       >
@@ -409,7 +436,9 @@ function AddVenues() {
                         value={formData.phone_number}
                         onChange={handleChange}
                         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
-                          errors.phone_number ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
+                          errors.phone_number
+                            ? "border-red-300 bg-red-50"
+                            : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       />
@@ -435,7 +464,9 @@ function AddVenues() {
                       onChange={handleChange}
                       rows={3}
                       className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent resize-none ${
-                        errors.address ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
+                        errors.address
+                          ? "border-red-300 bg-red-50"
+                          : "border-pink-200 hover:border-pink-300"
                       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                       disabled={loading}
                     />
@@ -462,7 +493,9 @@ function AddVenues() {
                         onChange={handleChange}
                         min="1"
                         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
-                          errors.capacity ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
+                          errors.capacity
+                            ? "border-red-300 bg-red-50"
+                            : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       />
@@ -487,7 +520,9 @@ function AddVenues() {
                         onChange={handleChange}
                         min="1"
                         className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent ${
-                          errors.price_seat ? "border-red-300 bg-red-50" : "border-pink-200 hover:border-pink-300"
+                          errors.price_seat
+                            ? "border-red-300 bg-red-50"
+                            : "border-pink-200 hover:border-pink-300"
                         } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={loading}
                       />
@@ -523,8 +558,12 @@ function AddVenues() {
                         <Upload className="h-8 w-8 text-pink-400" />
                         <Sparkles className="h-4 w-4 text-pink-500 absolute -top-1 -right-1 animate-pulse" />
                       </div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">📸 Rasmlarni yuklash</p>
-                      <p className="text-xs text-gray-500">JPG, PNG, GIF (max 5MB)</p>
+                      <p className="text-sm font-medium text-gray-700 mb-1">
+                        📸 Rasmlarni yuklash
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        JPG, PNG, GIF (max 5MB)
+                      </p>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -546,7 +585,9 @@ function AddVenues() {
                   {/* Yuklangan Rasmlar */}
                   {images.length > 0 && (
                     <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">📷 Yuklangan rasmlar</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        📷 Yuklangan rasmlar
+                      </label>
                       <div className="grid grid-cols-5 gap-3">
                         {images.map((image, index) => (
                           <div key={index} className="relative group">
@@ -559,7 +600,9 @@ function AddVenues() {
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                 <button
                                   type="button"
-                                  onClick={() => openImagePreview(image.preview)}
+                                  onClick={() =>
+                                    openImagePreview(image.preview)
+                                  }
                                   className="p-1 bg-pink-500/90 rounded-full text-white mr-1 hover:bg-pink-600 transition-colors"
                                 >
                                   <Maximize2 className="h-3 w-3" />
@@ -597,7 +640,8 @@ function AddVenues() {
                         </>
                       ) : (
                         <>
-                          <Heart className="w-5 h-5" />💕 To'yxona Qo'shish
+                          <Heart className="w-5 h-5" />
+                          💕 To'yxona Qo'shish
                         </>
                       )}
                     </button>
@@ -614,11 +658,13 @@ function AddVenues() {
                 <div className="p-2 bg-gradient-to-r from-pink-400 to-rose-400 rounded-lg">
                   <Info className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-800 ml-3">💡 Ma'lumot</h3>
+                <h3 className="text-lg font-bold text-gray-800 ml-3">
+                  💡 Ma'lumot
+                </h3>
               </div>
               <p className="text-gray-600 text-sm leading-relaxed">
-                To'yxona qo'shgandan so'ng, u sizning shaxsiy kabinetingizda ko'rinadi va mijozlar uni bron qilishlari
-                mumkin bo'ladi.
+                To'yxona qo'shgandan so'ng, u sizning shaxsiy kabinetingizda
+                ko'rinadi va mijozlar uni bron qilishlari mumkin bo'ladi.
               </p>
             </div>
 
@@ -627,10 +673,13 @@ function AddVenues() {
                 <div className="p-2 bg-gradient-to-r from-emerald-400 to-green-400 rounded-lg">
                   <CheckCircle className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-800 ml-3">💡 Maslahat</h3>
+                <h3 className="text-lg font-bold text-gray-800 ml-3">
+                  💡 Maslahat
+                </h3>
               </div>
               <p className="text-gray-600 text-sm leading-relaxed">
-                To'yxona ma'lumotlarini to'liq va aniq kiriting. Bu mijozlarga to'g'ri tanlov qilishda yordam beradi.
+                To'yxona ma'lumotlarini to'liq va aniq kiriting. Bu mijozlarga
+                to'g'ri tanlov qilishda yordam beradi.
               </p>
             </div>
 
@@ -706,7 +755,7 @@ function AddVenues() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default AddVenues
+export default AddVenues;

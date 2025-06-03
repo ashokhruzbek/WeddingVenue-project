@@ -79,7 +79,7 @@ const CreateOwner = () => {
       if (!token) throw new Error("Token topilmadi");
 
       const response = await axios.post(
-        "http://localhost:4000/admin/create-owner",
+        "http://13.51.241.247/api/admin/create-owner",
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },

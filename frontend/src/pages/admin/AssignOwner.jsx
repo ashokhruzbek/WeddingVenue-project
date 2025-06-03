@@ -31,10 +31,10 @@ const AssignOwner = () => {
         if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
         const [venuesRes, ownersRes] = await Promise.all([
-          axios.get("http://localhost:4000/admin/venues", {
+          axios.get("http://13.51.241.247/api/admin/venues", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:4000/admin/owners", {
+          axios.get("http://13.51.241.247/api/admin/owners", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -66,7 +66,9 @@ const AssignOwner = () => {
     }
 
     const selectedVenue = venues.find((v) => v.name === formData.venue_name);
-    const selectedOwner = owners.find((o) => o.username === formData.owner_name);
+    const selectedOwner = owners.find(
+      (o) => o.username === formData.owner_name
+    );
 
     if (!selectedVenue || !selectedOwner) {
       setError("Tanlangan qiymatlar topilmadi");
@@ -84,7 +86,7 @@ const AssignOwner = () => {
       if (!token) throw new Error("Token mavjud emas");
 
       const res = await axios.post(
-        "http://localhost:4000/admin/assign-owner",
+        "http://13.51.241.247/api/admin/assign-owner",
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -94,7 +96,8 @@ const AssignOwner = () => {
       navigate("/admin/venues");
     } catch (err) {
       console.error("Xatolik:", err);
-      const msg = err.response?.data?.message || "Egani biriktirishda xatolik yuz berdi";
+      const msg =
+        err.response?.data?.message || "Egani biriktirishda xatolik yuz berdi";
       setError(msg);
       toast.error(msg);
       if (err.response?.status === 401) {
@@ -152,7 +155,9 @@ const AssignOwner = () => {
           <Autocomplete
             options={venues.map((v) => v.name)}
             value={formData.venue_name}
-            onChange={(e, newValue) => handleChange("venue_name", newValue || "")}
+            onChange={(e, newValue) =>
+              handleChange("venue_name", newValue || "")
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -175,7 +180,9 @@ const AssignOwner = () => {
           <Autocomplete
             options={owners.map((o) => o.username)}
             value={formData.owner_name}
-            onChange={(e, newValue) => handleChange("owner_name", newValue || "")}
+            onChange={(e, newValue) =>
+              handleChange("owner_name", newValue || "")
+            }
             renderInput={(params) => (
               <TextField
                 {...params}

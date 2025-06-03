@@ -5,9 +5,9 @@ exports.getAllVenues = async (req, res) => {
     const ownerId = req.user?.id;
 
     if (!ownerId) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: "Foydalanuvchi ID topilmadi",
-        success: false
+        success: false,
       });
     }
 
@@ -22,15 +22,15 @@ exports.getAllVenues = async (req, res) => {
     const venues = venuesResult.rows;
 
     if (venues.length === 0) {
-      return res.status(200).json({ 
+      return res.status(200).json({
         message: "Sizga tegishli to'yxonalar topilmadi",
         venues: [],
-        success: false
+        success: false,
       });
     }
 
     // 2. To'yxona IDlarini olish
-    const venueIds = venues.map(v => v.id);
+    const venueIds = venues.map((v) => v.id);
 
     // 3. Tegishli rasmlarni olish
     const imagesResult = await pool.query(
@@ -41,27 +41,26 @@ exports.getAllVenues = async (req, res) => {
     const images = imagesResult.rows;
 
     // 4. Rasm URLlarini to‘liq qilib biriktirish
-    const venuesWithImages = venues.map(venue => ({
+    const venuesWithImages = venues.map((venue) => ({
       ...venue,
       images: images
-        .filter(img => img.venue_id === venue.id)
-        .map(img => ({
+        .filter((img) => img.venue_id === venue.id)
+        .map((img) => ({
           id: img.id,
-          image_url: `http://localhost:4000/uploads/venues/${img.image_url}`
-        }))
+          image_url: `http://13.51.241.247/api/uploads/venues/${img.image_url}`,
+        })),
     }));
 
     return res.status(200).json({
       message: "To'yxonalar muvaffaqiyatli olindi",
       venues: venuesWithImages,
-      success: true
+      success: true,
     });
-
   } catch (error) {
     console.error("Venue olishda xatolik:", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: "Serverda xatolik yuz berdi",
-      success: false
+      success: false,
     });
   }
 };

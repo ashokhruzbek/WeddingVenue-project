@@ -20,7 +20,7 @@ exports.viewAllVenues = async (req, res) => {
               'image_url', 
                 CASE 
                   WHEN i.image_url IS NOT NULL AND i.image_url != '' 
-                  THEN CONCAT('http://localhost:4000/uploads/venues/', i.image_url)
+                  THEN CONCAT('http://13.51.241.247/api/uploads/venues/', i.image_url)
                   ELSE NULL
                 END
             ) ORDER BY i.id
@@ -57,7 +57,9 @@ exports.viewAllVenues = async (req, res) => {
     const paginatedQueryParams = [...queryParams, limit, offset];
 
     // To‘liq so‘rov
-    const dataQueryString = `SELECT ${selectClause} ${baseQuery} LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+    const dataQueryString = `SELECT ${selectClause} ${baseQuery} LIMIT $${
+      queryParams.length + 1
+    } OFFSET $${queryParams.length + 2}`;
 
     const result = await pool.query(dataQueryString, paginatedQueryParams);
 

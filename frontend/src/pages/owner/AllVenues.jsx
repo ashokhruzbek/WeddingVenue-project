@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { toast } from "react-toastify"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import {
   MapPin,
   Users,
@@ -25,13 +25,13 @@ import {
   ImageIcon,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react"
+} from "lucide-react";
 
 export function AllVenues() {
-  const [venues, setVenues] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [editVenue, setEditVenue] = useState(null)
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [editVenue, setEditVenue] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     district_id: "",
@@ -39,76 +39,82 @@ export function AllVenues() {
     capacity: "",
     price_seat: "",
     phone_number: "",
-  })
+  });
   // Rasmlar galereyasi uchun yangi state'lar
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
-  const [selectedVenue, setSelectedVenue] = useState(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    const { id } = JSON.parse(localStorage.getItem("user") || "{}")
+    const token = localStorage.getItem("token");
+    const { id } = JSON.parse(localStorage.getItem("user") || "{}");
 
     const getData = async () => {
-      setLoading(true)
-      setError("")
+      setLoading(true);
+      setError("");
 
       if (!token || !id) {
-        const msg = "Foydalanuvchi ma'lumotlari topilmadi. Iltimos, qaytadan kiring."
-        setError(msg)
-        toast.error(msg)
-        setLoading(false)
-        return
+        const msg =
+          "Foydalanuvchi ma'lumotlari topilmadi. Iltimos, qaytadan kiring.";
+        setError(msg);
+        toast.error(msg);
+        setLoading(false);
+        return;
       }
 
       try {
-        const response = await axios.get(`http://localhost:4000/owner/view-owner-venue/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        console.log("API javobi:", response.data)
+        const response = await axios.get(
+          `http://13.51.241.247/api/owner/view-owner-venue/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("API javobi:", response.data);
 
         if (response.data?.venues && response.data.venues.length > 0) {
-          setVenues(response.data.venues)
-          setError("")
+          setVenues(response.data.venues);
+          setError("");
         } else {
-          const noVenuesMsg = "Sizga tegishli to'yxonalar topilmadi"
-          setVenues([])
-          setError(noVenuesMsg)
-          toast.info(noVenuesMsg)
+          const noVenuesMsg = "Sizga tegishli to'yxonalar topilmadi";
+          setVenues([]);
+          setError(noVenuesMsg);
+          toast.info(noVenuesMsg);
         }
       } catch (error) {
-        console.error("API xatolik:", error.message)
+        console.error("API xatolik:", error.message);
 
         if (error.response?.status === 401) {
-          const authError = "Avtorizatsiya xatoligi. Iltimos, qaytadan kiring."
-          setError(authError)
-          toast.error(authError)
-          localStorage.removeItem("token")
-          localStorage.removeItem("user")
+          const authError = "Avtorizatsiya xatoligi. Iltimos, qaytadan kiring.";
+          setError(authError);
+          toast.error(authError);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
         } else if (error.response?.status === 404) {
-          const notFoundMsg = "Sizga tegishli to'yxonalar topilmadi"
-          setError(notFoundMsg)
-          setVenues([])
-          toast.info(notFoundMsg)
+          const notFoundMsg = "Sizga tegishli to'yxonalar topilmadi";
+          setError(notFoundMsg);
+          setVenues([]);
+          toast.info(notFoundMsg);
         } else {
-          const serverError = error.response?.data?.message || "Server bilan bog'lanishda xatolik yuz berdi"
-          setError(serverError)
-          toast.error(serverError)
+          const serverError =
+            error.response?.data?.message ||
+            "Server bilan bog'lanishda xatolik yuz berdi";
+          setError(serverError);
+          toast.error(serverError);
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    getData()
-  }, [])
+    getData();
+  }, []);
 
   // Tahrirlash formasini ochish
   const handleEditClick = (venue) => {
-    setEditVenue(venue.id)
+    setEditVenue(venue.id);
     setFormData({
       name: venue.name || "",
       district_id: venue.district_id || "",
@@ -116,40 +122,50 @@ export function AllVenues() {
       capacity: venue.capacity || "",
       price_seat: venue.price_seat || "",
       phone_number: venue.phone_number || venue.phone || "",
-    })
-  }
+    });
+  };
 
   // Forma qiymatini yangilash
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // To'yxonani yangilash
   const handleUpdateVenue = async (venueId) => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
 
     try {
-      const response = await axios.put(`http://localhost:4000/owner/update-owner/${venueId}`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await axios.put(
+        `http://13.51.241.247/api/owner/update-owner/${venueId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      toast.success("💕 To'yxona muvaffaqiyatli yangilandi!")
-      setVenues((prevVenues) => prevVenues.map((venue) => (venue.id === venueId ? response.data.venue : venue)))
-      setEditVenue(null)
+      toast.success("💕 To'yxona muvaffaqiyatli yangilandi!");
+      setVenues((prevVenues) =>
+        prevVenues.map((venue) =>
+          venue.id === venueId ? response.data.venue : venue
+        )
+      );
+      setEditVenue(null);
     } catch (error) {
-      console.error("Yangilashda xatolik:", error)
-      const errorMsg = error.response?.data?.message || "To'yxonani yangilashda xatolik yuz berdi"
-      toast.error(errorMsg)
+      console.error("Yangilashda xatolik:", error);
+      const errorMsg =
+        error.response?.data?.message ||
+        "To'yxonani yangilashda xatolik yuz berdi";
+      toast.error(errorMsg);
     }
-  }
+  };
 
   // Tahrirlashni bekor qilish
   const handleCancelEdit = () => {
-    setEditVenue(null)
+    setEditVenue(null);
     setFormData({
       name: "",
       district_id: "",
@@ -157,55 +173,65 @@ export function AllVenues() {
       capacity: "",
       price_seat: "",
       phone_number: "",
-    })
-  }
+    });
+  };
 
   // To'yxonani o'chirish
   const handleDeleteVenue = async (venueId) => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(`http://localhost:4000/owner/delete-owner-venue/${venueId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      await axios.delete(
+        `http://13.51.241.247/api/owner/delete-owner-venue/${venueId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      toast.success("🗑️ To'yxona muvaffaqiyatli o'chirildi!")
-      setVenues((prevVenues) => prevVenues.filter((venue) => venue.id !== venueId))
+      toast.success("🗑️ To'yxona muvaffaqiyatli o'chirildi!");
+      setVenues((prevVenues) =>
+        prevVenues.filter((venue) => venue.id !== venueId)
+      );
     } catch (error) {
-      console.error("O'chirishda xatolik:", error)
-      const errorMsg = error.response?.data?.message || "To'yxonani o'chirishda xatolik yuz berdi"
-      toast.error(errorMsg)
+      console.error("O'chirishda xatolik:", error);
+      const errorMsg =
+        error.response?.data?.message ||
+        "To'yxonani o'chirishda xatolik yuz berdi";
+      toast.error(errorMsg);
     }
-  }
+  };
 
   // Rasmlar galereyasini ochish
   const openGallery = (venue) => {
-    setSelectedVenue(venue)
-    setCurrentImageIndex(0)
-    setIsGalleryOpen(true)
-  }
+    setSelectedVenue(venue);
+    setCurrentImageIndex(0);
+    setIsGalleryOpen(true);
+  };
 
   // Keyingi rasmga o'tish
   const nextImage = () => {
     if (selectedVenue?.images?.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % selectedVenue.images.length)
+      setCurrentImageIndex((prev) => (prev + 1) % selectedVenue.images.length);
     }
-  }
+  };
 
   // Oldingi rasmga qaytish
   const prevImage = () => {
     if (selectedVenue?.images?.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + selectedVenue.images.length) % selectedVenue.images.length)
+      setCurrentImageIndex(
+        (prev) =>
+          (prev - 1 + selectedVenue.images.length) % selectedVenue.images.length
+      );
     }
-  }
+  };
 
   // Rasmni tanlash
   const selectImage = (index) => {
-    setCurrentImageIndex(index)
-  }
+    setCurrentImageIndex(index);
+  };
 
   if (loading) {
     return (
@@ -215,15 +241,23 @@ export function AllVenues() {
             <div className="w-20 h-20 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto"></div>
             <Building2 className="w-8 h-8 text-pink-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
           </div>
-          <p className="mt-6 text-lg font-medium text-gray-700 animate-pulse">To'yxonalar yuklanmoqda...</p>
+          <p className="mt-6 text-lg font-medium text-gray-700 animate-pulse">
+            To'yxonalar yuklanmoqda...
+          </p>
           <div className="flex justify-center mt-4 space-x-1">
             <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-            <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            <div
+              className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -249,7 +283,9 @@ export function AllVenues() {
                 <Crown className="w-6 h-6 text-white absolute -top-1 -right-1 animate-pulse" />
               </div>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">🏰 Mening To'yxonalarim</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+              🏰 Mening To'yxonalarim
+            </h1>
             <p className="text-lg text-pink-100 max-w-2xl mx-auto">
               Sizning to'yxonalaringizni boshqaring va yangilarini qo'shing
             </p>
@@ -276,12 +312,18 @@ export function AllVenues() {
                   <div className="flex items-center gap-2">
                     <Building2 className="h-5 w-5 text-pink-500" />
                     <span className="text-sm text-gray-600">
-                      Jami: <span className="font-semibold text-gray-800">{venues.length}</span> ta to'yxona
+                      Jami:{" "}
+                      <span className="font-semibold text-gray-800">
+                        {venues.length}
+                      </span>{" "}
+                      ta to'yxona
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm text-gray-600">Sizning biznesingiz</span>
+                    <span className="text-sm text-gray-600">
+                      Sizning biznesingiz
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -306,7 +348,9 @@ export function AllVenues() {
                     <div className="p-6">
                       <div className="flex items-center gap-2 mb-4">
                         <Edit3 className="w-5 h-5 text-pink-500" />
-                        <h3 className="text-xl font-bold text-gray-800">To'yxonani tahrirlash</h3>
+                        <h3 className="text-xl font-bold text-gray-800">
+                          To'yxonani tahrirlash
+                        </h3>
                       </div>
                       <div className="space-y-3">
                         <input
@@ -384,9 +428,13 @@ export function AllVenues() {
                         <div className="absolute inset-0 bg-white/10"></div>
                         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                         <div className="relative h-full flex items-center justify-center">
-                          {venue.images && venue.images.length > 0 && venue.images[0].image_url ? (
+                          {venue.images &&
+                          venue.images.length > 0 &&
+                          venue.images[0].image_url ? (
                             <img
-                              src={venue.images[0].image_url || "/placeholder.svg"}
+                              src={
+                                venue.images[0].image_url || "/placeholder.svg"
+                              }
                               alt={venue.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
@@ -397,7 +445,9 @@ export function AllVenues() {
                           ) : (
                             <div className="text-center">
                               <Building2 className="w-10 h-10 text-white/90 mx-auto mb-1" />
-                              <div className="text-white/80 text-xs font-medium">To'yxona #{index + 1}</div>
+                              <div className="text-white/80 text-xs font-medium">
+                                To'yxona #{index + 1}
+                              </div>
                             </div>
                           )}
 
@@ -438,12 +488,16 @@ export function AllVenues() {
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex items-center text-gray-600">
                               <Users className="w-4 h-4 text-rose-500 mr-2" />
-                              <span className="text-sm font-medium">{venue.capacity || "N/A"} kishi</span>
+                              <span className="text-sm font-medium">
+                                {venue.capacity || "N/A"} kishi
+                              </span>
                             </div>
 
                             <div className="flex items-center text-gray-600">
                               <Phone className="w-4 h-4 text-pink-500 mr-2" />
-                              <span className="text-xs truncate">{venue.phone_number || venue.phone || "N/A"}</span>
+                              <span className="text-xs truncate">
+                                {venue.phone_number || venue.phone || "N/A"}
+                              </span>
                             </div>
                           </div>
 
@@ -451,17 +505,21 @@ export function AllVenues() {
                             <DollarSign className="w-4 h-4 text-green-500 mr-2" />
                             <span className="text-sm font-semibold text-green-600">
                               {venue.price_seat
-                                ? `${Number(venue.price_seat).toLocaleString()} so'm`
+                                ? `${Number(
+                                    venue.price_seat
+                                  ).toLocaleString()} so'm`
                                 : venue.price
-                                  ? `${Number(venue.price).toLocaleString()} so'm`
-                                  : "N/A"}
+                                ? `${Number(venue.price).toLocaleString()} so'm`
+                                : "N/A"}
                             </span>
                           </div>
                         </div>
 
                         {venue.description && (
                           <div className="mb-4 p-3 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg border-l-4 border-pink-400">
-                            <p className="text-xs text-gray-600 leading-relaxed italic">"{venue.description}"</p>
+                            <p className="text-xs text-gray-600 leading-relaxed italic">
+                              "{venue.description}"
+                            </p>
                           </div>
                         )}
 
@@ -476,8 +534,12 @@ export function AllVenues() {
                           <button
                             className="flex-1 bg-gradient-to-r from-red-400 to-pink-400 hover:from-red-500 hover:to-pink-500 text-white font-medium py-2.5 px-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm"
                             onClick={() => {
-                              if (confirm(`"${venue.name}" to'yxonasini o'chirishni xohlaysizmi?`)) {
-                                handleDeleteVenue(venue.id)
+                              if (
+                                confirm(
+                                  `"${venue.name}" to'yxonasini o'chirishni xohlaysizmi?`
+                                )
+                              ) {
+                                handleDeleteVenue(venue.id);
                               }
                             }}
                           >
@@ -518,10 +580,12 @@ export function AllVenues() {
                       <Sparkles className="w-8 h-8 text-pink-500 animate-pulse" />
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">🏰 To'yxonalar topilmadi</h3>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    🏰 To'yxonalar topilmadi
+                  </h3>
                   <p className="text-gray-600 leading-relaxed mb-8">
-                    Hozircha sizga tegishli to'yxonalar yo'q. Yangi to'yxona qo'shish uchun tugmani bosing va
-                    biznesingizni boshlang!
+                    Hozircha sizga tegishli to'yxonalar yo'q. Yangi to'yxona
+                    qo'shish uchun tugmani bosing va biznesingizni boshlang!
                   </p>
                 </div>
 
@@ -529,7 +593,8 @@ export function AllVenues() {
                   className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-3 mx-auto"
                   onClick={() => alert("Yangi to'yxona qo'shish")}
                 >
-                  <Plus className="w-5 h-5" />💕 To'yxona qo'shish
+                  <Plus className="w-5 h-5" />
+                  💕 To'yxona qo'shish
                 </button>
 
                 <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
@@ -581,8 +646,13 @@ export function AllVenues() {
               {selectedVenue.images && selectedVenue.images.length > 0 ? (
                 <>
                   <img
-                    src={selectedVenue.images[currentImageIndex]?.image_url || "/placeholder.svg"}
-                    alt={`${selectedVenue.name} - Rasm ${currentImageIndex + 1}`}
+                    src={
+                      selectedVenue.images[currentImageIndex]?.image_url ||
+                      "/placeholder.svg"
+                    }
+                    alt={`${selectedVenue.name} - Rasm ${
+                      currentImageIndex + 1
+                    }`}
                     className="max-h-[60vh] max-w-full object-contain"
                     onError={(e) => {
                       e.target.onerror = null; // Prevent infinite loop if placeholder also fails
@@ -605,8 +675,8 @@ export function AllVenues() {
                       <button
                         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          prevImage()
+                          e.stopPropagation();
+                          prevImage();
                         }}
                       >
                         <ChevronLeft className="w-6 h-6" />
@@ -614,8 +684,8 @@ export function AllVenues() {
                       <button
                         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          nextImage()
+                          e.stopPropagation();
+                          nextImage();
                         }}
                       >
                         <ChevronRight className="w-6 h-6" />
@@ -631,7 +701,9 @@ export function AllVenues() {
               ) : (
                 <div className="text-center p-8">
                   <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">Bu to'yxona uchun rasmlar mavjud emas</p>
+                  <p className="text-gray-500 text-lg">
+                    Bu to'yxona uchun rasmlar mavjud emas
+                  </p>
                 </div>
               )}
             </div>
@@ -695,7 +767,7 @@ export function AllVenues() {
         }
       `}</style>
     </div>
-  )
+  );
 }
 
-export default AllVenues
+export default AllVenues;

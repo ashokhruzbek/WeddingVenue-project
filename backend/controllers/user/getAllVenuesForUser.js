@@ -1,4 +1,4 @@
-const pool = require('../../config/db');
+const pool = require("../../config/db");
 
 exports.getAllVenuesForUser = async (req, res) => {
   try {
@@ -18,9 +18,9 @@ exports.getAllVenuesForUser = async (req, res) => {
     }
 
     // Tartiblash
-    const allowedSortFields = ['price_seat', 'capacity', 'name'];
-    const sortField = allowedSortFields.includes(sort_by) ? sort_by : 'name';
-    const sortOrder = order === 'desc' ? 'DESC' : 'ASC';
+    const allowedSortFields = ["price_seat", "capacity", "name"];
+    const sortField = allowedSortFields.includes(sort_by) ? sort_by : "name";
+    const sortOrder = order === "desc" ? "DESC" : "ASC";
 
     baseQuery += ` ORDER BY ${sortField} ${sortOrder}`;
 
@@ -32,12 +32,12 @@ exports.getAllVenuesForUser = async (req, res) => {
       return res.status(200).json({
         message: "To‘yxonalar topilmadi",
         count: 0,
-        venues: []
+        venues: [],
       });
     }
 
     // 2. To'yxona IDlarini olish
-    const venueIds = venues.map(v => v.id);
+    const venueIds = venues.map((v) => v.id);
 
     // 3. Tegishli rasmlarni olish
     const imagesResult = await pool.query(
@@ -47,20 +47,20 @@ exports.getAllVenuesForUser = async (req, res) => {
     const images = imagesResult.rows;
 
     // 4. Har bir venue ga rasmlarni biriktirish va URLni to'liq qilish
-    const venuesWithImages = venues.map(venue => ({
+    const venuesWithImages = venues.map((venue) => ({
       ...venue,
       images: images
-        .filter(img => img.venue_id === venue.id)
-        .map(img => ({
+        .filter((img) => img.venue_id === venue.id)
+        .map((img) => ({
           id: img.id,
-          image_url: `http://localhost:4000/uploads/venues/${img.image_url}`
-        }))
+          image_url: `http://13.51.241.247/api/uploads/venues/${img.image_url}`,
+        })),
     }));
 
     res.status(200).json({
       message: "Tasdiqlangan to‘yxonalar ro‘yxati",
       count: venuesWithImages.length,
-      venues: venuesWithImages
+      venues: venuesWithImages,
     });
   } catch (error) {
     console.error("To‘yxonalarni olishda xatolik:", error);

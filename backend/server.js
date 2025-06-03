@@ -21,11 +21,11 @@ app.use((req, res, next) => {
 // Statik papka (uploads ichidagi fayllarni brauzerga ko'rsatish uchun)
 app.use('/uploads', express.static('uploads'));
 
-app.use("/", authRoutes);
-app.use("/admin", adminRouter);
-app.use('/user', userRouter);
-app.use('/owner', ownerRouter );
-app.use('/', venueRouter);
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRouter);
+app.use('/api/user', userRouter);
+app.use('/api/owner', ownerRouter );
+app.use('/api/venues', venueRouter);
 
 const PORT = process.env.PORT || 4000;
 

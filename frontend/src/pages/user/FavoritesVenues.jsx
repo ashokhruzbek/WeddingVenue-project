@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import axios from "axios"
-import { motion, AnimatePresence } from "framer-motion"
-import { toast } from "react-hot-toast"
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 import {
   Building,
   Phone,
@@ -20,7 +20,7 @@ import {
   ArrowLeft,
   Trash2,
   HeartOff,
-} from "lucide-react"
+} from "lucide-react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,7 +28,7 @@ const containerVariants = {
     opacity: 1,
     transition: { staggerChildren: 0.1 },
   },
-}
+};
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -43,79 +43,93 @@ const itemVariants = {
     scale: 0.9,
     transition: { duration: 0.3 },
   },
-}
+};
 
 const Favorites = () => {
-  const [venues, setVenues] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchFavoriteVenues = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const token = localStorage.getItem("token")
-      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi")
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
       // LocalStorage dan sevimli IDlar olish
-      const favoriteIds = JSON.parse(localStorage.getItem("favorites") || "[]")
+      const favoriteIds = JSON.parse(localStorage.getItem("favorites") || "[]");
       if (favoriteIds.length === 0) {
-        setVenues([])
-        setLoading(false)
-        return
+        setVenues([]);
+        setLoading(false);
+        return;
       }
 
-      const response = await axios.get("http://localhost:4000/user/get-venues-user", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { status: "tasdiqlangan" },
-      })
+      const response = await axios.get(
+        "http://13.51.241.247/api/user/get-venues-user",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { status: "tasdiqlangan" },
+        }
+      );
 
       // Faqat sevimli IDlarga mos keladiganlarni filterlash
-      const allVenues = response.data.venues || response.data
-      const favoriteVenues = allVenues.filter((venue) => favoriteIds.includes(venue.id))
+      const allVenues = response.data.venues || response.data;
+      const favoriteVenues = allVenues.filter((venue) =>
+        favoriteIds.includes(venue.id)
+      );
 
-      setVenues(favoriteVenues)
+      setVenues(favoriteVenues);
     } catch (error) {
-      console.error("Xatolik yuz berdi:", error)
-      setError(error.response?.data?.error || error.message || "Sevimli to'yxonalarni olishda xatolik yuz berdi")
-      toast.error(error.response?.data?.error || "Sevimli to'yxonalarni olishda xatolik yuz berdi")
+      console.error("Xatolik yuz berdi:", error);
+      setError(
+        error.response?.data?.error ||
+          error.message ||
+          "Sevimli to'yxonalarni olishda xatolik yuz berdi"
+      );
+      toast.error(
+        error.response?.data?.error ||
+          "Sevimli to'yxonalarni olishda xatolik yuz berdi"
+      );
       if (error.response?.status === 401) {
-        localStorage.removeItem("token")
+        localStorage.removeItem("token");
         // navigate("/login") - Next.js da router.push("/login") ishlatish kerak
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchFavoriteVenues()
-  }, [fetchFavoriteVenues])
+    fetchFavoriteVenues();
+  }, [fetchFavoriteVenues]);
 
   // Sevimlidan o'chirish funksiyasi
   const removeFavorite = (venueId) => {
     // localStorage dan o'chirish
-    const updatedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]").filter((id) => id !== venueId)
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites))
+    const updatedFavorites = JSON.parse(
+      localStorage.getItem("favorites") || "[]"
+    ).filter((id) => id !== venueId);
+    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
 
     // State dan o'chirish (animatsiya bilan)
-    setVenues((prev) => prev.filter((venue) => venue.id !== venueId))
+    setVenues((prev) => prev.filter((venue) => venue.id !== venueId));
 
-    toast.success("💔 To'yxona sevimlilardan o'chirildi")
-  }
+    toast.success("💔 To'yxona sevimlilardan o'chirildi");
+  };
 
   // Barcha sevimlilarni tozalash
   const clearAllFavorites = () => {
-    localStorage.setItem("favorites", JSON.stringify([]))
-    setVenues([])
-    toast.success("🗑️ Barcha sevimlilar tozalandi")
-  }
+    localStorage.setItem("favorites", JSON.stringify([]));
+    setVenues([]);
+    toast.success("🗑️ Barcha sevimlilar tozalandi");
+  };
 
   const goBack = () => {
     // navigate(-1) - Next.js da router.back() ishlatish kerak
-    console.log("Go back")
-  }
+    console.log("Go back");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-white">
@@ -154,8 +168,12 @@ const Favorites = () => {
                   <Sparkles className="w-5 h-5 text-white absolute -top-1 -right-1 animate-pulse" />
                 </div>
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">💕 Sevimli To'yxonalar</h1>
-                  <p className="text-pink-100 text-sm mt-1">Sizning tanlagan eng yaxshi to'yxonalar</p>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                    💕 Sevimli To'yxonalar
+                  </h1>
+                  <p className="text-pink-100 text-sm mt-1">
+                    Sizning tanlagan eng yaxshi to'yxonalar
+                  </p>
                 </div>
               </div>
             </div>
@@ -194,12 +212,17 @@ const Favorites = () => {
               <div className="h-20 w-20 rounded-full border-t-4 border-b-4 border-pink-400 animate-spin"></div>
               <div
                 className="absolute top-0 left-0 h-20 w-20 rounded-full border-t-4 border-b-4 border-rose-300 animate-spin"
-                style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
+                style={{
+                  animationDirection: "reverse",
+                  animationDuration: "1.5s",
+                }}
               ></div>
               <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-pink-500 fill-pink-500" />
             </div>
             <div className="ml-4">
-              <p className="text-lg font-medium text-gray-700">Sevimlilar yuklanmoqda...</p>
+              <p className="text-lg font-medium text-gray-700">
+                Sevimlilar yuklanmoqda...
+              </p>
               <div className="flex mt-2 space-x-1">
                 <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
                 <div
@@ -228,9 +251,12 @@ const Favorites = () => {
                 <Sparkles className="h-6 w-6 text-pink-400 animate-pulse" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-3">💔 Sevimli to'yxonalar topilmadi</h3>
+            <h3 className="text-2xl font-bold text-gray-700 mb-3">
+              💔 Sevimli to'yxonalar topilmadi
+            </h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              Hali birorta to'yxonani sevimli qilmagansiz. To'yxonalarni sevimli qilish uchun yurak belgisini bosing
+              Hali birorta to'yxonani sevimli qilmagansiz. To'yxonalarni sevimli
+              qilish uchun yurak belgisini bosing
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -251,12 +277,18 @@ const Favorites = () => {
                   <div className="flex items-center gap-2">
                     <Heart className="h-5 w-5 text-pink-500 fill-pink-500" />
                     <span className="text-sm text-gray-600">
-                      Sevimlilar: <span className="font-semibold text-gray-800">{venues.length}</span> ta to'yxona
+                      Sevimlilar:{" "}
+                      <span className="font-semibold text-gray-800">
+                        {venues.length}
+                      </span>{" "}
+                      ta to'yxona
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm text-gray-600">Tanlangan eng yaxshilari</span>
+                    <span className="text-sm text-gray-600">
+                      Tanlangan eng yaxshilari
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -304,7 +336,7 @@ const Favorites = () => {
                     {venue.images && venue.images.length > 0 ? (
                       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
                         <img
-                          src={`http://localhost:4000/${venue.images[0]}`}
+                          src={`http://13.51.241.247/api/${venue.images[0]}`}
                           alt={venue.name}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
@@ -318,7 +350,9 @@ const Favorites = () => {
                       <div className="h-48 bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
                         <div className="text-center">
                           <ImageIcon className="h-12 w-12 text-pink-300 mx-auto mb-2" />
-                          <p className="text-sm text-pink-400">Rasm mavjud emas</p>
+                          <p className="text-sm text-pink-400">
+                            Rasm mavjud emas
+                          </p>
                         </div>
                       </div>
                     )}
@@ -347,13 +381,17 @@ const Favorites = () => {
                         <div className="flex items-center gap-2 text-gray-600">
                           <DollarSign className="h-4 w-4 text-pink-500 flex-shrink-0" />
                           <span className="font-semibold text-gray-800">
-                            💰 {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm
+                            💰{" "}
+                            {Number(venue.price_seat).toLocaleString("uz-UZ")}{" "}
+                            so'm
                           </span>
                         </div>
                         {venue.address && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <MapPin className="h-4 w-4 text-rose-500 flex-shrink-0" />
-                            <span className="truncate text-xs">{venue.address}</span>
+                            <span className="truncate text-xs">
+                              {venue.address}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -363,7 +401,9 @@ const Favorites = () => {
                         <div className="mt-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Eye className="h-4 w-4 text-pink-500" />
-                            <span className="text-xs text-gray-600">Qo'shimcha rasmlar</span>
+                            <span className="text-xs text-gray-600">
+                              Qo'shimcha rasmlar
+                            </span>
                           </div>
                           <div className="grid grid-cols-3 gap-2">
                             {venue.images.slice(1, 4).map((image, imgIndex) => (
@@ -372,7 +412,7 @@ const Favorites = () => {
                                 className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100 border border-pink-200"
                               >
                                 <img
-                                  src={`http://localhost:4000/${image}`}
+                                  src={`http://13.51.241.247/api/${image}`}
                                   alt={`${venue.name} image ${imgIndex + 1}`}
                                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                                 />
@@ -404,7 +444,7 @@ const Favorites = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Favorites
+export default Favorites;

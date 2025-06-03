@@ -52,7 +52,7 @@ const modalVariants = {
 };
 
 const fixImageUrl = (url) => {
-  if (!url || typeof url !== 'string') return "";
+  if (!url || typeof url !== "string") return "";
 
   let correctedUrl = url;
 
@@ -60,35 +60,50 @@ const fixImageUrl = (url) => {
   correctedUrl = correctedUrl.replace(new RegExp("\\\\\\\\", "g"), "/");
 
   // 2. Normalize case for "Uploads/" and "Venues/" path segments
-  correctedUrl = correctedUrl.replace(new RegExp("/Uploads/", "gi"), "/uploads/");
+  correctedUrl = correctedUrl.replace(
+    new RegExp("/Uploads/", "gi"),
+    "/uploads/"
+  );
   correctedUrl = correctedUrl.replace(new RegExp("/Venues/", "gi"), "/venues/");
 
   // 3. Specific fix for duplicated path segments like "/uploads/venues/uploads/" or "/uploads/venues/uploads/venues/"
-  correctedUrl = correctedUrl.replace(new RegExp("(/uploads/venues/)(?:uploads/venues/|uploads/)", "gi"), '$1');
+  correctedUrl = correctedUrl.replace(
+    new RegExp("(/uploads/venues/)(?:uploads/venues/|uploads/)", "gi"),
+    "$1"
+  );
 
   // 4. General fix for any consecutive duplicate "/uploads/" like "/uploads/uploads/"
-  correctedUrl = correctedUrl.replace(new RegExp("(/uploads/)uploads/", "gi"), '$1');
-  
+  correctedUrl = correctedUrl.replace(
+    new RegExp("(/uploads/)uploads/", "gi"),
+    "$1"
+  );
+
   // 5. Remove multiple consecutive slashes (e.g., // or ///), but not after http: or https:
   correctedUrl = correctedUrl.replace(new RegExp("(?<!:)//+", "g"), "/");
 
   // 6. Ensure it starts with the base URL if it's a relative path
-  const baseUrl = "http://localhost:4000";
+  const baseUrl = "http://13.51.241.247/api";
   if (correctedUrl.startsWith("/uploads")) {
     // Path like "/uploads/image.png" or "/uploads/venues/image.png"
     correctedUrl = baseUrl + correctedUrl;
-  } else if (!correctedUrl.startsWith("http://") && !correctedUrl.startsWith("https://")) {
+  } else if (
+    !correctedUrl.startsWith("http://") &&
+    !correctedUrl.startsWith("https://")
+  ) {
     // This block handles relative paths that don't start with "/uploads" or "http(s)://"
     // (e.g., "image.png", "venues/image.png", "/venues/image.png")
     let cleanedPath = correctedUrl.replace(new RegExp("^/+"), ""); // remove leading slashes from original relative path
-    
+
     // Check if the original URL string (before any modification in this function) indicated a venue-specific path
     // This is a heuristic. If backend sometimes returns "venues/img.jpg" and sometimes "img.jpg" for the same subfolder,
     // this logic might need more context or a more reliable indicator from the API data itself.
-    if (url.toLowerCase().includes("venues/")) { 
+    if (url.toLowerCase().includes("venues/")) {
       // Original URL suggested it belongs in /uploads/venues/
       // Remove any leading "uploads/" or "venues/" from cleanedPath before prepending full prefix
-      let imageName = cleanedPath.replace(new RegExp("^(uploads/|venues/)+", "i"), "");
+      let imageName = cleanedPath.replace(
+        new RegExp("^(uploads/|venues/)+", "i"),
+        ""
+      );
       correctedUrl = baseUrl + "/uploads/venues/" + imageName;
     } else {
       // Original URL did NOT explicitly suggest "venues/". Assume it belongs in /uploads/
@@ -97,17 +112,24 @@ const fixImageUrl = (url) => {
       correctedUrl = baseUrl + "/uploads/" + imageName;
     }
   }
-  
-  // 7. Final cleanup for double slashes immediately after base URL (e.g., http://localhost:4000//uploads)
-  if (correctedUrl.startsWith(baseUrl + "//")){
+
+  // 7. Final cleanup for double slashes immediately after base URL (e.g., http://13.51.241.247/api//uploads)
+  if (correctedUrl.startsWith(baseUrl + "//")) {
     correctedUrl = baseUrl + correctedUrl.substring(baseUrl.length + 1);
   }
 
   // 8. Clean up general double slashes after the protocol part, e.g. http://domain//path -> http://domain/path
-  correctedUrl = correctedUrl.replace(new RegExp("(https?://)([^/]+)(//+)", "g"), '$1$2/');
+  correctedUrl = correctedUrl.replace(
+    new RegExp("(https?://)([^/]+)(//+)", "g"),
+    "$1$2/"
+  );
 
   // 9. Remove trailing slash if it's not the base URL itself (and if the URL is not just the base URL)
-  if (correctedUrl !== baseUrl && correctedUrl !== baseUrl + '/' && correctedUrl.endsWith('/')) {
+  if (
+    correctedUrl !== baseUrl &&
+    correctedUrl !== baseUrl + "/" &&
+    correctedUrl.endsWith("/")
+  ) {
     correctedUrl = correctedUrl.slice(0, -1);
   }
   return correctedUrl;
@@ -121,7 +143,7 @@ const VenuesList = () => {
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading] = useState(false);
-  const [imageLoading, setImageLoading] = useState(false); 
+  const [imageLoading, setImageLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -191,12 +213,15 @@ const VenuesList = () => {
       if (sortBy) params.sort_by = sortBy;
       if (sortOrder) params.order = sortOrder;
 
-      const response = await axios.get("http://localhost:4000/admin/view-all-venues", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params,
-      });
+      const response = await axios.get(
+        "http://13.51.241.247/api/admin/view-all-venues",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params,
+        }
+      );
 
       if (!response.data.venues) {
         throw new Error("To'yxonalar ma'lumotlari topilmadi"); // Corrected escape
@@ -209,10 +234,10 @@ const VenuesList = () => {
               venue.images.map(async (image) => {
                 const correctedImageUrl = fixImageUrl(image.image_url);
                 const blobUrl = await fetchImageAsBlob(correctedImageUrl);
-                return { 
-                  ...image, 
-                  blob_url: blobUrl, 
-                  corrected_raw_url: correctedImageUrl 
+                return {
+                  ...image,
+                  blob_url: blobUrl,
+                  corrected_raw_url: correctedImageUrl,
                 };
               })
             );
@@ -257,7 +282,7 @@ const VenuesList = () => {
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
       await axios.delete(
-        `http://localhost:4000/admin/delete-venue/${venueId}`,
+        `http://13.51.241.247/api/admin/delete-venue/${venueId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -297,7 +322,9 @@ const VenuesList = () => {
     setSelectedVenue(venue);
     if (venue.images && venue.images.length > 0) {
       const firstImage = venue.images[0];
-      setSelectedImage(firstImage.blob_url || firstImage.corrected_raw_url || null);
+      setSelectedImage(
+        firstImage.blob_url || firstImage.corrected_raw_url || null
+      );
     } else {
       setSelectedImage(null);
     }
@@ -333,7 +360,7 @@ const VenuesList = () => {
       };
 
       const response = await axios.put(
-        `http://localhost:4000/admin/update-venue/${selectedVenue.id}`,
+        `http://13.51.241.247/api/admin/update-venue/${selectedVenue.id}`,
         updatedData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -578,20 +605,33 @@ const VenuesList = () => {
                 ) : venue.images && venue.images.length > 0 ? (
                   <div className="relative h-56 overflow-hidden bg-gray-100">
                     <img
-                      src={venue.images[0].blob_url || venue.images[0].corrected_raw_url || ""}
+                      src={
+                        venue.images[0].blob_url ||
+                        venue.images[0].corrected_raw_url ||
+                        ""
+                      }
                       alt={venue.name}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                       onError={(e) => {
                         const imgElement = e.target;
                         const currentVenueImage = venue.images[0];
                         // If src is already corrected_raw_url or if corrected_raw_url is missing, show placeholder
-                        if (imgElement.src === currentVenueImage.corrected_raw_url || !currentVenueImage.corrected_raw_url) {
+                        if (
+                          imgElement.src ===
+                            currentVenueImage.corrected_raw_url ||
+                          !currentVenueImage.corrected_raw_url
+                        ) {
                           imgElement.style.display = "none";
                           const placeholder = imgElement.nextElementSibling;
-                          if (placeholder && placeholder.classList.contains('placeholder-icon-container')) {
+                          if (
+                            placeholder &&
+                            placeholder.classList.contains(
+                              "placeholder-icon-container"
+                            )
+                          ) {
                             placeholder.style.display = "flex";
                           }
-                        } else { 
+                        } else {
                           // blob_url failed (or was initially empty), try corrected_raw_url
                           imgElement.onerror = null; // Prevent infinite loop
                           imgElement.src = currentVenueImage.corrected_raw_url;
@@ -642,7 +682,8 @@ const VenuesList = () => {
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-pink-500" />
                       <span>
-                        Narxi: {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm
+                        Narxi:{" "}
+                        {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm
                       </span>
                     </div>
                   </div>
@@ -679,7 +720,11 @@ const VenuesList = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`p-2 rounded-lg transition-colors duration-200 ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-pink-500 hover:bg-pink-100'}`}
+                className={`p-2 rounded-lg transition-colors duration-200 ${
+                  currentPage === 1
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-pink-500 hover:bg-pink-100"
+                }`}
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -691,7 +736,11 @@ const VenuesList = () => {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`p-2 rounded-lg transition-colors duration-200 ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-pink-500 hover:bg-pink-100'}`}
+                className={`p-2 rounded-lg transition-colors duration-200 ${
+                  currentPage === totalPages
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-pink-500 hover:bg-pink-100"
+                }`}
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -896,25 +945,39 @@ const VenuesList = () => {
                           transition={{ duration: 0.3 }}
                           onError={(e) => {
                             const imgElement = e.target;
-                            const currentImageObject = selectedVenue.images.find(
-                              (img) => img.blob_url === selectedImage || img.corrected_raw_url === selectedImage
-                            );
+                            const currentImageObject =
+                              selectedVenue.images.find(
+                                (img) =>
+                                  img.blob_url === selectedImage ||
+                                  img.corrected_raw_url === selectedImage
+                              );
 
-                            if (currentImageObject && currentImageObject.corrected_raw_url && imgElement.src !== currentImageObject.corrected_raw_url) {
+                            if (
+                              currentImageObject &&
+                              currentImageObject.corrected_raw_url &&
+                              imgElement.src !==
+                                currentImageObject.corrected_raw_url
+                            ) {
                               // If current src (selectedImage which might be blob) failed, and it's not already the corrected_raw_url, try corrected_raw_url
-                              imgElement.onerror = null; 
-                              imgElement.src = currentImageObject.corrected_raw_url;
+                              imgElement.onerror = null;
+                              imgElement.src =
+                                currentImageObject.corrected_raw_url;
                             } else {
                               // All attempts failed or no corrected_raw_url, show placeholder
                               imgElement.style.display = "none";
                               const placeholder = imgElement.nextElementSibling;
-                              if (placeholder && placeholder.classList.contains('placeholder-icon-container-modal')) {
+                              if (
+                                placeholder &&
+                                placeholder.classList.contains(
+                                  "placeholder-icon-container-modal"
+                                )
+                              ) {
                                 placeholder.style.display = "flex";
                               }
                             }
                           }}
                         />
-                        <div    
+                        <div
                           className="absolute inset-0 flex items-center justify-center bg-gray-200 placeholder-icon-container-modal"
                           style={{ display: "none" }}
                         >
@@ -926,14 +989,17 @@ const VenuesList = () => {
                         <ImageIcon className="h-16 w-16 text-gray-400" />
                       </div>
                     )}
-                    {selectedVenue.images && selectedVenue.images.length > 1 && (
-                      <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                        {selectedVenue.images.findIndex(
-                          (img) => img.blob_url === selectedImage || img.corrected_raw_url === selectedImage
-                        ) + 1}{" "}
-                        / {selectedVenue.images.length}
-                      </div>
-                    )}
+                    {selectedVenue.images &&
+                      selectedVenue.images.length > 1 && (
+                        <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                          {selectedVenue.images.findIndex(
+                            (img) =>
+                              img.blob_url === selectedImage ||
+                              img.corrected_raw_url === selectedImage
+                          ) + 1}{" "}
+                          / {selectedVenue.images.length}
+                        </div>
+                      )}
                   </div>
 
                   {/* Thumbnail Gallery */}
@@ -944,8 +1010,15 @@ const VenuesList = () => {
                           key={idx}
                           src={image.blob_url || image.image_url}
                           alt={`${selectedVenue.name} thumbnail ${idx + 1}`}
-                          className={`thumbnail ${selectedImage === (image.blob_url || image.image_url) ? "active" : ""}`}
-                          onClick={() => setSelectedImage(image.blob_url || image.image_url)}
+                          className={`thumbnail ${
+                            selectedImage ===
+                            (image.blob_url || image.image_url)
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setSelectedImage(image.blob_url || image.image_url)
+                          }
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onError={(e) => {

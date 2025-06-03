@@ -1,58 +1,62 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
-import { jwtDecode } from "jwt-decode"
-import { motion } from "framer-motion"
-import { User, Lock, ArrowRight, Heart, AlertCircle } from "lucide-react"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { motion } from "framer-motion";
+import { User, Lock, ArrowRight, Heart, AlertCircle } from "lucide-react";
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-  })
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     // Clear error when user starts typing
-    if (error) setError("")
-  }
+    if (error) setError("");
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
-      setIsLoading(true)
-      const response = await axios.post("http://localhost:4000/login", formData, {
-        headers: { "Content-Type": "application/json" },
-      })
+      setIsLoading(true);
+      const response = await axios.post(
+        "http://13.51.241.247/api/login",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-      const data = response.data
-      localStorage.setItem("token", data.token)
-      localStorage.setItem("user", JSON.stringify(data.user))
+      const data = response.data;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      const decoded = jwtDecode(data.token)
-      const role = decoded.role
+      const decoded = jwtDecode(data.token);
+      const role = decoded.role;
 
       // Navigate to corresponding route
-      navigate(`/${role}`)
+      navigate(`/${role}`);
     } catch (error) {
-      setIsLoading(false)
-      console.error("Login error:", error)
+      setIsLoading(false);
+      console.error("Login error:", error);
       if (error.response) {
-        setError(error.response.data.message || "Login failed")
+        setError(error.response.data.message || "Login failed");
       } else if (error.request) {
-        setError("No response from server. Please try again.")
+        setError("No response from server. Please try again.");
       } else {
-        setError("Server error occurred. Please try again later.")
+        setError("Server error occurred. Please try again later.");
       }
     }
-  }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -63,7 +67,7 @@ const Login = () => {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -72,7 +76,7 @@ const Login = () => {
       opacity: 1,
       transition: { type: "spring", stiffness: 100, damping: 10 },
     },
-  }
+  };
 
   // Decorative hearts
   const hearts = Array.from({ length: 8 }).map((_, i) => ({
@@ -81,7 +85,7 @@ const Login = () => {
     y: Math.random() * 100,
     delay: Math.random() * 5,
     duration: 3 + Math.random() * 5,
-  }))
+  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12 px-4 sm:px-6 relative overflow-hidden">
@@ -148,7 +152,10 @@ const Login = () => {
 
             {/* Username */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Foydalanuvchi nomi
               </label>
               <div className="relative">
@@ -170,7 +177,10 @@ const Login = () => {
 
             {/* Password */}
             <motion.div className="mb-6" variants={itemVariants}>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Parol
               </label>
               <div className="relative">
@@ -192,7 +202,10 @@ const Login = () => {
 
             {/* Forgot password link */}
             <motion.div className="mb-6 text-right" variants={itemVariants}>
-              <Link to="/forgot-password" className="text-sm text-pink-600 hover:text-pink-700 transition-colors">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-pink-600 hover:text-pink-700 transition-colors"
+              >
                 Parolni unutdingizmi?
               </Link>
             </motion.div>
@@ -221,10 +234,16 @@ const Login = () => {
             </motion.div>
 
             {/* Signup link */}
-            <motion.div className="mt-6 text-center text-sm" variants={itemVariants}>
+            <motion.div
+              className="mt-6 text-center text-sm"
+              variants={itemVariants}
+            >
               <p className="text-gray-600">
                 Hisobingiz yo'qmi?{" "}
-                <Link to="/signup" className="text-pink-600 hover:text-pink-700 font-medium">
+                <Link
+                  to="/signup"
+                  className="text-pink-600 hover:text-pink-700 font-medium"
+                >
                   Ro'yxatdan o'tish
                 </Link>
               </p>
@@ -244,13 +263,17 @@ const Login = () => {
               key={i}
               className="w-2 h-2 rounded-full bg-pink-300"
               animate={{ scale: [1, 1.5, 1] }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: i * 0.3 }}
+              transition={{
+                duration: 2,
+                repeat: Number.POSITIVE_INFINITY,
+                delay: i * 0.3,
+              }}
             />
           ))}
         </motion.div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

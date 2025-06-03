@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import axios from "axios"
-import DatePicker from "react-datepicker"
-import { format, isSameDay, isPast, isFuture } from "date-fns"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import DatePicker from "react-datepicker";
+import { format, isSameDay, isPast, isFuture } from "date-fns";
 import {
   Calendar,
   ChevronLeft,
@@ -20,218 +20,252 @@ import {
   Heart,
   Sparkles,
   Crown,
-} from "lucide-react"
-import "react-datepicker/dist/react-datepicker.css"
+} from "lucide-react";
+import "react-datepicker/dist/react-datepicker.css";
 
 function Bookings() {
-  const [bookings, setBookings] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [selectedDate, setSelectedDate] = useState(new Date())
-  const [filteredBookings, setFilteredBookings] = useState([])
-  const [selectedDistrict, setSelectedDistrict] = useState("all")
-  const [activeTab, setActiveTab] = useState("calendar")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [showBookingDetails, setShowBookingDetails] = useState(null)
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [filteredBookings, setFilteredBookings] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("all");
+  const [activeTab, setActiveTab] = useState("calendar");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showBookingDetails, setShowBookingDetails] = useState(null);
 
   // Token va user ma'lumotlarini olish
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const user =
     typeof window !== "undefined" && localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user"))
-      : { id: null }
-  const userId = user?.id
+      : { id: null };
+  const userId = user?.id;
 
   useEffect(() => {
     const fetchBookings = async () => {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       if (!token || !userId) {
-        setError("Token yoki foydalanuvchi ma'lumotlari topilmadi")
-        setLoading(false)
-        return
+        setError("Token yoki foydalanuvchi ma'lumotlari topilmadi");
+        setLoading(false);
+        return;
       }
 
       try {
-        const response = await axios.get(`http://localhost:4000/owner/view-venue-booking/${userId}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await axios.get(
+          `http://13.51.241.247/api/owner/view-venue-booking/${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        console.log("API Response:", response.data)
+        console.log("API Response:", response.data);
 
-        let bookingsData = []
+        let bookingsData = [];
 
         if (response.data) {
           if (Array.isArray(response.data)) {
-            bookingsData = response.data
-          } else if (response.data.bookings && Array.isArray(response.data.bookings)) {
-            bookingsData = response.data.bookings
+            bookingsData = response.data;
+          } else if (
+            response.data.bookings &&
+            Array.isArray(response.data.bookings)
+          ) {
+            bookingsData = response.data.bookings;
           } else if (response.data.data && Array.isArray(response.data.data)) {
-            bookingsData = response.data.data
-          } else if (typeof response.data === "object" && response.data !== null) {
-            bookingsData = [response.data]
+            bookingsData = response.data.data;
+          } else if (
+            typeof response.data === "object" &&
+            response.data !== null
+          ) {
+            bookingsData = [response.data];
           }
         }
 
         const formattedBookings = bookingsData.map((booking) => ({
           ...booking,
-          booking_id: booking.booking_id || booking.id || booking._id || Date.now(),
+          booking_id:
+            booking.booking_id || booking.id || booking._id || Date.now(),
           venue_name: booking.venue_name || booking.name || "Noma'lum joy",
-          reservation_date: booking.reservation_date || booking.date || booking.booking_date,
-          guest_count: booking.guest_count || booking.guests || booking.people_count || 0,
-          firstname: booking.firstname || booking.first_name || booking.client_name || "",
+          reservation_date:
+            booking.reservation_date || booking.date || booking.booking_date,
+          guest_count:
+            booking.guest_count || booking.guests || booking.people_count || 0,
+          firstname:
+            booking.firstname ||
+            booking.first_name ||
+            booking.client_name ||
+            "",
           lastname: booking.lastname || booking.last_name || "",
-          client_phone: booking.client_phone || booking.phone || booking.contact || "",
+          client_phone:
+            booking.client_phone || booking.phone || booking.contact || "",
           status: booking.status || "pending",
-        }))
+        }));
 
-        setBookings(formattedBookings)
+        setBookings(formattedBookings);
       } catch (error) {
-        console.error("Error fetching bookings:", error)
-        setError(error.response?.data?.message || error.message || "Ma'lumotlarni yuklashda xatolik yuz berdi")
+        console.error("Error fetching bookings:", error);
+        setError(
+          error.response?.data?.message ||
+            error.message ||
+            "Ma'lumotlarni yuklashda xatolik yuz berdi"
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchBookings()
-  }, [token, userId])
+    fetchBookings();
+  }, [token, userId]);
 
   useEffect(() => {
     if (Array.isArray(bookings) && bookings.length > 0 && selectedDate) {
       const filtered = bookings.filter((booking) => {
-        if (!booking.reservation_date) return false
+        if (!booking.reservation_date) return false;
         try {
-          return isSameDay(new Date(booking.reservation_date), selectedDate)
+          return isSameDay(new Date(booking.reservation_date), selectedDate);
         } catch (e) {
-          console.warn("Invalid date:", booking.reservation_date)
-          return false
+          console.warn("Invalid date:", booking.reservation_date);
+          return false;
         }
-      })
-      setFilteredBookings(filtered)
+      });
+      setFilteredBookings(filtered);
     } else {
-      setFilteredBookings([])
+      setFilteredBookings([]);
     }
-  }, [selectedDate, bookings])
+  }, [selectedDate, bookings]);
 
   const upcomingBookings = Array.isArray(bookings)
     ? bookings.filter((booking) => {
-        if (!booking.reservation_date) return false
+        if (!booking.reservation_date) return false;
         try {
-          return isFuture(new Date(booking.reservation_date))
+          return isFuture(new Date(booking.reservation_date));
         } catch {
-          return false
+          return false;
         }
       })
-    : []
+    : [];
 
   const pastBookings = Array.isArray(bookings)
     ? bookings.filter((booking) => {
-        if (!booking.reservation_date) return false
+        if (!booking.reservation_date) return false;
         try {
-          const bookingDate = new Date(booking.reservation_date)
-          return isPast(bookingDate) && !isSameDay(bookingDate, new Date())
+          const bookingDate = new Date(booking.reservation_date);
+          return isPast(bookingDate) && !isSameDay(bookingDate, new Date());
         } catch {
-          return false
+          return false;
         }
       })
-    : []
+    : [];
 
   const todayBookings = Array.isArray(bookings)
     ? bookings.filter((booking) => {
-        if (!booking.reservation_date) return false
+        if (!booking.reservation_date) return false;
         try {
-          return isSameDay(new Date(booking.reservation_date), new Date())
+          return isSameDay(new Date(booking.reservation_date), new Date());
         } catch {
-          return false
+          return false;
         }
       })
-    : []
+    : [];
 
   const renderDayContents = (day, date) => {
-    if (!Array.isArray(bookings)) return <div className="flex items-center justify-center h-8 w-8">{day}</div>
+    if (!Array.isArray(bookings))
+      return (
+        <div className="flex items-center justify-center h-8 w-8">{day}</div>
+      );
 
     const hasBooking = bookings.some((booking) => {
-      if (!booking.reservation_date) return false
+      if (!booking.reservation_date) return false;
       try {
-        return isSameDay(new Date(booking.reservation_date), date)
+        return isSameDay(new Date(booking.reservation_date), date);
       } catch {
-        return false
+        return false;
       }
-    })
+    });
 
-    const isPastBooking = hasBooking && isPast(date) && !isSameDay(date, new Date())
-    const isFutureBooking = hasBooking && isFuture(date)
-    const isTodayBooking = hasBooking && isSameDay(date, new Date())
+    const isPastBooking =
+      hasBooking && isPast(date) && !isSameDay(date, new Date());
+    const isFutureBooking = hasBooking && isFuture(date);
+    const isTodayBooking = hasBooking && isSameDay(date, new Date());
 
     return (
       <div
-        className={`relative flex items-center justify-center h-8 w-8 ${hasBooking ? "font-bold" : ""} ${
-          isSameDay(date, selectedDate) ? "text-white" : ""
-        }`}
+        className={`relative flex items-center justify-center h-8 w-8 ${
+          hasBooking ? "font-bold" : ""
+        } ${isSameDay(date, selectedDate) ? "text-white" : ""}`}
       >
         {day}
         {hasBooking && (
           <div
             className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 h-1.5 w-1.5 rounded-full ${
-              isPastBooking ? "bg-gray-400" : isFutureBooking ? "bg-emerald-500" : "bg-pink-500"
+              isPastBooking
+                ? "bg-gray-400"
+                : isFutureBooking
+                ? "bg-emerald-500"
+                : "bg-pink-500"
             }`}
           />
         )}
       </div>
-    )
-  }
+    );
+  };
 
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
         return {
-          color: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200",
+          color:
+            "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200",
           text: "Tasdiqlangan",
           icon: <CheckCircle className="w-4 h-4 text-emerald-600" />,
-        }
+        };
       case "pending":
         return {
-          color: "bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200",
+          color:
+            "bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200",
           text: "Kutilmoqda",
           icon: <Clock className="w-4 h-4 text-amber-600" />,
-        }
+        };
       case "cancelled":
         return {
-          color: "bg-gradient-to-r from-rose-50 to-red-50 text-rose-700 border-rose-200",
+          color:
+            "bg-gradient-to-r from-rose-50 to-red-50 text-rose-700 border-rose-200",
           text: "Bekor qilingan",
           icon: <XCircle className="w-4 h-4 text-rose-600" />,
-        }
+        };
       default:
         return {
-          color: "bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 border-gray-200",
+          color:
+            "bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 border-gray-200",
           text: status || "Noma'lum",
           icon: <AlertCircle className="w-4 h-4 text-gray-600" />,
-        }
+        };
     }
-  }
+  };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "Noma'lum sana"
+    if (!dateString) return "Noma'lum sana";
     try {
-      const date = new Date(dateString)
-      return format(date, "dd.MM.yyyy")
+      const date = new Date(dateString);
+      return format(date, "dd.MM.yyyy");
     } catch {
-      return "Noto'g'ri sana"
+      return "Noto'g'ri sana";
     }
-  }
+  };
 
   const handleBookingCardClick = (booking) => {
-    setShowBookingDetails(booking)
-  }
+    setShowBookingDetails(booking);
+  };
 
   const closeBookingDetails = () => {
-    setShowBookingDetails(null)
-  }
+    setShowBookingDetails(null);
+  };
 
   if (loading) {
     return (
@@ -241,15 +275,23 @@ function Bookings() {
             <div className="w-20 h-20 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto"></div>
             <Heart className="w-8 h-8 text-pink-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
           </div>
-          <p className="mt-6 text-lg font-medium text-gray-700 animate-pulse">💕 Bronlar yuklanmoqda...</p>
+          <p className="mt-6 text-lg font-medium text-gray-700 animate-pulse">
+            💕 Bronlar yuklanmoqda...
+          </p>
           <div className="flex justify-center mt-4 space-x-1">
             <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-            <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            <div
+              className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -276,8 +318,12 @@ function Bookings() {
                   <Sparkles className="w-5 h-5 text-white absolute -top-1 -right-1 animate-pulse" />
                 </div>
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">💒 Bronlar Boshqaruvi</h1>
-                  <p className="text-lg text-pink-100 mt-2">Barcha bronlaringizni bir joyda boshqaring</p>
+                  <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                    💒 Bronlar Boshqaruvi
+                  </h1>
+                  <p className="text-lg text-pink-100 mt-2">
+                    Barcha bronlaringizni bir joyda boshqaring
+                  </p>
                 </div>
               </div>
             </div>
@@ -309,7 +355,9 @@ function Bookings() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm font-medium">💕 Bugungi bronlar</p>
+                  <p className="text-gray-500 text-sm font-medium">
+                    💕 Bugungi bronlar
+                  </p>
                   <h3 className="text-3xl font-bold mt-2 bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
                     {todayBookings.length}
                   </h3>
@@ -330,7 +378,9 @@ function Bookings() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm font-medium">🌟 Kelasi bronlar</p>
+                  <p className="text-gray-500 text-sm font-medium">
+                    🌟 Kelasi bronlar
+                  </p>
                   <h3 className="text-3xl font-bold mt-2 bg-gradient-to-r from-emerald-500 to-green-500 bg-clip-text text-transparent">
                     {upcomingBookings.length}
                   </h3>
@@ -351,7 +401,9 @@ function Bookings() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm font-medium">👑 Jami bronlar</p>
+                  <p className="text-gray-500 text-sm font-medium">
+                    👑 Jami bronlar
+                  </p>
                   <h3 className="text-3xl font-bold mt-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
                     {Array.isArray(bookings) ? bookings.length : 0}
                   </h3>
@@ -374,7 +426,9 @@ function Bookings() {
             <div className="flex items-center">
               <AlertCircle className="w-6 h-6 text-red-600 mr-3" />
               <div>
-                <p className="text-red-800 font-medium">⚠️ Xatolik yuz berdi:</p>
+                <p className="text-red-800 font-medium">
+                  ⚠️ Xatolik yuz berdi:
+                </p>
                 <p className="text-red-700 text-sm mt-1">{error}</p>
               </div>
             </div>
@@ -397,7 +451,8 @@ function Bookings() {
             }`}
             onClick={() => setActiveTab("calendar")}
           >
-            <Calendar className="w-4 h-4" />📅 Kalendar ko'rinishi
+            <Calendar className="w-4 h-4" />
+            📅 Kalendar ko'rinishi
           </button>
           <button
             className={`px-6 py-3 font-medium text-sm rounded-xl transition-all duration-300 flex items-center gap-2 ${
@@ -407,7 +462,8 @@ function Bookings() {
             }`}
             onClick={() => setActiveTab("list")}
           >
-            <Users className="w-4 h-4" />📋 Ro'yxat ko'rinishi
+            <Users className="w-4 h-4" />
+            📋 Ro'yxat ko'rinishi
           </button>
         </div>
 
@@ -425,15 +481,21 @@ function Bookings() {
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex items-center p-3 bg-emerald-50 rounded-lg border-2 border-emerald-200">
                     <span className="inline-block h-3 w-3 bg-emerald-500 rounded-full mr-3"></span>
-                    <span className="text-emerald-700 font-medium">🌟 Kelasi bronlar</span>
+                    <span className="text-emerald-700 font-medium">
+                      🌟 Kelasi bronlar
+                    </span>
                   </div>
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
                     <span className="inline-block h-3 w-3 bg-gray-400 rounded-full mr-3"></span>
-                    <span className="text-gray-700 font-medium">📅 O'tgan bronlar</span>
+                    <span className="text-gray-700 font-medium">
+                      📅 O'tgan bronlar
+                    </span>
                   </div>
                   <div className="flex items-center p-3 bg-pink-50 rounded-lg border-2 border-pink-200">
                     <span className="inline-block h-3 w-3 bg-pink-500 rounded-full mr-3"></span>
-                    <span className="text-pink-700 font-medium">💕 Bugungi bronlar</span>
+                    <span className="text-pink-700 font-medium">
+                      💕 Bugungi bronlar
+                    </span>
                   </div>
                 </div>
               </div>
@@ -467,7 +529,9 @@ function Bookings() {
                   📅 {format(selectedDate, "dd.MM.yyyy")} sanasidagi bronlar
                 </h2>
                 <div className="bg-gradient-to-r from-pink-100 to-rose-100 px-4 py-2 rounded-full border-2 border-pink-200">
-                  <span className="text-pink-700 font-semibold text-sm">💕 {filteredBookings.length} ta bron</span>
+                  <span className="text-pink-700 font-semibold text-sm">
+                    💕 {filteredBookings.length} ta bron
+                  </span>
                 </div>
               </div>
 
@@ -477,13 +541,17 @@ function Bookings() {
                     <Calendar className="h-16 w-16 text-pink-300" />
                     <Heart className="h-6 w-6 text-pink-400 absolute -top-1 -right-1" />
                   </div>
-                  <p className="text-lg font-medium text-gray-500">💔 Bu sana uchun bronlar mavjud emas</p>
-                  <p className="text-sm text-gray-400 mt-1">Boshqa sanani tanlang</p>
+                  <p className="text-lg font-medium text-gray-500">
+                    💔 Bu sana uchun bronlar mavjud emas
+                  </p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Boshqa sanani tanlang
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {filteredBookings.map((booking, index) => {
-                    const statusInfo = getStatusInfo(booking.status)
+                    const statusInfo = getStatusInfo(booking.status);
                     return (
                       <div
                         key={booking.booking_id || Math.random()}
@@ -502,14 +570,18 @@ function Bookings() {
                             </h3>
                             <div className="flex items-center mt-2 text-gray-600">
                               <Users className="h-4 w-4 mr-2 text-rose-500" />
-                              <span className="font-medium">👥 {booking.guest_count || 0} mehmon</span>
+                              <span className="font-medium">
+                                👥 {booking.guest_count || 0} mehmon
+                              </span>
                             </div>
                           </div>
                           <div
                             className={`px-4 py-2 rounded-xl border-2 ${statusInfo.color} flex items-center gap-2 shadow-sm`}
                           >
                             {statusInfo.icon}
-                            <span className="font-medium text-sm">{statusInfo.text}</span>
+                            <span className="font-medium text-sm">
+                              {statusInfo.text}
+                            </span>
                           </div>
                         </div>
 
@@ -517,16 +589,21 @@ function Bookings() {
                           <div className="flex items-center text-gray-600">
                             <User className="h-4 w-4 mr-2 text-pink-500" />
                             <span className="text-sm font-medium">
-                              👤 {`${booking.firstname || ""} ${booking.lastname || ""}`.trim() || "Noma'lum"}
+                              👤{" "}
+                              {`${booking.firstname || ""} ${
+                                booking.lastname || ""
+                              }`.trim() || "Noma'lum"}
                             </span>
                           </div>
                           <div className="flex items-center text-gray-600">
                             <Phone className="h-4 w-4 mr-2 text-green-500" />
-                            <span className="text-sm">📱 {booking.client_phone || "Noma'lum"}</span>
+                            <span className="text-sm">
+                              📱 {booking.client_phone || "Noma'lum"}
+                            </span>
                           </div>
                         </div>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               )}
@@ -542,8 +619,12 @@ function Bookings() {
                   <Calendar className="h-16 w-16 text-pink-300" />
                   <Heart className="h-6 w-6 text-pink-400 absolute -top-1 -right-1" />
                 </div>
-                <p className="text-lg font-medium text-gray-500">💔 Bronlar mavjud emas</p>
-                <p className="text-sm text-gray-400 mt-1">Hozircha hech qanday bron yo'q</p>
+                <p className="text-lg font-medium text-gray-500">
+                  💔 Bronlar mavjud emas
+                </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Hozircha hech qanday bron yo'q
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -569,19 +650,25 @@ function Bookings() {
                   </thead>
                   <tbody className="bg-white divide-y divide-pink-100">
                     {bookings.map((booking, index) => {
-                      const statusInfo = getStatusInfo(booking.status)
+                      const statusInfo = getStatusInfo(booking.status);
                       return (
                         <tr
                           key={booking.booking_id || index}
                           className={`hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 cursor-pointer transition-all duration-300 ${
-                            booking.reservation_date && isSameDay(new Date(booking.reservation_date), selectedDate)
+                            booking.reservation_date &&
+                            isSameDay(
+                              new Date(booking.reservation_date),
+                              selectedDate
+                            )
                               ? "bg-gradient-to-r from-pink-50 to-rose-50 border-l-4 border-pink-400"
                               : ""
                           }`}
                           onClick={() => {
                             if (booking.reservation_date) {
-                              setSelectedDate(new Date(booking.reservation_date))
-                              setActiveTab("calendar")
+                              setSelectedDate(
+                                new Date(booking.reservation_date)
+                              );
+                              setActiveTab("calendar");
                             }
                           }}
                         >
@@ -602,7 +689,9 @@ function Bookings() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900 flex items-center gap-1">
                               <User className="w-4 h-4 text-pink-500" />
-                              {`${booking.firstname || ""} ${booking.lastname || ""}`.trim() || "Noma'lum"}
+                              {`${booking.firstname || ""} ${
+                                booking.lastname || ""
+                              }`.trim() || "Noma'lum"}
                             </div>
                             <div className="text-xs text-gray-500 flex items-center gap-1">
                               <Phone className="w-3 h-3" />
@@ -612,7 +701,9 @@ function Bookings() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <Users className="w-4 h-4 text-rose-500 mr-2" />
-                              <span className="text-sm font-medium text-gray-900">👥 {booking.guest_count || 0}</span>
+                              <span className="text-sm font-medium text-gray-900">
+                                👥 {booking.guest_count || 0}
+                              </span>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -620,11 +711,13 @@ function Bookings() {
                               className={`px-3 py-2 rounded-xl border-2 ${statusInfo.color} flex items-center gap-2 w-fit`}
                             >
                               {statusInfo.icon}
-                              <span className="font-medium text-xs">{statusInfo.text}</span>
+                              <span className="font-medium text-xs">
+                                {statusInfo.text}
+                              </span>
                             </div>
                           </td>
                         </tr>
-                      )
+                      );
                     })}
                   </tbody>
                 </table>
@@ -642,7 +735,8 @@ function Bookings() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <Crown className="w-6 h-6 text-pink-500" />💒 Bron ma'lumotlari
+                    <Crown className="w-6 h-6 text-pink-500" />
+                    💒 Bron ma'lumotlari
                   </h2>
                   <p className="text-gray-500 mt-1">Batafsil ma'lumotlar</p>
                 </div>
@@ -662,20 +756,26 @@ function Bookings() {
                   </h3>
                   <div className="bg-white px-3 py-1 rounded-full inline-block">
                     <p className="text-sm text-gray-600">
-                      Bron ID: <span className="font-mono font-medium">{showBookingDetails.booking_id || "N/A"}</span>
+                      Bron ID:{" "}
+                      <span className="font-mono font-medium">
+                        {showBookingDetails.booking_id || "N/A"}
+                      </span>
                     </p>
                   </div>
                 </div>
 
                 <div>
                   <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-pink-600" />📅 Bron ma'lumotlari
+                    <Calendar className="w-5 h-5 text-pink-600" />
+                    📅 Bron ma'lumotlari
                   </h4>
                   <div className="bg-pink-50 rounded-xl p-6 space-y-4">
                     <div className="flex items-start p-4 bg-white rounded-lg shadow-sm border border-pink-100">
                       <Calendar className="h-6 w-6 text-pink-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-bold text-gray-800">📅 Sana</p>
+                        <p className="text-sm font-bold text-gray-800">
+                          📅 Sana
+                        </p>
                         <p className="text-lg text-gray-600 font-medium">
                           {formatDate(showBookingDetails.reservation_date)}
                         </p>
@@ -685,19 +785,29 @@ function Bookings() {
                     <div className="flex items-start p-4 bg-white rounded-lg shadow-sm border border-pink-100">
                       <Users className="h-6 w-6 text-rose-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-bold text-gray-800">👥 Mehmonlar soni</p>
-                        <p className="text-lg text-gray-600 font-medium">{showBookingDetails.guest_count || 0} kishi</p>
+                        <p className="text-sm font-bold text-gray-800">
+                          👥 Mehmonlar soni
+                        </p>
+                        <p className="text-lg text-gray-600 font-medium">
+                          {showBookingDetails.guest_count || 0} kishi
+                        </p>
                       </div>
                     </div>
 
                     <div className="flex items-start p-4 bg-white rounded-lg shadow-sm border border-pink-100">
                       {getStatusInfo(showBookingDetails.status).icon}
                       <div className="ml-4">
-                        <p className="text-sm font-bold text-gray-800">📊 Holati</p>
+                        <p className="text-sm font-bold text-gray-800">
+                          📊 Holati
+                        </p>
                         <div
-                          className={`px-3 py-1 rounded-lg border-2 ${getStatusInfo(showBookingDetails.status).color} inline-block mt-1`}
+                          className={`px-3 py-1 rounded-lg border-2 ${
+                            getStatusInfo(showBookingDetails.status).color
+                          } inline-block mt-1`}
                         >
-                          <p className="text-sm font-medium">{getStatusInfo(showBookingDetails.status).text}</p>
+                          <p className="text-sm font-medium">
+                            {getStatusInfo(showBookingDetails.status).text}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -706,16 +816,20 @@ function Bookings() {
 
                 <div>
                   <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <User className="w-5 h-5 text-green-600" />👤 Mijoz ma'lumotlari
+                    <User className="w-5 h-5 text-green-600" />
+                    👤 Mijoz ma'lumotlari
                   </h4>
                   <div className="bg-green-50 rounded-xl p-6 space-y-4">
                     <div className="flex items-start p-4 bg-white rounded-lg shadow-sm border border-green-100">
                       <User className="h-6 w-6 text-green-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-bold text-gray-800">👤 Mijoz ismi</p>
+                        <p className="text-sm font-bold text-gray-800">
+                          👤 Mijoz ismi
+                        </p>
                         <p className="text-lg text-gray-600 font-medium">
-                          {`${showBookingDetails.firstname || ""} ${showBookingDetails.lastname || ""}`.trim() ||
-                            "Noma'lum"}
+                          {`${showBookingDetails.firstname || ""} ${
+                            showBookingDetails.lastname || ""
+                          }`.trim() || "Noma'lum"}
                         </p>
                       </div>
                     </div>
@@ -723,7 +837,9 @@ function Bookings() {
                     <div className="flex items-start p-4 bg-white rounded-lg shadow-sm border border-green-100">
                       <Phone className="h-6 w-6 text-indigo-500 mr-4 mt-1" />
                       <div>
-                        <p className="text-sm font-bold text-gray-800">📱 Telefon raqami</p>
+                        <p className="text-sm font-bold text-gray-800">
+                          📱 Telefon raqami
+                        </p>
                         <p className="text-lg text-gray-600 font-medium">
                           {showBookingDetails.client_phone || "Noma'lum"}
                         </p>
@@ -738,7 +854,8 @@ function Bookings() {
                   className="flex-1 bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
                   onClick={closeBookingDetails}
                 >
-                  <Heart className="w-5 h-5" />💕 Yopish
+                  <Heart className="w-5 h-5" />
+                  💕 Yopish
                 </button>
               </div>
             </div>
@@ -791,7 +908,7 @@ function Bookings() {
         }
       `}</style>
     </div>
-  )
+  );
 }
 
-export default Bookings
+export default Bookings;

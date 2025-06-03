@@ -103,10 +103,13 @@ const Venues = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
-      const response = await axios.get("http://localhost:4000/user/get-venues-user", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { status: "tasdiqlangan" },
-      });
+      const response = await axios.get(
+        "http://13.51.241.247/api/user/get-venues-user",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { status: "tasdiqlangan" },
+        }
+      );
 
       const filteredVenues = (response.data.venues || response.data).filter(
         (venue) => venue.status === "tasdiqlangan"
@@ -114,8 +117,14 @@ const Venues = () => {
       setVenues(filteredVenues);
     } catch (err) {
       console.error("Xatolik yuz berdi:", err);
-      setError(err.response?.data?.error || err.message || "To'yxonalarni olishda xatolik yuz berdi");
-      toast.error(err.response?.data?.error || "To'yxonalarni olishda xatolik yuz berdi");
+      setError(
+        err.response?.data?.error ||
+          err.message ||
+          "To'yxonalarni olishda xatolik yuz berdi"
+      );
+      toast.error(
+        err.response?.data?.error || "To'yxonalarni olishda xatolik yuz berdi"
+      );
       if (err.response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");
@@ -131,8 +140,11 @@ const Venues = () => {
 
   const toggleFavorite = (venueId) => {
     setFavorites((prev) => {
-      const newFavs = prev.includes(venueId) ? prev.filter((id) => id !== venueId) : [...prev, venueId];
-      if (typeof window !== "undefined") localStorage.setItem("favorites", JSON.stringify(newFavs));
+      const newFavs = prev.includes(venueId)
+        ? prev.filter((id) => id !== venueId)
+        : [...prev, venueId];
+      if (typeof window !== "undefined")
+        localStorage.setItem("favorites", JSON.stringify(newFavs));
 
       toast.success(
         prev.includes(venueId)
@@ -184,8 +196,12 @@ const Venues = () => {
                 <Sparkles className="w-5 h-5 text-white absolute -top-1 -right-1 animate-pulse" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">💒 Tasdiqlangan To'yxonalar</h1>
-                <p className="text-pink-100 text-sm mt-1">Eng yaxshi to'yxonalarni tanlang</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  💒 Tasdiqlangan To'yxonalar
+                </h1>
+                <p className="text-pink-100 text-sm mt-1">
+                  Eng yaxshi to'yxonalarni tanlang
+                </p>
               </div>
             </div>
             <motion.button
@@ -222,12 +238,17 @@ const Venues = () => {
               <div className="h-20 w-20 rounded-full border-t-4 border-b-4 border-pink-400 animate-spin"></div>
               <div
                 className="absolute top-0 left-0 h-20 w-20 rounded-full border-t-4 border-b-4 border-rose-300 animate-spin"
-                style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
+                style={{
+                  animationDirection: "reverse",
+                  animationDuration: "1.5s",
+                }}
               ></div>
               <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-pink-500" />
             </div>
             <div className="ml-4">
-              <p className="text-lg font-medium text-gray-700">To'yxonalar yuklanmoqda...</p>
+              <p className="text-lg font-medium text-gray-700">
+                To'yxonalar yuklanmoqda...
+              </p>
               <div className="flex mt-2 space-x-1">
                 <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
                 <div
@@ -250,8 +271,12 @@ const Venues = () => {
           >
             <div className="mb-4">
               <Building className="h-16 w-16 text-pink-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">To'yxonalar topilmadi</h3>
-              <p className="text-gray-500">Hozirda tasdiqlangan to'yxonalar mavjud emas</p>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                To'yxonalar topilmadi
+              </h3>
+              <p className="text-gray-500">
+                Hozirda tasdiqlangan to'yxonalar mavjud emas
+              </p>
             </div>
           </motion.div>
         ) : (
@@ -261,7 +286,11 @@ const Venues = () => {
                 <div className="flex items-center gap-2">
                   <Building className="h-5 w-5 text-pink-500" />
                   <span className="text-sm text-gray-600">
-                    Jami: <span className="font-semibold text-gray-800">{venues.length}</span> ta to'yxona
+                    Jami:{" "}
+                    <span className="font-semibold text-gray-800">
+                      {venues.length}
+                    </span>{" "}
+                    ta to'yxona
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -312,14 +341,19 @@ const Venues = () => {
                               : "text-gray-500 hover:text-pink-400"
                           }`}
                           variants={heartVariants}
-                          animate={favorites.includes(venue.id) ? "filled" : "unfilled"}
+                          animate={
+                            favorites.includes(venue.id) ? "filled" : "unfilled"
+                          }
                         />
                       </div>
                     </motion.div>
 
                     {/* Slayder rasm uchun */}
                     {venue.images && venue.images.length > 0 ? (
-                      <Slider {...sliderSettings} className="h-48 rounded-t-2xl overflow-hidden">
+                      <Slider
+                        {...sliderSettings}
+                        className="h-48 rounded-t-2xl overflow-hidden"
+                      >
                         {venue.images.map((img, idx) => (
                           <div key={idx} className="h-48">
                             <img
@@ -334,7 +368,9 @@ const Venues = () => {
                       <div className="h-48 bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center rounded-t-2xl">
                         <div className="text-center">
                           <ImageIcon className="h-12 w-12 text-pink-300 mx-auto mb-2" />
-                          <p className="text-sm text-pink-400">Rasm mavjud emas</p>
+                          <p className="text-sm text-pink-400">
+                            Rasm mavjud emas
+                          </p>
                         </div>
                       </div>
                     )}
@@ -362,20 +398,26 @@ const Venues = () => {
                         <div className="flex items-center gap-2 text-gray-600">
                           <DollarSign className="h-4 w-4 text-pink-500 flex-shrink-0" />
                           <span className="font-semibold text-gray-800">
-                            💰 {Number(venue.price_seat).toLocaleString("uz-UZ")} so'm
+                            💰{" "}
+                            {Number(venue.price_seat).toLocaleString("uz-UZ")}{" "}
+                            so'm
                           </span>
                         </div>
                         {venue.address && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <MapPin className="h-4 w-4 text-rose-500 flex-shrink-0" />
-                            <span className="truncate text-xs">{venue.address}</span>
+                            <span className="truncate text-xs">
+                              {venue.address}
+                            </span>
                           </div>
                         )}
                       </div>
 
                       <div className="mt-4 pt-3 border-t border-pink-100">
                         <button
-                          onClick={() => navigate(`/user/bookings?venueId=${venue.id}`)}
+                          onClick={() =>
+                            navigate(`/user/bookings?venueId=${venue.id}`)
+                          }
                           className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-sm font-medium"
                         >
                           <Calendar className="h-4 w-4" />

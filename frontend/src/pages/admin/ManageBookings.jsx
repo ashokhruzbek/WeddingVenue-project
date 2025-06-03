@@ -111,7 +111,7 @@ const ManageBookings = () => {
       if (statusFilter) params.status = statusFilter.toLowerCase();
 
       const response = await axios.get(
-        "http://localhost:4000/admin/view-all-bookings",
+        "http://13.51.241.247/api/admin/view-all-bookings",
         {
           headers: { Authorization: `Bearer ${token}` },
           params,
@@ -158,7 +158,7 @@ const ManageBookings = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:4000/admin/get-booking-user?booking_id=${bookingId}`,
+        `http://13.51.241.247/api/admin/get-booking-user?booking_id=${bookingId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -190,7 +190,7 @@ const ManageBookings = () => {
 
       // API endpoint ni to'g'ri format bilan
       const response = await axios.put(
-        `http://localhost:4000/admin/cancel-booking/${selectedBooking.id}`,
+        `http://13.51.241.247/api/admin/cancel-booking/${selectedBooking.id}`,
         {}, // Empty body for PUT request
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -795,7 +795,7 @@ const ManageBookings = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4 text-gray-500">
-                    Foydalanuvchi ma'lumotlari  
+                    Foydalanuvchi ma'lumotlari
                   </div>
                 )}
 
@@ -876,8 +876,7 @@ const ManageBookings = () => {
                     Bekor qilish
                   </button>
                   <button
-                    onClick={()=> handleCancelBooking( )}
-
+                    onClick={() => handleCancelBooking()}
                     disabled={deleteLoading}
                     className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2"
                     aria-label="Buyurtmani bekor qilishni tasdiqlash"

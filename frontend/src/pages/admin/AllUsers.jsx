@@ -31,18 +31,28 @@ const AllOwners = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.get("http://localhost:4000/admin/owners", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        "http://13.51.241.247/api/admin/owners",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      const data = Array.isArray(response.data.owners) ? response.data.owners : [];
+      const data = Array.isArray(response.data.owners)
+        ? response.data.owners
+        : [];
       setOwners(data);
     } catch (error) {
       console.error("Error fetching owners:", error);
-      setError(error.response?.data?.error || "Egalarni yuklashda xatolik yuz berdi");
-      toast.error(error.response?.data?.error || "Egalarni yuklashda xatolik yuz berdi", {
-        duration: 3000,
-      });
+      setError(
+        error.response?.data?.error || "Egalarni yuklashda xatolik yuz berdi"
+      );
+      toast.error(
+        error.response?.data?.error || "Egalarni yuklashda xatolik yuz berdi",
+        {
+          duration: 3000,
+        }
+      );
       if (error.response?.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");
@@ -79,7 +89,12 @@ const AllOwners = () => {
       )}
 
       {loading && owners.length === 0 ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+        >
           <CircularProgress />
         </Box>
       ) : (
@@ -89,7 +104,9 @@ const AllOwners = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>To‘liq ism</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Telefon / Username</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Telefon / Username
+                </TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Role</TableCell>
               </TableRow>
             </TableHead>
@@ -105,7 +122,8 @@ const AllOwners = () => {
                 >
                   <TableCell>{owner.id}</TableCell>
                   <TableCell>
-                    {(owner.firstname || "") + " " + (owner.lastname || "") || "Noma'lum"}
+                    {(owner.firstname || "") + " " + (owner.lastname || "") ||
+                      "Noma'lum"}
                   </TableCell>
                   <TableCell>{owner.username || "Noma'lum"}</TableCell>
                   <TableCell>🇺🇿 {owner.role}</TableCell>
