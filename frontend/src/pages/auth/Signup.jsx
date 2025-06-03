@@ -72,7 +72,7 @@ function Signup() {
 
     try {
       const response = await axios.post(
-        "http://13.51.241.247/api/signup",
+        "http://13.51.241.247/api/auth/signup",
         formData
       );
 

@@ -29,7 +29,7 @@ const Login = () => {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        "http://13.51.241.247/api/login",
+        "http://13.51.241.247/api/auth/login",
         formData,
         {
           headers: { "Content-Type": "application/json" },

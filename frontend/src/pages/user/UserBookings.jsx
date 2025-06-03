@@ -49,7 +49,7 @@ function UserBookings() {
     const fetchVenues = async () => {
       setFetchingVenues(true);
       try {
-        const response = await axios.get("http://13.51.241.247/api/venues");
+        const response = await axios.get("http://13.51.241.247/api/venues/venues");
         setVenues(response.data.venues);
       } catch (err) {
         console.error("To'yxonalarni yuklashda xatolik:", err);

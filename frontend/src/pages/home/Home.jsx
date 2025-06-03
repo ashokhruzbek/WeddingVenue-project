@@ -98,7 +98,7 @@ function Home() {
     const fetchVenues = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get("http://13.51.241.247/api/venues");
+        const res = await axios.get("http://13.51.241.247/api/venues/venues");
         setVenues(res.data.venues);
         setFilteredVenues(res.data.venues);
         console.log("Venues data:", res.data.venues);
