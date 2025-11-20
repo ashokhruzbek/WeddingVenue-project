@@ -19,14 +19,15 @@ exports.viewVenues = async (req, res) => {
       images = imagesResult.rows;
     }
 
-    // Rasmlarni venuesga biriktirish va to‘liq URL qilish
+    // Rasmlarni venuesga biriktirish va to'liq URL qilish
+    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 4000}`;
     const venuesWithImages = venues.map((venue) => ({
       ...venue,
       images: images
         .filter((img) => img.venue_id === venue.id)
         .map((img) => ({
           id: img.id,
-          image_url: `http://13.51.241.247/uploads/${img.image_url}`,
+          image_url: `${baseURL}/${img.image_url}`,
         })),
     }));
 
@@ -36,7 +37,6 @@ exports.viewVenues = async (req, res) => {
       venues: venuesWithImages,
     });
   } catch (error) {
-    console.error("To'yxonalarni olishda xatolik:", error);
     res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

@@ -3,10 +3,7 @@ const pool = require("../../config/db");
 exports.deleteOwnerVenue = async (req, res) => {
   try {
     const venueId = req.params.id;
-    const ownerId = JSON.parse(localStorage.getItem("user"))?.id;
-
-    console.log("venueId:", venueId);
-    console.log("ownerId:", ownerId);
+    const ownerId = req.user?.id;
 
     if (!ownerId) {
       return res.status(400).json({
@@ -36,7 +33,6 @@ exports.deleteOwnerVenue = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.error("Venue o'chirishda xatolik:", error);
     return res.status(500).json({
       message: "Serverda xatolik yuz berdi",
       success: false,

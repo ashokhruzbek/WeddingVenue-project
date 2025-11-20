@@ -44,7 +44,6 @@ exports.cancelBooking = async (req, res) => {
     return res.status(403).json({ message: "Bu bronni o‘chirishga ruxsatingiz yo‘q" });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+    res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

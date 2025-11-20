@@ -27,8 +27,22 @@ app.use('/api/user', userRouter);
 app.use('/api/owner', ownerRouter );
 app.use('/api/venues', venueRouter);
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Global error:', err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Server xatosi',
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ message: 'API endpoint topilmadi' });
+});
+
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-    console.log(`Server ${PORT}-portda xizmatingizga muntazir 🫡  | Omad yor bo'lsin`);
+    console.log(`Server ${PORT}-portda ishga tushdi 🚀 | Omad yor bo'lsin`);
 });

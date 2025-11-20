@@ -77,7 +77,6 @@ exports.viewAllVenues = async (req, res) => {
       totalCount: totalCount,
     });
   } catch (error) {
-    console.error("❌ Venue ko‘rsatishda xatolik:", error);
     res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

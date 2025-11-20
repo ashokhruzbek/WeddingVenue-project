@@ -35,7 +35,6 @@ exports.createOwner = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Owner yaratishda xatolik:", error.message);
         res.status(500).json({ message: "Server xatosi", error: error.message });
     }
 };

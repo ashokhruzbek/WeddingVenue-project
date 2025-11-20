@@ -1,4 +1,79 @@
 ### Wedding Venue Project semester topshirig'i Frontend va Backend 
+
+## 📋 Loyiha haqida
+To'yxonalarni boshqarish va bron qilish tizimi. Uch xil foydalanuvchi roli: Admin, Owner (To'yxona egasi) va User (Foydalanuvchi).
+
+## 🚀 Loyihani ishga tushirish
+
+### Backend ishga tushirish
+
+1. Backend papkasiga o'ting:
+```bash
+cd backend
+```
+
+2. Kerakli paketlarni o'rnating:
+```bash
+npm install
+```
+
+3. `.env.example` faylidan `.env` yarating va to'ldiring:
+```bash
+cp .env.example .env
+```
+
+4. PostgreSQL databaseni sozlang:
+   - `postgres-database/create-table-codes.sql` - jadvallar yaratish
+   - `postgres-database/insert-data.sql` - dastlabki ma'lumotlar
+
+5. Serverni ishga tushiring:
+```bash
+npm run dev    # Development rejimda
+# yoki
+npm start      # Production rejimda
+```
+
+Server http://localhost:4000 da ishga tushadi.
+
+### Frontend ishga tushirish
+
+1. Frontend papkasiga o'ting:
+```bash
+cd frontend
+```
+
+2. Kerakli paketlarni o'rnating:
+```bash
+npm install
+```
+
+3. Development serverni ishga tushiring:
+```bash
+npm run dev
+```
+
+Frontend http://localhost:5173 da ishga tushadi.
+
+## 🛠️ Texnologiyalar
+
+### Backend
+- Node.js & Express.js
+- PostgreSQL
+- JWT (Authentication)
+- Bcrypt (Password hashing)
+- Multer (File upload)
+
+### Frontend
+- React 19
+- Vite
+- TailwindCSS
+- Axios
+- React Router DOM
+- Framer Motion
+- React DatePicker
+
+## 📁 Loyiha strukturasi
+
 ```bash
 frontend/                                # Frontend ilova papkasi
 ├── hooks/                              # Maxsus React hooklar

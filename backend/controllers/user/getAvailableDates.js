@@ -30,7 +30,6 @@ exports.getAvailableDates = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Kalendar uchun bo‘sh kunlarni olishda xatolik:', error);
     res.status(500).json({ message: 'Server xatosi', error: error.message });
   }
 };

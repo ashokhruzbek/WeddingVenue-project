@@ -27,9 +27,7 @@ exports.assignOwner = async (req, res) => {
     res.status(200).json({ message: `Venue ID ${venue_id} ga Owner ID ${owner_id} biriktirildi` });
 
   } catch (error) {
-    console.error('Xatolik:', error);
-    res.status(500).json({ message: 'Server xatosi' });
+    res.status(500).json({ message: 'Server xatosi', error: error.message });
   }
 };
-
 

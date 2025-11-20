@@ -15,7 +15,6 @@ import AddVenues from "../pages/owner/AddVenues";
 import AllVenues from "../pages/owner/AllVenues";
 import Bookings from "../pages/owner/Bookings";
 import UpdateVenues from "../pages/owner/UpdateVenues";
-import OwnerVenue from "../pages/owner/UpdateVenues";
 import VenueBookings from "../pages/owner/VenueBookings";
 import User from "../pages/user";
 import FavoritesVenues from "../pages/user/FavoritesVenues";

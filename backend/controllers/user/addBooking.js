@@ -10,7 +10,6 @@ exports.addBooking = async (req, res) => {
 
     const user_id = req.user.id;
     const { venue_id, reservation_date, guest_count, client_phone, status: incomingStatus } = req.body;
-    console.log(user_id);
     
 
     // Default holat: "endi bo‘ladigan"
@@ -82,7 +81,6 @@ exports.addBooking = async (req, res) => {
       booking: result.rows[0],
     });
   } catch (err) {
-    console.error('Bron qo‘shishda xatolik:', err);
-    res.status(500).json({ error: 'Bron qo‘shishda xatolik yuz berdi' });
+    res.status(500).json({ error: 'Bron qo\'shishda xatolik yuz berdi', message: err.message });
   }
 };

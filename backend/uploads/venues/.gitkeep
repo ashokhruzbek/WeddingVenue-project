@@ -1,0 +1,2 @@
+# This file ensures the uploads/venues directory is tracked by git
+# Actual venue images should be in .gitignore

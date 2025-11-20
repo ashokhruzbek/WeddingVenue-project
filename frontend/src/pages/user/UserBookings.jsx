@@ -153,7 +153,6 @@ function UserBookings() {
           },
         }
       );
-      console.log(response);
 
       toast.success("Bron muvaffaqiyatli qo'shildi!", {
         position: "top-right",

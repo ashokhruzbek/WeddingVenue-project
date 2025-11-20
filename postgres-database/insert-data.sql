@@ -1,0 +1,67 @@
+-- O'zbekiston tumanlari ma'lumotlarini kiritish
+INSERT INTO District (name) VALUES 
+    ('Olmazor'),
+    ('Yunusobod'),
+    ('Mirobod'),
+    ('Chilonzor'),
+    ('Bektemir'),
+    ('Yakkasaroy'),
+    ('Shayxontohur'),
+    ('Sergeli'),
+    ('Uchtepa'),
+    ('Yashnobod'),
+    ('Mirzo Ulug''bek'),
+    ('Yangihayot'),
+    -- Qoraqalpog'iston
+    ('Nukus'),
+    ('Chimboy'),
+    ('Qo''ng''irot'),
+    ('Kegeyli'),
+    ('Mo''ynoq'),
+    ('Beruniy'),
+    ('Amudaryo'),
+    ('To''rtko''l'),
+    ('Xo''jayli'),
+    ('Taxtako''pir'),
+    ('Qorao''zak'),
+    ('Ellikqal''a'),
+    ('Bo''zatov'),
+    ('Shumanay'),
+    ('Nukus tumani'),
+    -- Andijon viloyati
+    ('Andijon'),
+    ('Asaka'),
+    ('Xonobod'),
+    ('Baliqchi'),
+    ('Bo''z'),
+    ('Buloqboshi'),
+    ('Jalaquduq'),
+    ('Izboskan'),
+    ('Qo''rg''ontepa'),
+    ('Marhamat'),
+    ('Oltinko''l'),
+    ('Paxtaobod'),
+    ('Shahrixon'),
+    ('Xo''jaobod'),
+    ('Ulug''nor'),
+    -- Buxoro viloyati
+    ('Buxoro'),
+    ('Kogon'),
+    ('Olot'),
+    ('Buxoro tumani'),
+    ('Gijduvon'),
+    ('Jondor'),
+    ('Kogon tumani'),
+    ('Olot tumani'),
+    ('Peshku'),
+    ('Qorako''l'),
+    ('Qorovulbozor'),
+    ('Romitan'),
+    ('Shofirkon'),
+    ('Vobkent')
+ON CONFLICT (name) DO NOTHING;
+
+-- Demo admin user qo'shish (parol: admin123)
+INSERT INTO Users (username, password, firstname, lastname, role) VALUES 
+    ('admin', '$2b$10$YourHashedPasswordHere', 'Admin', 'User', 'admin')
+ON CONFLICT (username) DO NOTHING;

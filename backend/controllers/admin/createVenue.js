@@ -100,12 +100,10 @@ exports.createVenue = async (req, res) => {
       await Promise.all(imageInsertPromises);
 
       res.status(201).json({
-        message: "To‘yxona muvaffaqiyatli yaratildi",
+        message: "To'yxona muvaffaqiyatli yaratildi",
         venue: venueResult.rows[0],
       });
     } catch (error) {
-      console.error("Venue yaratishda xatolik:", error.message);
-      console.error(error.stack);
       res.status(500).json({
         message: "Server xatosi",
         error: error.message,

@@ -40,14 +40,15 @@ exports.getAllVenues = async (req, res) => {
 
     const images = imagesResult.rows;
 
-    // 4. Rasm URLlarini to‘liq qilib biriktirish
+    // 4. Rasm URLlarini to'liq qilib biriktirish
+    const baseURL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 4000}`;
     const venuesWithImages = venues.map((venue) => ({
       ...venue,
       images: images
         .filter((img) => img.venue_id === venue.id)
         .map((img) => ({
           id: img.id,
-          image_url: `http://13.51.241.247/uploads/${img.image_url}`,
+          image_url: `${baseURL}/${img.image_url}`,
         })),
     }));
 
@@ -57,7 +58,6 @@ exports.getAllVenues = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.error("Venue olishda xatolik:", error);
     return res.status(500).json({
       message: "Serverda xatolik yuz berdi",
       success: false,

@@ -1,0 +1,2 @@
+# This file ensures the uploads/users directory is tracked by git
+# Actual user images should be in .gitignore

@@ -65,7 +65,6 @@ exports.getUserBookings = async (req, res) => {
       bookings: result.rows
     });
   } catch (error) {
-    console.error("Foydalanuvchi bronlarini olishda xatolik:", error);
     res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

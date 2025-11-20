@@ -58,7 +58,6 @@ exports.viewAllBookings = async (req, res) => {
       bookings: result.rows
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+    res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

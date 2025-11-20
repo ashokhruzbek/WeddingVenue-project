@@ -27,7 +27,6 @@ exports.approveVenue = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("To'yxonani tasdiqlashda xatolik:", error);
-    res.status(500).json({ message: "Server xatosi" });
+    res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

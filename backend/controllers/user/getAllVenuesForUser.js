@@ -63,7 +63,6 @@ exports.getAllVenuesForUser = async (req, res) => {
       venues: venuesWithImages,
     });
   } catch (error) {
-    console.error("To‘yxonalarni olishda xatolik:", error);
     res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };

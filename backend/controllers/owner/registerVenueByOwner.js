@@ -46,9 +46,6 @@ exports.registerVenueByOwner = [
       }
 
       // Multer orqali kelgan ma'lumotlarni olish
-      console.log('req.body:', req.body);
-      console.log('req.files:', req.files);
-
       const {
         name,
         district_id,
@@ -121,16 +118,13 @@ exports.registerVenueByOwner = [
       });
 
     } catch (error) {
-      console.error("To'yxona qo'shishda xatolik:", error.message);
-      console.error(error.stack);
-      
       // Xatolik yuz bersa, yuklangan fayllarni o'chirish
       if (req.files) {
         req.files.forEach((file) => {
           try {
             fs.unlinkSync(file.path);
           } catch (unlinkError) {
-            console.error("Faylni o'chirishda xatolik:", unlinkError.message);
+            // Fayl o'chirish xatosi
           }
         });
       }

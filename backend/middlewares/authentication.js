@@ -15,6 +15,12 @@ exports.authentication = async (req, res, next) => {
 		
 		next();
 	} catch (error) {
-		res.status(400).json({message: error})
+		if (error.name === 'TokenExpiredError') {
+			return res.status(401).json({message: "Token muddati tugagan"});
+		}
+		if (error.name === 'JsonWebTokenError') {
+			return res.status(401).json({message: "Noto'g'ri token"});
+		}
+		res.status(500).json({message: "Autentifikatsiya xatosi", error: error.message});
 	}
 }
