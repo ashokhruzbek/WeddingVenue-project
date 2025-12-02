@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { gsap } from "gsap";
+import { motion } from "framer-motion";
 import {
   User,
   Lock,
