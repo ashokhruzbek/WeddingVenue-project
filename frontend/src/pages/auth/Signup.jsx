@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import {
   User,
@@ -371,12 +370,10 @@ function Signup() {
                 </div>
 
                 {/* Submit Button */}
-                <motion.button
+                <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#D4AF37] hover:bg-[#c49a2c] text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D4AF37]/25 disabled:opacity-70 mt-4"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
+                  className="w-full bg-[#D4AF37] hover:bg-[#c49a2c] text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D4AF37]/25 disabled:opacity-70 mt-4 hover:scale-[1.01] active:scale-[0.99]"
                 >
                   {isSubmitting ? (
                     <>
@@ -389,7 +386,7 @@ function Signup() {
                       <ArrowRight size={18} />
                     </>
                   )}
-                </motion.button>
+                </button>
               </form>
 
               <div className="flex items-center gap-4 my-4">

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { 
   User, 
@@ -274,12 +273,10 @@ const Login = () => {
                   </div>
                 </div>
 
-                <motion.button
+                <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[#D4AF37] hover:bg-[#c49a2c] text-white py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D4AF37]/25 disabled:opacity-70"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
+                  className="w-full bg-[#D4AF37] hover:bg-[#c49a2c] text-white py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D4AF37]/25 disabled:opacity-70 hover:scale-[1.01] active:scale-[0.99]"
                 >
                   {isLoading ? (
                     <>
@@ -292,7 +289,7 @@ const Login = () => {
                       <ArrowRight size={20} />
                     </>
                   )}
-                </motion.button>
+                </button>
               </form>
 
               <div className="flex items-center gap-4 my-5">
