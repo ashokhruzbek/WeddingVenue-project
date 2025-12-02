@@ -18,7 +18,9 @@ exports.login = async (req, res) => {
     const result = await pool.query(
       "SELECT * FROM users WHERE username = $1",
       [username]
-    );
+    ).catch(err => {
+      throw new Error('Database so\'rov xatosi: ' + err.message);
+    });
     
     if (result.rows.length === 0) {
       return res.status(404).json({ 
@@ -57,9 +59,16 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
+    // Database connection xatosi
+    if (err.message && err.message.includes('Connection terminated')) {
+      return res.status(503).json({ 
+        message: "Database bilan bog'lanishda muammo. Keyinroq qayta urinib ko'ring" 
+      });
+    }
+    
     res.status(500).json({ 
-      message: "Server xatosi", 
-      error: err.message 
+      message: "Server xatosi yuz berdi", 
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Ichki xato'
     });
   }
 };

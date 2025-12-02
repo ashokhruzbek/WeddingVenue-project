@@ -44,5 +44,5 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-    console.log(`Server ${PORT}-portda ishga tushdi 🚀 | Omad yor bo'lsin`);
+    console.log(`Server ${PORT}-portda ishlayabdi !!!`);
 });

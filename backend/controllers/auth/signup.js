@@ -33,7 +33,9 @@ exports.signup = async (req, res) => {
     const existingUser = await pool.query(
       "SELECT id FROM users WHERE username = $1",
       [username]
-    );
+    ).catch(err => {
+      throw new Error('Database so\'rov xatosi: ' + err.message);
+    });
 
     if (existingUser.rows.length > 0) {
       return res.status(409).json({ 
@@ -51,7 +53,9 @@ exports.signup = async (req, res) => {
         VALUES ($1, $2, $3, $4, $5) 
         RETURNING id, firstname, lastname, username, role`,
       [firstname, lastname, username, hashedPassword, role]
-    );
+    ).catch(err => {
+      throw new Error('Database so\'rov xatosi: ' + err.message);
+    });
 
     res.status(201).json({
       message: "Foydalanuvchi muvaffaqiyatli ro'yxatdan o'tdi",
@@ -65,9 +69,16 @@ exports.signup = async (req, res) => {
       });
     }
     
+    // Database connection xatosi
+    if (err.message && err.message.includes('Connection terminated')) {
+      return res.status(503).json({ 
+        message: "Database bilan bog'lanishda muammo. Keyinroq qayta urinib ko'ring" 
+      });
+    }
+    
     res.status(500).json({ 
-      message: "Server xatosi", 
-      error: err.message 
+      message: "Server xatosi yuz berdi", 
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Ichki xato'
     });
   }
 };

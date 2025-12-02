@@ -3,6 +3,7 @@ const { viewVenues } = require('../../controllers/venues');
 
 const venueRouter = express.Router();
 
-venueRouter.get('/venues', viewVenues);
+// /api/venues da ishlaydi (server.js da prefix qo'shilgan)
+venueRouter.get('/', viewVenues);
 
 module.exports = venueRouter;

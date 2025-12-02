@@ -39,16 +39,17 @@ exports.createVenue = async (req, res) => {
     }
 
     try {
-      const owner_id = req.user?.id;
+      const admin_id = req.user?.id;
+      const admin_role = req.user?.role;
 
-      if (!owner_id) {
-        return res.status(401).json({ message: "Token noto‘g‘ri yoki foydalanuvchi aniqlanmadi" });
+      if (!admin_id || admin_role !== 'admin') {
+        return res.status(403).json({ message: "Faqat admin to'yxona yarata oladi" });
       }
 
-      const { name, district_id, address, capacity, price_seat, phone_number } = req.body;
+      const { name, district_id, address, capacity, price_seat, phone_number, owner_id } = req.body;
 
       if (!name || !district_id || !address || !capacity || !price_seat || !phone_number) {
-        return res.status(400).json({ message: "Barcha maydonlar to‘ldirilishi shart" });
+        return res.status(400).json({ message: "Barcha maydonlar to'ldirilishi shart" });
       }
 
       const phoneRegex = /^\+998\d{9}$/;
@@ -62,28 +63,39 @@ exports.createVenue = async (req, res) => {
         return res.status(400).json({ message: "Kamida bitta rasm yuklang" });
       }
 
-      const checkOwner = await pool.query("SELECT * FROM users WHERE id = $1", [owner_id]);
-      if (checkOwner.rows.length === 0) {
-        return res.status(400).json({ message: "Bunday owner mavjud emas" });
+      // District mavjudligini tekshirish
+      const checkDistrict = await pool.query("SELECT * FROM district WHERE id = $1", [district_id]);
+      if (checkDistrict.rows.length === 0) {
+        return res.status(400).json({ message: "Bunday tuman mavjud emas" });
+      }
+
+      // Owner_id ixtiyoriy - keyinroq assign qilish mumkin
+      let finalOwnerId = owner_id || null;
+      
+      if (finalOwnerId) {
+        const checkOwner = await pool.query("SELECT * FROM users WHERE id = $1 AND role = 'owner'", [finalOwnerId]);
+        if (checkOwner.rows.length === 0) {
+          return res.status(400).json({ message: "Bunday owner mavjud emas" });
+        }
       }
 
       const checkVenue = await pool.query(
-        "SELECT * FROM venues WHERE LOWER(name) = LOWER($1) AND owner_id = $2",
-        [name, owner_id]
+        "SELECT * FROM venues WHERE LOWER(name) = LOWER($1)",
+        [name]
       );
       if (checkVenue.rows.length !== 0) {
         return res.status(400).json({
-          message: "Siz bu nomdagi to‘yxonani allaqachon qo‘shgansiz",
+          message: "Bu nomdagi to'yxona allaqachon mavjud",
         });
       }
 
-      const status = "tasdiqlanmagan";
+      const status = "tasdiqlangan"; // Admin yaratgan to'yxonalar avtomatik tasdiqlangan
 
       const venueResult = await pool.query(
         `INSERT INTO venues (name, district_id, address, capacity, price_seat, phone_number, status, owner_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [name, district_id, address, Number(capacity), Number(price_seat), phone_number, status, owner_id]
+        [name, district_id, address, Number(capacity), Number(price_seat), phone_number, status, finalOwnerId]
       );
 
       const venueId = venueResult.rows[0].id;
