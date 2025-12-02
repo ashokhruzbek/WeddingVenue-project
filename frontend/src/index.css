@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Scrollbar with Gold Glow Effect */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: white;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #D4AF37 0%, #F4D03F 50%, #D4AF37 100%);
+  border-radius: 10px;
+  box-shadow: 
+    0 0 10px #D4AF37,
+    0 0 20px rgba(212, 175, 55, 0.6),
+    0 0 30px rgba(212, 175, 55, 0.4),
+    0 0 40px rgba(212, 175, 55, 0.2);
+  border: 2px solid #1E3A5F;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #F4D03F 0%, #FFD700 50%, #F4D03F 100%);
+  box-shadow: 
+    0 0 15px #FFD700,
+    0 0 25px rgba(255, 215, 0, 0.7),
+    0 0 35px rgba(255, 215, 0, 0.5),
+    0 0 50px rgba(255, 215, 0, 0.3);
+}
+
+::-webkit-scrollbar-corner {
+  background: white;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #D4AF37 white;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

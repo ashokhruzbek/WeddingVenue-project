@@ -31,10 +31,10 @@ const AssignOwner = () => {
         if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
         const [venuesRes, ownersRes] = await Promise.all([
-          axios.get("api/admin/venues", {
+          axios.get("/api/admin/venues", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("api/admin/owners", {
+          axios.get("/api/admin/owners", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -85,7 +85,7 @@ const AssignOwner = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token mavjud emas");
 
-      const res = await axios.post("api/admin/assign-owner", payload, {
+      const res = await axios.post("/api/admin/assign-owner", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

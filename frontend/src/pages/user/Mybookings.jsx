@@ -37,9 +37,8 @@ function Mybookings() {
         }
 
         const response = await axios.get(
-          `api/user/get-user-booking/${userId}`,
+          `/api/user/get-user-booking/${userId}`,
           {
-            // Changed id to userId
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -93,7 +92,7 @@ function Mybookings() {
       }
 
       const response = await axios.delete(
-        `api/api/users/cancel-booking/${bookingId}`,
+        `/api/user/cancel-booking/${bookingId}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -110,7 +110,7 @@ const ManageBookings = () => {
       const params = {};
       if (statusFilter) params.status = statusFilter.toLowerCase();
 
-      const response = await axios.get("api/admin/view-all-bookings", {
+      const response = await axios.get("/api/admin/view-all-bookings", {
         headers: { Authorization: `Bearer ${token}` },
         params,
       });
@@ -155,7 +155,7 @@ const ManageBookings = () => {
       }
 
       const response = await axios.get(
-        `api/admin/get-booking-user?booking_id=${bookingId}`,
+        `/api/admin/get-booking-user?booking_id=${bookingId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -187,7 +187,7 @@ const ManageBookings = () => {
 
       // API endpoint ni to'g'ri format bilan
       const response = await axios.put(
-        `api/admin/cancel-booking/${selectedBooking.id}`,
+        `/api/admin/cancel-booking/${selectedBooking.id}`,
         {}, // Empty body for PUT request
         {
           headers: { Authorization: `Bearer ${token}` },

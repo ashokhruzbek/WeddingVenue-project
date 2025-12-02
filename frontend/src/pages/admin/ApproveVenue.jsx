@@ -23,6 +23,16 @@ import {
   Filter,
 } from "lucide-react";
 
+// Rasm URL ni to'g'irlash
+const fixImageUrl = (url) => {
+  if (!url) return "";
+  let fixed = url.replace(/\\/g, "/");
+  if (!fixed.startsWith("/")) {
+    fixed = "/" + fixed;
+  }
+  return fixed.replace(/(\/uploads)+/g, "/uploads");
+};
+
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -68,7 +78,7 @@ const ApproveVenueDashboard = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.get("api/admin/venues", {
+      const response = await axios.get("/api/admin/venues", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -155,7 +165,7 @@ const ApproveVenueDashboard = () => {
       const endpoint = action === "approve" ? "approve-venue" : "reject-venue";
 
       const response = await axios.put(
-        `api/admin/${endpoint}/${venueId}`,
+        `/api/admin/${endpoint}/${venueId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -520,7 +530,7 @@ const ApproveVenueDashboard = () => {
                     {selectedVenue.images && selectedVenue.images.length > 0 ? (
                       <div className="relative h-48 rounded-lg overflow-hidden">
                         <img
-                          src={`api/${selectedVenue.images[0].image_url}`}
+                          src={fixImageUrl(selectedVenue.images[0].image_url)}
                           alt={selectedVenue.name}
                           className="w-full h-full object-cover"
                         />
@@ -559,7 +569,7 @@ const ApproveVenueDashboard = () => {
                                 className="h-16 rounded-md overflow-hidden"
                               >
                                 <img
-                                  src={`api/${image.image_url}`}
+                                  src={fixImageUrl(image.image_url)}
                                   alt={`${selectedVenue.name} image ${
                                     index + 1
                                   }`}

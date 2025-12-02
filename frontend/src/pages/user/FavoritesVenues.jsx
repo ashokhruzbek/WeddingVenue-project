@@ -22,6 +22,16 @@ import {
   HeartOff,
 } from "lucide-react";
 
+// Rasm URL ni to'g'irlash
+const fixImageUrl = (url) => {
+  if (!url) return "";
+  let fixed = url.replace(/\\/g, "/");
+  if (!fixed.startsWith("/")) {
+    fixed = "/" + fixed;
+  }
+  return fixed.replace(/(\/uploads)+/g, "/uploads");
+};
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -66,7 +76,7 @@ const Favorites = () => {
         return;
       }
 
-      const response = await axios.get("api/user/get-venues-user", {
+      const response = await axios.get("/api/user/get-venues-user", {
         headers: { Authorization: `Bearer ${token}` },
         params: { status: "tasdiqlangan" },
       });
@@ -333,7 +343,7 @@ const Favorites = () => {
                     {venue.images && venue.images.length > 0 ? (
                       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
                         <img
-                          src={`api/${venue.images[0]}`}
+                          src={fixImageUrl(venue.images[0])}
                           alt={venue.name}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
@@ -409,7 +419,7 @@ const Favorites = () => {
                                 className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100 border border-pink-200"
                               >
                                 <img
-                                  src={`api/${image}`}
+                                  src={fixImageUrl(image)}
                                   alt={`${venue.name} image ${imgIndex + 1}`}
                                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                                 />

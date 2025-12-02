@@ -1,18 +1,19 @@
- import React from 'react'
+import React from 'react'
 import Header from '../components/header/Header'
-import Landing from '../pages/landing'
 import { Outlet } from 'react-router-dom'
-import AnimatedFooter from '../components/footer/Footer'
+import Footer from '../components/footer/Footer'
  
- function MainLayout() {
-   return (
-     <div>
+function MainLayout() {
+  return (
+    <div className="min-h-screen flex flex-col">
       <Header/>
-       <Outlet/>
-       <AnimatedFooter/>
-     </div>
-   )
- }
+      <main className="flex-grow pt-20">
+        <Outlet/>
+      </main>
+      <Footer/>
+    </div>
+  )
+}
  
- export default MainLayout
+export default MainLayout
  

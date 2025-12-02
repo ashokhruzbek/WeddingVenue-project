@@ -191,7 +191,7 @@ const CreateVenue = () => {
       });
 
       const response = await axios.post(
-        "api/admin/create-venue",
+        "/api/admin/create-venue",
         formDataToSend,
         {
           headers: {

@@ -63,7 +63,7 @@ export function AllVenues() {
       }
 
       try {
-        const response = await axios.get(`api/owner/view-owner-venue/${id}`, {
+        const response = await axios.get(`/api/owner/view-owner-venue/${id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -134,7 +134,7 @@ export function AllVenues() {
 
     try {
       const response = await axios.put(
-        `api/owner/update-owner/${venueId}`,
+        `/api/owner/update-owner/${venueId}`,
         formData,
         {
           headers: {
@@ -178,7 +178,7 @@ export function AllVenues() {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(`api/owner/delete-owner-venue/${venueId}`, {
+      await axios.delete(`/api/owner/delete-owner-venue/${venueId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

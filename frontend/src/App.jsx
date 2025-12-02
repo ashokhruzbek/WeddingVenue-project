@@ -18,11 +18,13 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Umumiy (Public) yo‘llar */}
+      {/* Umumiy (Public) yo'llar */}
         <Route element={<PublicRoute />}>
+          {/* Landing page - o'zining navbar va footer bor, shuning uchun MainLayout'siz */}
+          <Route path="/" element={<Landing />} />
+          
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Landing />} />
-            <Route path="/venue" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/user-venues/:id" element={<VenueInfos />} />
             <Route path="/user-bookings" element={<UserBookings />} />
           </Route>

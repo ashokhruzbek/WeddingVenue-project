@@ -31,7 +31,7 @@ const AllOwners = () => {
         throw new Error("Autentifikatsiya tokeni topilmadi");
       }
 
-      const response = await axios.get("api/admin/owners", {
+      const response = await axios.get("/api/admin/owners", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

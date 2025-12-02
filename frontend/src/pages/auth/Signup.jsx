@@ -1,17 +1,23 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { gsap } from "gsap";
 import {
   User,
   Lock,
-  Mail,
-  UserCheck,
   ArrowRight,
-  Heart,
-  CheckCircle,
+  Crown,
   AlertCircle,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Menu,
+  X,
+  UserCheck
 } from "lucide-react";
 
 function Signup() {
@@ -21,435 +27,388 @@ function Signup() {
     lastname: "",
     username: "",
     password: "",
-    role: "owner",
+    role: "user",
   });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const containerRef = useRef(null);
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(".floating-decor", {
+        y: -20,
+        duration: 2,
+        ease: "power1.inOut",
+        yoyo: true,
+        repeat: -1,
+        stagger: 0.3
+      });
+
+      gsap.fromTo(formRef.current,
+        { opacity: 0, y: 50, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
+      );
+
+      gsap.to(".gradient-bg", {
+        backgroundPosition: "100% 100%",
+        duration: 10,
+        ease: "none",
+        repeat: -1,
+        yoyo: true
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error for this field when user starts typing
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.firstname.trim())
-      newErrors.firstname = "Ism kiritilishi shart";
-    if (!formData.lastname.trim())
-      newErrors.lastname = "Familiya kiritilishi shart";
-    if (!formData.username.trim())
-      newErrors.username = "Foydalanuvchi nomi kiritilishi shart";
-    if (formData.password.length < 4)
-      newErrors.password = "Parol kamida 4 ta belgidan iborat bo'lishi kerak";
-    if (formData.password !== confirmPassword)
-      newErrors.confirmPassword = "Parollar mos kelmadi";
-
+    if (!formData.firstname.trim()) newErrors.firstname = "Ism kiritilishi shart";
+    if (!formData.lastname.trim()) newErrors.lastname = "Familiya kiritilishi shart";
+    if (!formData.username.trim()) newErrors.username = "Foydalanuvchi nomi kiritilishi shart";
+    if (formData.password.length < 4) newErrors.password = "Parol kamida 4 ta belgidan iborat bo'lishi kerak";
+    if (formData.password !== confirmPassword) newErrors.confirmPassword = "Parollar mos kelmadi";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     setSubmitStatus(null);
 
     try {
-      const response = await axios.post("api/auth/signup", formData);
-
+      await axios.post("/api/auth/signup", formData);
       setSubmitStatus("success");
-
-      // Redirect after successful signup (after showing success message)
       setTimeout(() => {
         navigate("/login");
       }, 2000);
     } catch (error) {
       console.error("Signup error:", error);
       setSubmitStatus("error");
-
       if (error.response?.data?.message) {
-        // Handle specific error from backend
-        setErrors((prev) => ({
-          ...prev,
-          server: error.response.data.message,
-        }));
+        setErrors((prev) => ({ ...prev, server: error.response.data.message }));
       } else {
-        setErrors((prev) => ({
-          ...prev,
-          server:
-            "Ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
-        }));
+        setErrors((prev) => ({ ...prev, server: "Ro'yxatdan o'tishda xatolik yuz berdi." }));
       }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 100, damping: 10 },
-    },
-  };
-
-  // Decorative hearts
-  const hearts = Array.from({ length: 8 }).map((_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    delay: Math.random() * 5,
-    duration: 3 + Math.random() * 5,
-  }));
+  const inputClasses = (fieldName) => `w-full pl-11 pr-4 py-2.5 rounded-xl border text-sm ${
+    errors[fieldName] ? "border-red-300 bg-red-50" : "border-gray-200"
+  } focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all outline-none text-gray-700`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12 px-4 sm:px-6 relative overflow-hidden">
-      {/* Decorative hearts */}
-      {hearts.map((heart) => (
-        <motion.div
-          key={heart.id}
-          className="absolute text-pink-200 opacity-50 z-0"
-          style={{ left: `${heart.x}%`, top: `${heart.y}%` }}
-          animate={{
-            y: [0, -20, 0],
-            x: [0, 10, 0],
-            rotate: [0, 10, -10, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: heart.duration,
-            repeat: Infinity,
-            delay: heart.delay,
-          }}
-        >
-          <Heart size={20 + Math.random() * 30} fill="currentColor" />
-        </motion.div>
-      ))}
+    <div ref={containerRef} className="min-h-screen bg-gray-50" style={{ fontFamily: "'Inter', sans-serif" }}>
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-[#1E3A5F] rounded-full flex items-center justify-center">
+                <Crown className="w-5 h-5 text-[#D4AF37]" />
+              </div>
+              <span className="text-xl font-semibold text-[#1E3A5F]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Wedding<span className="text-[#D4AF37]">Venue</span>
+              </span>
+            </Link>
 
-      <div className="max-w-md mx-auto">
-        <motion.div
-          className="bg-white rounded-2xl shadow-xl overflow-hidden relative z-10"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}
-        >
-          {/* Colored header */}
-          <div className="bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-8 text-white text-center">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring" }}
-            >
-              <h2 className="text-2xl font-bold mb-2">Ro'yxatdan o'tish</h2>
-              <p className="opacity-90">To'yxona.uz tizimiga xush kelibsiz</p>
-            </motion.div>
+            <nav className="hidden lg:flex items-center gap-10">
+              <Link to="/" className="text-sm font-medium text-[#1E3A5F] hover:text-[#D4AF37] transition-colors">
+                Bosh sahifa
+              </Link>
+              <Link to="/home" className="text-sm font-medium text-[#1E3A5F] hover:text-[#D4AF37] transition-colors">
+                To'yxonalar
+              </Link>
+            </nav>
+
+            <div className="hidden lg:flex items-center gap-4">
+              <Link to="/login" className="text-sm font-medium text-[#1E3A5F] hover:text-[#D4AF37] transition-colors">
+                Kirish
+              </Link>
+              <Link to="/signup" className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full text-sm font-medium">
+                Ro'yxatdan o'tish
+              </Link>
+            </div>
+
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 text-[#1E3A5F]">
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
 
-          {/* Form */}
-          <motion.form
-            onSubmit={handleSubmit}
-            className="px-6 py-8"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Success message */}
-            {submitStatus === "success" && (
-              <motion.div
-                className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center text-green-700"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-              >
-                <CheckCircle className="mr-2 text-green-500" size={20} />
-                <span>
-                  Ro'yxatdan muvaffaqiyatli o'tdingiz! Kirish sahifasiga
-                  yo'naltirilmoqdasiz...
-                </span>
-              </motion.div>
-            )}
+          {mobileMenuOpen && (
+            <div className="lg:hidden absolute top-16 left-0 right-0 bg-white shadow-lg border-t p-4 space-y-3">
+              <Link to="/" className="block py-2 text-[#1E3A5F] font-medium" onClick={() => setMobileMenuOpen(false)}>Bosh sahifa</Link>
+              <Link to="/home" className="block py-2 text-[#1E3A5F] font-medium" onClick={() => setMobileMenuOpen(false)}>To'yxonalar</Link>
+              <Link to="/login" className="block py-2 text-[#1E3A5F] font-medium" onClick={() => setMobileMenuOpen(false)}>Kirish</Link>
+            </div>
+          )}
+        </div>
+      </nav>
 
-            {/* Error message */}
-            {submitStatus === "error" && (
-              <motion.div
-                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center text-red-700"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-              >
-                <AlertCircle className="mr-2 text-red-500" size={20} />
-                <span>
-                  {errors.server ||
-                    "Ro'yxatdan o'tishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."}
-                </span>
-              </motion.div>
-            )}
-
-            {/* First name */}
-            <motion.div className="mb-4" variants={itemVariants}>
-              <label
-                htmlFor="firstname"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Ism
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  id="firstname"
-                  name="firstname"
-                  value={formData.firstname}
-                  onChange={handleChange}
-                  className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.firstname
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
-                  placeholder="Ismingizni kiriting"
-                />
-              </div>
-              {errors.firstname && (
-                <p className="mt-1 text-sm text-red-600">{errors.firstname}</p>
-              )}
-            </motion.div>
-
-            {/* Last name */}
-            <motion.div className="mb-4" variants={itemVariants}>
-              <label
-                htmlFor="lastname"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Familiya
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  id="lastname"
-                  name="lastname"
-                  value={formData.lastname}
-                  onChange={handleChange}
-                  className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.lastname
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
-                  placeholder="Familiyangizni kiriting"
-                />
-              </div>
-              {errors.lastname && (
-                <p className="mt-1 text-sm text-red-600">{errors.lastname}</p>
-              )}
-            </motion.div>
-
-            {/* Username */}
-            <motion.div className="mb-4" variants={itemVariants}>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Foydalanuvchi nomi
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.username
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
-                  placeholder="Foydalanuvchi nomini kiriting"
-                />
-              </div>
-              {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-              )}
-            </motion.div>
-
-            {/* Password */}
-            <motion.div className="mb-4" variants={itemVariants}>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Parol
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.password
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
-                  placeholder="Parolni kiriting"
-                />
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-            </motion.div>
-
-            {/* Confirm Password */}
-            <motion.div className="mb-4" variants={itemVariants}>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Parolni tasdiqlang
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`pl-10 pr-4 py-2 w-full rounded-lg border ${
-                    errors.confirmPassword
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  } focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none`}
-                  placeholder="Parolni qayta kiriting"
-                />
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </motion.div>
-
-            {/* Role selection */}
-            <motion.div className="mb-6" variants={itemVariants}>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Ro'l
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserCheck className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 outline-none appearance-none"
-                >
-                  <option value="owner">To'yxona egasi</option>
-                  <option value="user">Foydalanuvchi</option>
-                </select>
-              </div>
-            </motion.div>
-
-            {/* Submit button */}
-            <motion.div variants={itemVariants}>
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
-                    <span>Ro'yxatdan o'tmoqda...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span>Ro'yxatdan o'tish</span>
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </div>
-                )}
-              </motion.button>
-            </motion.div>
-
-            {/* Login link */}
+      {/* Main Content */}
+      <div className="pt-16 h-screen flex">
+        {/* Left Side - Decorative */}
+        <div className="hidden lg:flex lg:w-1/2 bg-[#1E3A5F] relative overflow-hidden">
+          <div className="gradient-bg absolute inset-0 bg-gradient-to-br from-[#1E3A5F] via-[#2d4a6f] to-[#1E3A5F] bg-[length:200%_200%]"></div>
+          
+          <div className="absolute top-20 left-20 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl floating-decor"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl floating-decor"></div>
+          
+          <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-center">
             <motion.div
-              className="mt-6 text-center text-sm"
-              variants={itemVariants}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <p className="text-gray-600">
-                Allaqachon ro'yxatdan o'tganmisiz?{" "}
-                <Link
-                  to="/login"
-                  className="text-pink-600 hover:text-pink-700 font-medium"
-                >
-                  Kirish
-                </Link>
+              <div className="w-20 h-20 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-6">
+                <Crown className="w-10 h-10 text-white" />
+              </div>
+              
+              <h1 className="text-4xl font-semibold text-white mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Bizga qo'shiling!
+              </h1>
+              
+              <p className="text-white/70 text-lg max-w-md leading-relaxed">
+                Ro'yxatdan o'ting va o'zingizga mos to'yxonani toping yoki o'z to'yxonangizni ro'yxatdan o'tkazing
               </p>
-            </motion.div>
-          </motion.form>
-        </motion.div>
 
-        {/* Decorative elements */}
-        <motion.div
-          className="mt-8 flex justify-center space-x-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-2 h-2 rounded-full bg-pink-300"
-              animate={{ scale: [1, 1.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-            />
-          ))}
-        </motion.div>
+              <div className="mt-10 grid grid-cols-2 gap-6 max-w-sm mx-auto">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
+                  <User className="w-7 h-7 text-[#D4AF37] mx-auto mb-2" />
+                  <div className="text-white font-medium text-sm">Foydalanuvchi</div>
+                  <div className="text-white/60 text-xs">To'yxona izlash</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
+                  <Crown className="w-7 h-7 text-[#D4AF37] mx-auto mb-2" />
+                  <div className="text-white font-medium text-sm">To'yxona egasi</div>
+                  <div className="text-white/60 text-xs">To'yxona qo'shish</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Right Side - Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gray-50">
+          <div ref={formRef} className="w-full max-w-md">
+            {/* Mobile Header */}
+            <div className="lg:hidden text-center mb-4">
+              <div className="w-14 h-14 bg-[#1E3A5F] rounded-full flex items-center justify-center mx-auto mb-3">
+                <Crown className="w-7 h-7 text-[#D4AF37]" />
+              </div>
+              <h1 className="text-xl font-semibold text-[#1E3A5F]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Bizga qo'shiling!
+              </h1>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 p-5 border border-gray-100">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 px-4 py-1.5 rounded-full mb-2">
+                  <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                  <span className="text-[#D4AF37] text-sm font-medium">Ro'yxatdan o'tish</span>
+                </div>
+                <h2 className="text-xl font-semibold text-[#1E3A5F]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Yangi hisob yarating
+                </h2>
+              </div>
+
+              {submitStatus === "success" && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700"
+                >
+                  <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+                  <span className="text-sm">Muvaffaqiyatli! Kirish sahifasiga yo'naltirilmoqdasiz...</span>
+                </motion.div>
+              )}
+
+              {submitStatus === "error" && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700"
+                >
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+                  <span className="text-sm">{errors.server || "Xatolik yuz berdi"}</span>
+                </motion.div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-3">
+                {/* First & Last Name Row */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E3A5F] mb-1">Ism</label>
+                    <div className="relative flex items-center">
+                      <User className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        name="firstname"
+                        value={formData.firstname}
+                        onChange={handleChange}
+                        className={inputClasses("firstname")}
+                        placeholder="Ism"
+                      />
+                    </div>
+                    {errors.firstname && <p className="mt-1 text-xs text-red-500">{errors.firstname}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E3A5F] mb-1">Familiya</label>
+                    <div className="relative flex items-center">
+                      <User className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        name="lastname"
+                        value={formData.lastname}
+                        onChange={handleChange}
+                        className={inputClasses("lastname")}
+                        placeholder="Familiya"
+                      />
+                    </div>
+                    {errors.lastname && <p className="mt-1 text-xs text-red-500">{errors.lastname}</p>}
+                  </div>
+                </div>
+
+                {/* Username */}
+                <div>
+                  <label className="block text-sm font-medium text-[#1E3A5F] mb-1">Foydalanuvchi nomi</label>
+                  <div className="relative flex items-center">
+                    <User className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className={inputClasses("username")}
+                      placeholder="Foydalanuvchi nomi"
+                    />
+                  </div>
+                  {errors.username && <p className="mt-1 text-xs text-red-500">{errors.username}</p>}
+                </div>
+
+                {/* Password Row */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E3A5F] mb-1">Parol</label>
+                    <div className="relative flex items-center">
+                      <Lock className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className={`${inputClasses("password")} pr-10`}
+                        placeholder="Parol"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E3A5F] mb-1">Tasdiqlash</label>
+                    <div className="relative flex items-center">
+                      <Lock className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={`${inputClasses("confirmPassword")} pr-10`}
+                        placeholder="Qayta kiriting"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    {errors.confirmPassword && <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>}
+                  </div>
+                </div>
+
+                {/* Role Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-[#1E3A5F] mb-1">Ro'l</label>
+                  <div className="relative flex items-center">
+                    <UserCheck className="absolute left-3.5 w-4 h-4 text-gray-400" />
+                    <select
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all outline-none text-gray-700 text-sm appearance-none bg-white"
+                    >
+                      <option value="user">Foydalanuvchi</option>
+                      <option value="owner">To'yxona egasi</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#D4AF37] hover:bg-[#c49a2c] text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D4AF37]/25 disabled:opacity-70 mt-4"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Ro'yxatdan o'tmoqda...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Ro'yxatdan o'tish</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </motion.button>
+              </form>
+
+              <div className="flex items-center gap-4 my-4">
+                <div className="flex-1 h-px bg-gray-200"></div>
+                <span className="text-gray-400 text-sm">yoki</span>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-gray-600 text-sm">
+                  Allaqachon hisobingiz bormi?{" "}
+                  <Link to="/login" className="text-[#D4AF37] hover:text-[#c49a2c] font-medium">
+                    Kirish
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

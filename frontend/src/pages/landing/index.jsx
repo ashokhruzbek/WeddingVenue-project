@@ -1,201 +1,216 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react"
+import { Link } from "react-router-dom"
+import { 
+  Menu, 
+  X, 
+  Crown,
+  Users,
+  Star,
+  Calendar,
+  ArrowRight,
+  MapPin,
+  Phone,
+  Mail,
+  Heart,
+  Sparkles,
+  Shield,
+  Clock,
+  ChevronUp,
+  Quote,
+  CheckCircle2
+} from "lucide-react"
 
 function Landing() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [activeTestimonial, setActiveTestimonial] = useState(0)
-  const [showScrollTop, setShowScrollTop] = useState(false)
-  const [toyxona, setToyxona] = useState([])
-  const [venueError, setVenueError] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
-  // Loading effect on page mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1500)
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Scroll handling for "Scroll to Top" button
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 500)
+      setScrolled(window.scrollY > 50)
+      setShowScrollTop(window.scrollY > 600)
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  // Testimonials data
-  const testimonials = [
-    {
-      name: "Aziza va Bobur",
-      image: "/testimonials/couple1.jpg",
-      quote: "WeddingVenue orqali to'yimizni tashkil etdik, hamma narsa ajoyib o'tdi!",
-      rating: 5,
-    },
-    {
-      name: "Malika va Jamshid",
-      image: "/testimonials/couple2.jpg",
-      quote: "Platformadagi barcha xizmatlar yuqori darajada, to'yxonadan to'y kunigacha mamnunmiz.",
-      rating: 5,
-    },
-    {
-      name: "Nargiza va Temur",
-      image: "/testimonials/couple3.jpg",
-      quote: "Vaqtimizni tejab, eng zo'r to'yxonani tanladik. Mehmonlar hali ham to'y haqida gaplashishadi!",
-      rating: 4,
-    },
+  const stats = [
+    { number: "150+", label: "Premium To'yxonalar", icon: Crown },
+    { number: "10,000+", label: "Baxtli Juftliklar", icon: Heart },
+    { number: "4.9", label: "O'rtacha Reyting", icon: Star },
+    { number: "15+", label: "Yillik Tajriba", icon: Calendar },
   ]
 
-  // Services data
   const services = [
     {
-      icon: "🎉",
-      title: "To'y Marosimlari",
-      desc: "Zamonaviy, klassik va milliy uslubdagi to'yxonalar.",
-      color: "from-blue-500 to-indigo-600",
+      icon: Crown,
+      title: "Premium To'yxonalar",
+      description: "Eng hashamatli va zamonaviy to'yxonalarni o'z ichiga olgan keng katalog",
+      features: ["Verified venues", "Virtual tours", "Real photos"]
     },
     {
-      icon: "🍽️",
-      title: "Taomlar va Servis",
-      desc: "Yuqori sifatli taomlar, servis va xizmat ko'rsatish.",
-      color: "from-emerald-500 to-teal-600",
+      icon: Calendar,
+      title: "Oson Bron Qilish",
+      description: "Bir necha daqiqada o'zingizga yoqqan to'yxonani band qiling",
+      features: ["Online booking", "Instant confirmation", "Flexible dates"]
     },
     {
-      icon: "🎶",
-      title: "Shou Dasturlar",
-      desc: "DJ, jonli musiqa, raqs va boshqa shou elementlari.",
-      color: "from-amber-500 to-orange-600",
-    },
-    {
-      icon: "📸",
-      title: "Foto va Video",
-      desc: "Professional suratga olish va video tasvirga olish xizmatlari.",
-      color: "from-rose-500 to-pink-600",
-    },
-    {
-      icon: "🚗",
-      title: "Transport Xizmatlari",
-      desc: "To'y mashinalaridan tortib mehmonlar uchun transport xizmatlari.",
-      color: "from-violet-500 to-purple-600",
-    },
-    {
-      icon: "💐",
-      title: "Bezak va Dizayn",
-      desc: "Har qanday did va uslubdagi to'y bezaklari va dekoratsiyalar.",
-      color: "from-amber-400 to-yellow-600",
-    },
+      icon: Shield,
+      title: "Ishonchli Xizmat",
+      description: "100% xavfsiz to'lov va kafolatlangan xizmat sifati",
+      features: ["Secure payments", "Money-back guarantee", "24/7 support"]
+    }
   ]
 
-  // Stats data
-  const stats = [
-    { value: "100+", label: "To'yxonalar" },
-    { value: "5000+", label: "Muvaffaqiyatli to'ylar" },
-    { value: "50+", label: "Hamkor tashkilotlar" },
-    { value: "4.9", label: "O'rtacha reyting (5 dan)" },
-  ]
-
-  // Steps data
-  const steps = [
+  const testimonials = [
     {
-      number: "01",
-      title: "To'yxona Tanlash",
-      description: "Qulay interfeysda ko'plab to'yxonalar orasidan eng ma'qulini tanlang.",
+      name: "Aziza & Jasur",
+      date: "Noyabr 2024",
+      text: "WeddingVenue orqali to'yxona topish juda oson bo'ldi. Xizmat sifati a'lo darajada!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=100&h=100&fit=crop&crop=faces"
     },
     {
-      number: "02",
-      title: "Band Qilish",
-      description: "Tanlagan to'yxonangizni sana va vaqtini belgilab onlayn band qiling.",
+      name: "Nilufar & Sardor",
+      date: "Oktyabr 2024", 
+      text: "Eng yaxshi tanlov qildik. To'yxona juda chiroyli va xizmat mukammal edi.",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=100&h=100&fit=crop&crop=faces"
     },
     {
-      number: "03",
-      title: "Xizmatlarni Sozlash",
-      description: "Taomlar, bezaklar va qo'shimcha xizmatlarni o'zingizga moslab tanlang.",
-    },
-    {
-      number: "04",
-      title: "To'y Kuni",
-      description: "Hech qanday tashvishsiz, mukammal to'y kunidan zavqlaning.",
-    },
+      name: "Madina & Bobur",
+      date: "Sentyabr 2024",
+      text: "Professional yondashuv va yuqori sifat. Hammaga tavsiya qilamiz!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1460978812857-470ed1c77af0?w=100&h=100&fit=crop&crop=faces"
+    }
   ]
 
   return (
-    <>
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-600 to-indigo-800 z-50 flex items-center justify-center">
-          <div className="text-5xl animate-spin">💍</div>
-          <h2 className="text-white text-xl ml-4 font-medium animate-pulse">WeddingVenue...</h2>
-        </div>
-      )}
-
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+      {/* Elegant Navbar */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <div className="flex items-center">
-              <span className="text-2xl">💍</span>
-              <span className="ml-2 text-xl font-bold text-blue-600">WeddingVenue</span>
-            </div>
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                scrolled ? 'bg-[#1E3A5F]' : 'bg-white/20 backdrop-blur-sm'
+              }`}>
+                <Crown className={`w-5 h-5 ${scrolled ? 'text-[#D4AF37]' : 'text-[#D4AF37]'}`} />
+              </div>
+              <div>
+                <span className={`text-xl font-semibold tracking-wide transition-colors duration-300 ${
+                  scrolled ? 'text-[#1E3A5F]' : 'text-white'
+                }`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Wedding<span className="text-[#D4AF37]">Venue</span>
+                </span>
+              </div>
+            </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Home
+            <div className="hidden lg:flex items-center gap-10">
+              <Link 
+                to="/" 
+                className={`text-sm font-medium tracking-wide transition-all duration-300 hover:text-[#D4AF37] ${
+                  scrolled ? 'text-[#1E3A5F]' : 'text-white'
+                }`}
+              >
+                Bosh sahifa
               </Link>
-              <Link to="/venue" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link 
+                to="/home" 
+                className={`text-sm font-medium tracking-wide transition-all duration-300 hover:text-[#D4AF37] ${
+                  scrolled ? 'text-[#1E3A5F]' : 'text-white'
+                }`}
+              >
                 To'yxonalar
               </Link>
-              <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-500 text-white hover:bg-blue-600 mt-2">
+              <a 
+                href="#services" 
+                className={`text-sm font-medium tracking-wide transition-all duration-300 hover:text-[#D4AF37] ${
+                  scrolled ? 'text-[#1E3A5F]' : 'text-white'
+                }`}
+              >
+                Xizmatlar
+              </a>
+              <a 
+                href="#testimonials" 
+                className={`text-sm font-medium tracking-wide transition-all duration-300 hover:text-[#D4AF37] ${
+                  scrolled ? 'text-[#1E3A5F]' : 'text-white'
+                }`}
+              >
+                Fikrlar
+              </a>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="hidden lg:flex items-center gap-4">
+              <Link 
+                to="/login" 
+                className={`text-sm font-medium tracking-wide transition-all duration-300 hover:text-[#D4AF37] ${
+                  scrolled ? 'text-[#1E3A5F]' : 'text-white'
+                }`}
+              >
                 Kirish
+              </Link>
+              <Link 
+                to="/signup" 
+                className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full text-sm font-medium tracking-wide 
+                         hover:bg-[#c49a2c] transition-all duration-300 shadow-lg shadow-[#D4AF37]/25"
+              >
+                Ro'yxatdan o'tish
               </Link>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600"
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`lg:hidden p-2 rounded-lg transition-colors ${
+                scrolled ? 'text-[#1E3A5F]' : 'text-white'
+              }`}
+            >
+              {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden">
-              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-                <Link
-                  to="/"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+            <div className="lg:hidden absolute top-20 left-0 right-0 bg-white shadow-2xl border-t">
+              <div className="p-6 space-y-4">
+                <Link 
+                  to="/" 
+                  className="block py-3 text-[#1E3A5F] font-medium border-b border-gray-100"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Home
+                  Bosh sahifa
                 </Link>
-                <Link
-                  to="/venue"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                <Link 
+                  to="/home" 
+                  className="block py-3 text-[#1E3A5F] font-medium border-b border-gray-100"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   To'yxonalar
                 </Link>
-                <Link
-                  to="/login"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                <Link 
+                  to="/login" 
+                  className="block py-3 text-[#1E3A5F] font-medium border-b border-gray-100"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Kirish
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="block w-full text-center bg-[#D4AF37] text-white py-3 rounded-full font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Ro'yxatdan o'tish
                 </Link>
               </div>
             </div>
@@ -203,372 +218,378 @@ function Landing() {
         </div>
       </nav>
 
-      <main className="bg-gradient-to-b from-gray-50 to-white min-h-screen pb-16 overflow-hidden pt-16">
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-[#2e82ff] to-[#1c4ed8] text-white pt-12 sm:pt-24 pb-16 sm:pb-32 px-4 sm:px-6 text-center overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <pattern id="pattern-circles" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1.6257413380501518" fill="#fff" />
-              </pattern>
-              <rect x="0" y="0" width="100" height="100" fill="url(#pattern-circles)" />
-            </svg>
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1920&q=80"
+            alt="Wedding venue"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1E3A5F]/90 via-[#1E3A5F]/70 to-[#1E3A5F]/50"></div>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-5 py-2 rounded-full mb-8">
+            <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+            <span className="text-white/90 text-sm font-medium tracking-wide">Premium To'yxona Xizmati</span>
+          </div>
+          
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-tight mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Orzuyingizdagi <br/>
+            <span className="text-[#D4AF37]">To'y Marosimi</span>
+          </h1>
+          
+          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed">
+            O'zbekistonning eng hashamatli to'yxonalarini kashf eting. 
+            Biz sizning maxsus kuningizni unutilmas qilishga yordam beramiz.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              to="/home"
+              className="group inline-flex items-center gap-3 bg-[#D4AF37] text-white px-8 py-4 rounded-full 
+                       font-medium text-lg hover:bg-[#c49a2c] transition-all duration-300 
+                       shadow-xl shadow-[#D4AF37]/30"
+            >
+              To'yxonalarni ko'rish
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm text-white px-8 py-4 
+                       rounded-full font-medium text-lg border border-white/30 
+                       hover:bg-white/20 transition-all duration-300"
+            >
+              Bepul Ro'yxatdan o'tish
+            </Link>
           </div>
 
-          <div className="relative z-10 max-w-6xl mx-auto">
-            <div className="mb-6 sm:mb-8">
-              <span className="bg-white text-blue-600 px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium uppercase tracking-wider">
-                #1 To'y platformasi O'zbekistonda
-              </span>
+          {/* Trust Badges */}
+          <div className="mt-16 flex flex-wrap justify-center items-center gap-8">
+            <div className="flex items-center gap-2 text-white/70">
+              <Shield className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-sm">100% Xavfsiz</span>
             </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
-              Siz orzu qilgan to'y, <br className="hidden sm:block" />
-              <span className="text-yellow-300">bizda ro'yobga chiqadi!</span>
-            </h1>
-
-            <p className="text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-8 sm:mb-10">
-              WeddingVenue — to'yxona tanlash, buyurtma qilish va xizmatlardan samarali foydalanishning zamonaviy usuli.
-            </p>
-
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                to="/venue"
-                className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6 sm:px-8 py-3 rounded-full transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                To'yxonalarni ko'rish
-              </Link>
-              <Link
-                to="#"
-                className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium px-6 sm:px-8 py-3 rounded-full transition"
-              >
-                Xizmatlar bilan tanishish
-              </Link>
+            <div className="flex items-center gap-2 text-white/70">
+              <CheckCircle2 className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-sm">Tasdiqlangan To'yxonalar</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70">
+              <Clock className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-sm">24/7 Qo'llab-quvvatlash</span>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Statistics Section */}
-        <section className="pt-16 sm:pt-32 pb-8 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+            <div className="w-1 h-2 bg-[#D4AF37] rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Statistics Section */}
+      <section className="relative py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map((stat, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-600 mb-2">{stat.value}</h3>
-                <p className="text-gray-600 text-sm sm:text-base">{stat.label}</p>
+              <div 
+                key={index} 
+                className="text-center group"
+              >
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#1E3A5F]/5 flex items-center justify-center
+                              group-hover:bg-[#1E3A5F] transition-all duration-300">
+                  <stat.icon className="w-7 h-7 text-[#D4AF37] group-hover:text-[#D4AF37]" />
+                </div>
+                <div className="text-3xl md:text-4xl font-semibold text-[#1E3A5F] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  {stat.number}
+                </div>
+                <div className="text-gray-500 text-sm tracking-wide">
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Services Section */}
-        <section className="py-8 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm font-medium uppercase tracking-wider mb-3">
-              O'z tanlashingizga qarab
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800">
-              Bizning <span className="text-[#2e82ff]">Xizmatlarimiz</span>
+      {/* Services Section */}
+      <section id="services" className="py-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 px-4 py-2 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+              <span className="text-[#D4AF37] text-sm font-medium">Bizning Xizmatlarimiz</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-[#1E3A5F] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Nima uchun <span className="text-[#D4AF37]">WeddingVenue</span>?
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
-              To'yingizni mukammal qilish uchun zarur bo'lgan barcha xizmatlarni bir joydan toping.
+            <p className="text-gray-600 text-lg leading-relaxed">
+              Biz sizga eng yaxshi xizmatni taqdim etish uchun har bir tafsilotga e'tibor beramiz
             </p>
           </div>
 
-          <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((item, i) => (
-              <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition">
-                <div
-                  className={`bg-gradient-to-r ${item.color} h-2 w-full transform origin-left transition-all duration-300 group-hover:h-3`}
-                />
-                <div className="p-4 sm:p-6">
-                  <div className="text-3xl sm:text-4xl mb-4 transform transition group-hover:scale-110">
-                    {item.icon}
+          {/* Services Grid */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <div 
+                key={index}
+                className="group bg-white rounded-3xl p-8 shadow-lg shadow-gray-100/50 border border-gray-100
+                          hover:shadow-xl hover:shadow-[#D4AF37]/10 hover:border-[#D4AF37]/20 
+                          transition-all duration-500"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A5F] to-[#2d4a6f] 
+                              flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <service.icon className="w-6 h-6 text-[#D4AF37]" />
+                </div>
+                
+                <h3 className="text-xl font-semibold text-[#1E3A5F] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  {service.title}
+                </h3>
+                
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {service.description}
+                </p>
+                
+                <ul className="space-y-2">
+                  {service.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
+                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-24 bg-[#1E3A5F]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
+              <Heart className="w-4 h-4 text-[#D4AF37]" />
+              <span className="text-[#D4AF37] text-sm font-medium">Mijozlar Fikrlari</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Baxtli <span className="text-[#D4AF37]">Juftliklar</span>
+            </h2>
+            <p className="text-white/70 text-lg leading-relaxed">
+              Minglab oilalar bizga ishonib, unutilmas to'y marosimlarini o'tkazishdi
+            </p>
+          </div>
+
+          {/* Testimonials Grid */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index}
+                className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10
+                          hover:bg-white/10 transition-all duration-300"
+              >
+                <Quote className="w-10 h-10 text-[#D4AF37]/50 mb-4" />
+                
+                <p className="text-white/90 text-lg leading-relaxed mb-6">
+                  "{testimonial.text}"
+                </p>
+                
+                <div className="flex items-center gap-4">
+                  <img 
+                    src={testimonial.image} 
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-[#D4AF37]"
+                  />
+                  <div>
+                    <div className="text-white font-medium">{testimonial.name}</div>
+                    <div className="text-white/50 text-sm">{testimonial.date}</div>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 group-hover:text-[#2e82ff] transition">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm sm:text-base">{item.desc}</p>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <Link
-                      to={`/services/${item.title.toLowerCase().replace(/\s+/g, "-")}`}
-                      className="text-[#2e82ff] font-medium flex items-center group-hover:translate-x-2 transition-transform text-sm sm:text-base"
-                    >
-                      Batafsil
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
+                  <div className="ml-auto flex gap-1">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" />
+                    ))}
                   </div>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-8 sm:mt-12 text-center">
+      {/* CTA Section */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#1E3A5F]/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+
+        <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 px-4 py-2 rounded-full mb-6">
+            <Crown className="w-4 h-4 text-[#D4AF37]" />
+            <span className="text-[#D4AF37] text-sm font-medium">Hoziroq Boshlang</span>
+          </div>
+          
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-[#1E3A5F] mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Orzuyingizdagi to'yxonani <br/>
+            <span className="text-[#D4AF37]">bugun toping</span>
+          </h2>
+          
+          <p className="text-gray-600 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+            10,000+ baxtli juftliklarga qo'shiling va o'zingizning maxsus kuningizni 
+            eng yaxshi to'yxonada nishonlang
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/services"
-              className="inline-block bg-[#2e82ff] text-white py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-md hover:shadow-lg"
+              to="/home"
+              className="group inline-flex items-center justify-center gap-3 bg-[#1E3A5F] text-white 
+                       px-8 py-4 rounded-full font-medium text-lg hover:bg-[#2d4a6f] 
+                       transition-all duration-300 shadow-xl shadow-[#1E3A5F]/20"
             >
-              Barcha xizmatlarni ko'rish
+              To'yxonalarni ko'rish
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center justify-center gap-3 bg-[#D4AF37] text-white 
+                       px-8 py-4 rounded-full font-medium text-lg hover:bg-[#c49a2c] 
+                       transition-all duration-300 shadow-xl shadow-[#D4AF37]/20"
+            >
+              Ro'yxatdan o'tish
             </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* How It Works Section */}
-        <section className="bg-gray-50 py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12 sm:mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm font-medium uppercase tracking-wider mb-3">
-                To'y rejasi
-              </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800">
-                Qanday <span className="text-[#2e82ff]">ishlaydi</span>
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
-                To'rt oddiy qadamda to'yingizni rejalashtiring va mukammal to'y marosimiga ega bo'ling.
+      {/* Elegant Footer */}
+      <footer className="bg-[#1E3A5F] pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          {/* Footer Top */}
+          <div className="grid md:grid-cols-4 gap-12 pb-12 border-b border-white/10">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <Link to="/" className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-[#D4AF37] rounded-full flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-semibold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Wedding<span className="text-[#D4AF37]">Venue</span>
+                </span>
+              </Link>
+              <p className="text-white/60 text-sm leading-relaxed">
+                O'zbekistonning eng yaxshi to'yxona xizmati. 
+                Sizning maxsus kuningizni unutilmas qilish bizning vazifamiz.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-              {steps.map((step, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-md p-4 sm:p-6 relative">
-                  <div className="absolute -top-4 left-4 sm:left-6 bg-[#2e82ff] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
-                    {step.number}
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 mt-2">{step.title}</h3>
-                  <p className="text-gray-600 text-sm sm:text-base">{step.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Advantages Section */}
-        <section className="bg-white py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12 sm:mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm font-medium uppercase tracking-wider mb-3">
-                Afzalliklar
-              </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-gray-800">
-                Nega <span className="text-[#2e82ff]">aynan biz?</span>
-              </h2>
-            </div>
-
-            <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2">
-              {[
-                {
-                  icon: "⚡️",
-                  title: "Tezkor va oson band qilish",
-                  desc: "Bir necha daqiqada to'yxonani tanlang va band qiling.",
-                },
-                {
-                  icon: "🛡️",
-                  title: "Sifatli xizmatlar kafolati",
-                  desc: "Eng sifatli to'yxonalar bilan hamkorlik qilamiz.",
-                },
-                {
-                  icon: "💰",
-                  title: "To'liq narxlar va tafsilotlar",
-                  desc: "Hech qanday yashirin to'lovlar yo'q.",
-                },
-                {
-                  icon: "📱",
-                  title: "Mobil va web ilova orqali boshqaruv",
-                  desc: "To'y tashkilotchiligini istalgan qurilmadan boshqaring.",
-                },
-                {
-                  icon: "🔍",
-                  title: "Keng tanlash imkoniyati",
-                  desc: "Turli narx toifalaridagi yuzlab to'yxonalar.",
-                },
-                {
-                  icon: "💌",
-                  title: "24/7 qo'llab-quvvatlash",
-                  desc: "Savollaringizga tez va aniq javob olish imkoniyati.",
-                },
-              ].map((item, index) => (
-                <div key={index} className="flex p-4 sm:p-6 bg-gray-50 rounded-xl hover:bg-blue-50 transition">
-                  <div className="text-2xl sm:text-3xl mr-4">{item.icon}</div>
-                  <div>
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">{item.title}</h3>
-                    <p className="text-gray-600 text-sm sm:text-base">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section className="bg-gradient-to-br from-blue-500 to-blue-700 text-white py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12 sm:mb-16">
-              <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium uppercase tracking-wider mb-3">
-                Mijozlar fikrlari
-              </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Baxtli juftliklar biz haqimizda</h2>
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-white font-medium mb-6">Havolalar</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link to="/" className="text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    Bosh sahifa
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/home" className="text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    To'yxonalar
+                  </Link>
+                </li>
+                <li>
+                  <a href="#services" className="text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    Xizmatlar
+                  </a>
+                </li>
+                <li>
+                  <a href="#testimonials" className="text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    Fikrlar
+                  </a>
+                </li>
+              </ul>
             </div>
 
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8">
-                <div className="flex flex-col md:flex-row items-center text-center md:text-left">
-                  <div className="mb-6 md:mb-0 md:mr-8">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-white/30 mx-auto md:mx-0">
-                      <img
-                        src={testimonials[activeTestimonial].image || "/placeholder-couple.jpg"}
-                        alt={testimonials[activeTestimonial].name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => (e.target.src = "/placeholder-couple.jpg")}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={`text-lg sm:text-xl ${i < testimonials[activeTestimonial].rating ? "text-yellow-300" : "text-white/30"}`}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-lg sm:text-xl italic mb-4">"{testimonials[activeTestimonial].quote}"</p>
-                    <h3 className="text-base sm:text-lg font-medium">{testimonials[activeTestimonial].name}</h3>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-center mt-8 gap-2">
-                {testimonials.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveTestimonial(i)}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      activeTestimonial === i ? "bg-white w-8" : "bg-white/50"
-                    }`}
-                    aria-label={`Testimonial ${i + 1}`}
-                  />
-                ))}
-              </div>
-
-              <div className="flex justify-between mt-8 gap-4">
-                <button
-                  onClick={() => setActiveTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
-                  className="bg-white/10 hover:bg-white/20 rounded-full p-3 transition"
-                  aria-label="Oldingi sharh"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setActiveTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
-                  className="bg-white/10 hover:bg-white/20 rounded-full p-3 transition"
-                  aria-label="Keyingi sharh"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
-            <div className="relative px-6 py-12 sm:px-12 sm:py-16 lg:px-16 text-center">
-              <div className="absolute inset-0 opacity-10">
-                <svg width="100%" height="100%" viewBox="0 0 800 800">
-                  <defs>
-                    <pattern id="ring-pattern" patternUnits="userSpaceOnUse" width="40" height="40">
-                      <circle cx="20" cy="20" r="18" fill="none" stroke="white" strokeWidth="1" />
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#ring-pattern)" />
-                </svg>
-              </div>
-              <div className="relative z-10">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
-                  Mukammal to'y tajribasini hoziroq rejalashtiring!
-                </h2>
-                <p className="text-blue-100 text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
-                  O'zingizga va seviklingizga mos keladigan ajoyib to'y marosimini tashkil eting.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                  <Link
-                    to="/register"
-                    className="bg-white text-blue-600 hover:bg-blue-50 px-6 sm:px-8 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition w-full sm:w-auto text-center"
-                  >
+            {/* Account */}
+            <div>
+              <h4 className="text-white font-medium mb-6">Akkaunt</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link to="/login" className="text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    Kirish
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/signup" className="text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
                     Ro'yxatdan o'tish
                   </Link>
-                  <Link
-                    to="/contact"
-                    className="text-white hover:text-blue-100 px-6 sm:px-8 py-3 flex items-center justify-center w-full sm:w-auto"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
-                    </svg>
-                    Bog'lanish
-                  </Link>
-                </div>
-              </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-white font-medium mb-6">Aloqa</h4>
+              <ul className="space-y-3">
+                <li>
+                  <a href="tel:+998901234567" className="flex items-center gap-3 text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    <Phone className="w-4 h-4" />
+                    +998 90 123 45 67
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:info@weddingvenue.uz" className="flex items-center gap-3 text-white/60 hover:text-[#D4AF37] transition-colors text-sm">
+                    <Mail className="w-4 h-4" />
+                    info@weddingvenue.uz
+                  </a>
+                </li>
+                <li>
+                  <span className="flex items-center gap-3 text-white/60 text-sm">
+                    <MapPin className="w-4 h-4" />
+                    Toshkent, O'zbekiston
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
-        </section>
 
-        {/* Scroll to Top Button */}
-        {showScrollTop && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-[#2e82ff] text-white p-3 sm:p-4 rounded-full shadow-lg hover:bg-blue-700 transition z-30"
-            aria-label="Yuqoriga qaytish"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 sm:h-6 sm:w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-          </button>
-        )}
-      </main>
-    </>
+          {/* Footer Bottom */}
+          <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-white/40 text-sm">
+              © 2024 WeddingVenue. Barcha huquqlar himoyalangan.
+            </p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-white/40 hover:text-[#D4AF37] transition-colors text-sm">
+                Maxfiylik siyosati
+              </a>
+              <a href="#" className="text-white/40 hover:text-[#D4AF37] transition-colors text-sm">
+                Foydalanish shartlari
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 bg-[#D4AF37] text-white p-4 rounded-full 
+                   shadow-lg shadow-[#D4AF37]/30 hover:bg-[#c49a2c] transition-all duration-300 z-50"
+        >
+          <ChevronUp size={24} />
+        </button>
+      )}
+    </div>
   )
 }
 

@@ -210,7 +210,7 @@ const VenuesList = () => {
       if (sortBy) params.sort_by = sortBy;
       if (sortOrder) params.order = sortOrder;
 
-      const response = await axios.get("api/admin/view-all-venues", {
+      const response = await axios.get("/api/admin/view-all-venues", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -275,7 +275,7 @@ const VenuesList = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Autentifikatsiya tokeni topilmadi");
 
-      await axios.delete(`api/admin/delete-venue/${venueId}`, {
+      await axios.delete(`/api/admin/delete-venue/${venueId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -351,7 +351,7 @@ const VenuesList = () => {
       };
 
       const response = await axios.put(
-        `api/admin/update-venue/${selectedVenue.id}`,
+        `/api/admin/update-venue/${selectedVenue.id}`,
         updatedData,
         {
           headers: { Authorization: `Bearer ${token}` },

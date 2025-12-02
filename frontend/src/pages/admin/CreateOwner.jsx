@@ -78,7 +78,7 @@ const CreateOwner = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token topilmadi");
 
-      const response = await axios.post("api/admin/create-owner", payload, {
+      const response = await axios.post("/api/admin/create-owner", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
