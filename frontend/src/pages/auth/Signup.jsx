@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { gsap } from "gsap";
-import { motion } from "framer-motion";
 import {
   User,
   Lock,
@@ -39,6 +38,7 @@ function Signup() {
 
   const containerRef = useRef(null);
   const formRef = useRef(null);
+  const leftContentRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -54,6 +54,11 @@ function Signup() {
       gsap.fromTo(formRef.current,
         { opacity: 0, y: 50, scale: 0.95 },
         { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out", delay: 0.2 }
+      );
+
+      gsap.fromTo(leftContentRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.3 }
       );
 
       gsap.to(".gradient-bg", {
@@ -175,11 +180,7 @@ function Signup() {
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl floating-decor"></div>
           
           <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
+            <div ref={leftContentRef}>
               <div className="w-20 h-20 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-6">
                 <Crown className="w-10 h-10 text-white" />
               </div>
@@ -204,7 +205,7 @@ function Signup() {
                   <div className="text-white/60 text-xs">To'yxona qo'shish</div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 
