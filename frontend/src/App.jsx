@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import PublicRoute from "./components/PublicRoute";
 import MainLayout from "./layouts/MainLayout";
 import routes from "./routes";
-import Landing from "./pages/landing";
+import LandingEnhanced from "./pages/landing/LandingEnhanced";
 import Venues from "./pages/user/Venues";
 import VenueInfos from "./pages/user/FavoritesVenues";
 import UserBookings from "./pages/user/UserBookings";
@@ -21,7 +21,7 @@ function App() {
       {/* Umumiy (Public) yo'llar */}
         <Route element={<PublicRoute />}>
           {/* Landing page - o'zining navbar va footer bor, shuning uchun MainLayout'siz */}
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<LandingEnhanced />} />
           
           <Route element={<MainLayout />}>
             <Route path="/home" element={<Home />} />

@@ -78,7 +78,6 @@ const Favorites = () => {
 
       const response = await axios.get("/api/user/get-venues-user", {
         headers: { Authorization: `Bearer ${token}` },
-        params: { status: "tasdiqlangan" },
       });
 
       // Faqat sevimli IDlarga mos keladiganlarni filterlash
@@ -123,14 +122,14 @@ const Favorites = () => {
     // State dan o'chirish (animatsiya bilan)
     setVenues((prev) => prev.filter((venue) => venue.id !== venueId));
 
-    toast.success("💔 To'yxona sevimlilardan o'chirildi");
+    toast.success("To'yxona sevimlilardan o'chirildi");
   };
 
   // Barcha sevimlilarni tozalash
   const clearAllFavorites = () => {
     localStorage.setItem("favorites", JSON.stringify([]));
     setVenues([]);
-    toast.success("🗑️ Barcha sevimlilar tozalandi");
+    toast.success("Barcha sevimlilar tozalandi");
   };
 
   const goBack = () => {
@@ -139,17 +138,17 @@ const Favorites = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-200/20 rounded-full blur-xl"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-rose-200/30 rounded-full blur-xl"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-pink-100/40 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-10 w-28 h-28 bg-rose-100/50 rounded-full blur-xl"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-[#1E3A5F]/10 rounded-full blur-xl"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-[#D4AF37]/5 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-10 w-28 h-28 bg-[#1E3A5F]/5 rounded-full blur-xl"></div>
       </div>
 
       {/* Header Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 py-12">
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#1E3A5F] via-[#2d4a6f] to-[#1E3A5F] py-12">
         <div className="absolute inset-0 bg-white/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -170,15 +169,15 @@ const Favorites = () => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full">
-                    <Heart className="h-8 w-8 text-white fill-white" />
+                    <Heart className="h-8 w-8 text-[#D4AF37]" />
                   </div>
-                  <Sparkles className="w-5 h-5 text-white absolute -top-1 -right-1 animate-pulse" />
+                  <Sparkles className="w-5 h-5 text-[#D4AF37] absolute -top-1 -right-1 animate-pulse" />
                 </div>
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">
-                    💕 Sevimli To'yxonalar
+                  <h1 className="text-2xl md:text-3xl font-bold text-white" style={{fontFamily: "'Playfair Display', serif"}}>
+                    Sevimli To'yxonalar
                   </h1>
-                  <p className="text-pink-100 text-sm mt-1">
+                  <p className="text-white/80 text-sm mt-1">
                     Sizning tanlagan eng yaxshi to'yxonalar
                   </p>
                 </div>
@@ -204,7 +203,7 @@ const Favorites = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-6 shadow-lg"
+            className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-6 shadow-lg"
           >
             <div className="flex items-center gap-2">
               <span className="text-red-500">⚠️</span>
@@ -216,28 +215,28 @@ const Favorites = () => {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="relative">
-              <div className="h-20 w-20 rounded-full border-t-4 border-b-4 border-pink-400 animate-spin"></div>
+              <div className="h-20 w-20 rounded-full border-t-4 border-b-4 border-[#D4AF37] animate-spin"></div>
               <div
-                className="absolute top-0 left-0 h-20 w-20 rounded-full border-t-4 border-b-4 border-rose-300 animate-spin"
+                className="absolute top-0 left-0 h-20 w-20 rounded-full border-t-4 border-b-4 border-[#c49a2c] animate-spin"
                 style={{
                   animationDirection: "reverse",
                   animationDuration: "1.5s",
                 }}
               ></div>
-              <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-pink-500 fill-pink-500" />
+              <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-[#D4AF37] fill-[#D4AF37]" />
             </div>
             <div className="ml-4">
               <p className="text-lg font-medium text-gray-700">
                 Sevimlilar yuklanmoqda...
               </p>
               <div className="flex mt-2 space-x-1">
-                <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce"></div>
                 <div
-                  className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce"
                   style={{ animationDelay: "0.1s" }}
                 ></div>
                 <div
-                  className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce"
                   style={{ animationDelay: "0.2s" }}
                 ></div>
               </div>
@@ -251,15 +250,15 @@ const Favorites = () => {
             className="text-center py-20"
           >
             <div className="relative mb-6">
-              <div className="w-32 h-32 bg-gradient-to-br from-pink-100 to-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <HeartOff className="h-16 w-16 text-pink-300" />
+              <div className="w-32 h-32 bg-gradient-to-br from-[#D4AF37]/20 to-[#c49a2c]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <HeartOff className="h-16 w-16 text-[#D4AF37]" />
               </div>
               <div className="absolute top-0 right-1/2 transform translate-x-12 -translate-y-2">
-                <Sparkles className="h-6 w-6 text-pink-400 animate-pulse" />
+                <Sparkles className="h-6 w-6 text-[#D4AF37] animate-pulse" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-3">
-              💔 Sevimli to'yxonalar topilmadi
+            <h3 className="text-2xl font-bold text-gray-700 mb-3" style={{fontFamily: "'Playfair Display', serif"}}>
+              Sevimli to'yxonalar topilmadi
             </h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
               Hali birorta to'yxonani sevimli qilmagansiz. To'yxonalarni sevimli
@@ -269,7 +268,7 @@ const Favorites = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={goBack}
-              className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 mx-auto"
+              className="bg-gradient-to-r from-[#D4AF37] to-[#c49a2c] hover:from-[#c49a2c] hover:to-[#D4AF37] text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 mx-auto"
             >
               <Building className="h-5 w-5" />
               To'yxonalarni ko'rish
@@ -278,11 +277,11 @@ const Favorites = () => {
         ) : (
           <>
             {/* Stats Bar */}
-            <div className="mb-8 bg-white rounded-xl shadow-lg p-4 border border-pink-100">
+            <div className="mb-8 bg-white rounded-xl shadow-lg p-4 border border-gray-100">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-pink-500 fill-pink-500" />
+                    <Heart className="h-5 w-5 text-[#D4AF37] fill-[#D4AF37]" />
                     <span className="text-sm text-gray-600">
                       Sevimlilar:{" "}
                       <span className="font-semibold text-gray-800">
@@ -292,14 +291,14 @@ const Favorites = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                    <Star className="h-5 w-5 text-[#D4AF37] fill-[#D4AF37]" />
                     <span className="text-sm text-gray-600">
                       Tanlangan eng yaxshilari
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Crown className="h-4 w-4 text-pink-400" />
+                  <Crown className="h-4 w-4 text-[#D4AF37]" />
                   Premium tanlov
                 </div>
               </div>
@@ -318,11 +317,11 @@ const Favorites = () => {
                     variants={itemVariants}
                     layout
                     whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                    className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white relative group"
+                    className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-[#D4AF37]/30 bg-gradient-to-br from-gray-50 to-white relative group"
                   >
                     {/* Favorite Badge */}
                     <div className="absolute top-3 left-3 z-10">
-                      <div className="bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <div className="bg-gradient-to-r from-[#D4AF37] to-[#c49a2c] text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                         <Crown className="h-3 w-3" />
                         Sevimli
                       </div>
@@ -336,12 +335,12 @@ const Favorites = () => {
                       whileTap={{ scale: 0.95 }}
                       aria-label="Remove from favorites"
                     >
-                      <Heart className="h-5 w-5 fill-pink-500 text-pink-500 hover:fill-red-500 hover:text-red-500 transition-colors" />
+                      <Heart className="h-5 w-5 fill-[#D4AF37] text-[#D4AF37] hover:fill-red-500 hover:text-red-500 transition-colors" />
                     </motion.button>
 
                     {/* Image Section */}
                     {venue.images && venue.images.length > 0 ? (
-                      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
+                      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                         <img
                           src={fixImageUrl(venue.images[0])}
                           alt={venue.name}
@@ -354,10 +353,10 @@ const Favorites = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="h-48 bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
+                      <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                         <div className="text-center">
-                          <ImageIcon className="h-12 w-12 text-pink-300 mx-auto mb-2" />
-                          <p className="text-sm text-pink-400">
+                          <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-400">
                             Rasm mavjud emas
                           </p>
                         </div>
@@ -378,24 +377,23 @@ const Favorites = () => {
 
                       <div className="space-y-3 text-sm">
                         <div className="flex items-center gap-2 text-gray-600">
-                          <Phone className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                          <Phone className="h-4 w-4 text-[#D4AF37] flex-shrink-0" />
                           <span className="truncate">{venue.phone_number}</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600">
-                          <Users className="h-4 w-4 text-rose-500 flex-shrink-0" />
-                          <span>👥 Sig'im: {venue.capacity} kishi</span>
+                          <Users className="h-4 w-4 text-[#D4AF37] flex-shrink-0" />
+                          <span>Sig'im: {venue.capacity} kishi</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600">
-                          <DollarSign className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                          <DollarSign className="h-4 w-4 text-[#D4AF37] flex-shrink-0" />
                           <span className="font-semibold text-gray-800">
-                            💰{" "}
                             {Number(venue.price_seat).toLocaleString("uz-UZ")}{" "}
                             so'm
                           </span>
                         </div>
                         {venue.address && (
                           <div className="flex items-center gap-2 text-gray-600">
-                            <MapPin className="h-4 w-4 text-rose-500 flex-shrink-0" />
+                            <MapPin className="h-4 w-4 text-[#D4AF37] flex-shrink-0" />
                             <span className="truncate text-xs">
                               {venue.address}
                             </span>
@@ -407,7 +405,7 @@ const Favorites = () => {
                       {venue.images && venue.images.length > 1 && (
                         <div className="mt-4">
                           <div className="flex items-center gap-2 mb-2">
-                            <Eye className="h-4 w-4 text-pink-500" />
+                            <Eye className="h-4 w-4 text-[#D4AF37]" />
                             <span className="text-xs text-gray-600">
                               Qo'shimcha rasmlar
                             </span>
@@ -416,7 +414,7 @@ const Favorites = () => {
                             {venue.images.slice(1, 4).map((image, imgIndex) => (
                               <div
                                 key={imgIndex}
-                                className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100 border border-pink-200"
+                                className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-200"
                               >
                                 <img
                                   src={fixImageUrl(image)}
@@ -430,14 +428,14 @@ const Favorites = () => {
                       )}
 
                       {/* Action Buttons */}
-                      <div className="mt-4 pt-3 border-t border-pink-100 flex gap-2">
-                        <button className="flex-1 bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-2 px-3 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-sm font-medium">
+                      <div className="mt-4 pt-3 border-t border-gray-100 flex gap-2">
+                        <button className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#c49a2c] hover:from-[#c49a2c] hover:to-[#D4AF37] text-white py-2 px-3 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 text-sm font-medium">
                           <Calendar className="h-4 w-4" />
                           Bron qilish
                         </button>
                         <button
                           onClick={() => removeFavorite(venue.id)}
-                          className="bg-gradient-to-r from-red-400 to-pink-400 hover:from-red-500 hover:to-pink-500 text-white p-2 rounded-lg transition-all duration-300 transform hover:scale-105"
+                          className="bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white p-2 rounded-lg transition-all duration-300 transform hover:scale-105"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

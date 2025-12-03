@@ -140,7 +140,7 @@ const Sidebar = () => {
               ref={refs.setFloating}
               style={floatingStyles}
               {...getFloatingProps()}
-              className="bg-gradient-to-r from-pink-600 to-rose-600 text-white text-sm px-3 py-1.5 rounded-lg shadow-xl z-50"
+              className="bg-gradient-to-r from-[#1E3A5F] to-[#2d4a6f] text-white text-sm px-3 py-1.5 rounded-lg shadow-xl z-50 border border-[#D4AF37]/20"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
@@ -337,8 +337,8 @@ const Sidebar = () => {
                       <button
                         className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                           activeSubmenu === item.submenuName || hasActivePath(item.items)
-                            ? "bg-pink-100 text-pink-600"
-                            : "hover:bg-pink-50 text-gray-700"
+                            ? "bg-[#D4AF37]/10 text-[#D4AF37]"
+                            : "hover:bg-gray-50 text-gray-700"
                         } ${!isOpen ? "justify-center" : ""}`}
                         onClick={() => isOpen && toggleSubmenu(item.submenuName)}
                       >
@@ -352,9 +352,9 @@ const Sidebar = () => {
                               <span
                                 className={`${
                                   activeSubmenu === item.submenuName || hasActivePath(item.items)
-                                    ? "text-pink-600"
+                                    ? "text-[#D4AF37]"
                                     : "text-gray-500"
-                                } p-2 rounded-full hover:bg-pink-50`}
+                                } p-2 rounded-full hover:bg-[#D4AF37]/10`}
                               >
                                 {item.icon}
                               </span>
@@ -363,7 +363,7 @@ const Sidebar = () => {
                             <span
                               className={`${
                                 activeSubmenu === item.submenuName || hasActivePath(item.items)
-                                  ? "text-pink-600"
+                                  ? "text-[#D4AF37]"
                                   : "text-gray-500"
                               }`}
                             >
@@ -406,12 +406,12 @@ const Sidebar = () => {
                                     to={subItem.path}
                                     className={`flex items-center p-2 pl-6 rounded-lg transition-colors ${
                                       isActivePath(subItem.path)
-                                        ? "bg-pink-100 text-pink-600"
-                                        : "hover:bg-pink-50 text-gray-600"
+                                        ? "bg-[#D4AF37]/10 text-[#D4AF37]"
+                                        : "hover:bg-gray-50 text-gray-600"
                                     }`}
                                     onClick={() => isMobile && setIsOpen(false)}
                                   >
-                                    <span className="text-pink-400 mr-2">{subItem.icon}</span>
+                                    <span className="text-[#D4AF37] mr-2">{subItem.icon}</span>
                                     <span>{subItem.title}</span>
                                   </Link>
                                 </motion.li>
@@ -425,7 +425,7 @@ const Sidebar = () => {
                     <Link
                       to={item.path}
                       className={`flex items-center p-3 rounded-lg transition-colors ${
-                        isActivePath(item.path) ? "bg-pink-100 text-pink-600" : "hover:bg-pink-50 text-gray-700"
+                        isActivePath(item.path) ? "bg-[#D4AF37]/10 text-[#D4AF37]" : "hover:bg-gray-50 text-gray-700"
                       } ${!isOpen ? "justify-center" : ""}`}
                       onClick={() => isMobile && setIsOpen(false)}
                     >
@@ -438,14 +438,14 @@ const Sidebar = () => {
                           <Tooltip label={item.title}>
                             <span
                               className={`${
-                                isActivePath(item.path) ? "text-pink-600" : "text-gray-500"
-                              } p-2 rounded-full hover:bg-pink-50`}
+                                isActivePath(item.path) ? "text-[#D4AF37]" : "text-gray-500"
+                              } p-2 rounded-full hover:bg-[#D4AF37]/10`}
                             >
                               {item.icon}
                             </span>
                           </Tooltip>
                         ) : (
-                          <span className={`${isActivePath(item.path) ? "text-pink-600" : "text-gray-500"}`}>
+                          <span className={`${isActivePath(item.path) ? "text-[#D4AF37]" : "text-gray-500"}`}>
                             {item.icon}
                           </span>
                         )}
